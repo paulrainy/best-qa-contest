@@ -24,7 +24,7 @@ All future work in this repo is expected to be **written material**: task specif
 ## Key open questions (from base-chat.md)
 
 Before drafting new task material, check whether these have been resolved (e.g., in newer chat exports or jury communication) — they affect scope:
-1. What exactly is the **semifinal**? It's on the timeline but has no defined rules, and the math doesn't reconcile (10 advance from rating stage, but final slots suggest 3–4).
+1. ~~What exactly is the **semifinal**?~~ Resolved (organizers, 2026-09-23): 10 per nomination advance from the rating stage, all employees vote for them, and the top 3 go to the final. The jury has no task in the semifinal.
 2. Is there an **automation/load-testing sandbox environment** available? This gates whether specialization tracks for automation/load testing can be hands-on or must be reduced to code/report review exercises.
 3. **Who scores submissions** — testers/jury experts, or non-expert organizers? This determines whether tasks must be scorable against a fixed answer key (no expert judgment required) or can rely on rubric-based expert review.
 
