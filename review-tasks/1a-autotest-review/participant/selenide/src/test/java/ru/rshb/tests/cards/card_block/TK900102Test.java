@@ -36,8 +36,8 @@ public class TK900102Test extends CardsHelper {
         selenideSetUp();
         open(stand.getNewEfrApplicationUrl());
 
-        // =---> Предусловие: Выполнить вход в ЕФР
-        allureReport.messageWithConsole("Предусловие: Выполнить вход в ЕФР. rf_card_mng1");
+        // =---> Подготовка: вход в ЕФР
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 
@@ -49,8 +49,8 @@ public class TK900102Test extends CardsHelper {
         setCashLimit("Шаг 2: Установить лимит на снятие наличных 50 000 ₽", cardPage, "50000");
         Thread.sleep(5000);
 
-        // =---> Шаг 3: Лимит сохранён
-        allureReport.messageWithConsole("Шаг 3: Лимит сохранён, отображается сообщение 'Лимит изменён'");
+        // =---> Шаг 2: Лимит сохранён
+        allureReport.messageWithConsole("Шаг 2: Лимит сохранён, отображается сообщение 'Лимит изменён'");
         assertTrue($x(cardPage.cashLimitInputXpath).getValue().equals("50 000"));
         allureReport.screenshot("Сообщение 'Лимит изменён'");
     }

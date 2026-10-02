@@ -1,0 +1,8 @@
+# Стенды ЕФР. В песочнице оба тестовых стенда — локальная заглушка ЕФР.
+# Стенд для запуска выбирается переменной env.name (по умолчанию test3, см. pom.xml).
+test2:
+  newEfrApplicationUrl: http://localhost:18080/efr/
+  efrApiUrl: http://localhost:18080/efr/api/
+test3:
+  newEfrApplicationUrl: http://localhost:18080/efr/
+  efrApiUrl: http://localhost:18080/efr/api/

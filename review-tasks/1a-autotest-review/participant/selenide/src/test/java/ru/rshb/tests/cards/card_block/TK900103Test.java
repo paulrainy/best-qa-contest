@@ -26,10 +26,10 @@ public class TK900103Test extends CardsHelper {
         webUser.get("rf_card_mng1", "web_users.yaml");     // Клиентский менеджер
 
         selenideSetUp();
-        open("https://efr-test2.bank.local/efr/");
+        open("http://localhost:18080/efr/");
 
-        // =---> Предусловие: Выполнить вход в ЕФР
-        allureReport.messageWithConsole("Предусловие: Выполнить вход в ЕФР. rf_card_mng1");
+        // =---> Подготовка: вход в ЕФР
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 

@@ -38,8 +38,8 @@ public class TK900106Test extends CardsHelper {
         selenideSetUp();
         open(stand.getNewEfrApplicationUrl());
 
-        // =---> Предусловие: Выполнить вход в ЕФР
-        allureReport.messageWithConsole("Предусловие: Выполнить вход в ЕФР. rf_card_mng1");
+        // =---> Подготовка: вход в ЕФР
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 
