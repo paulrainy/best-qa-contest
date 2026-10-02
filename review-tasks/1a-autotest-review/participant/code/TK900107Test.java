@@ -42,8 +42,8 @@ public class TK900107Test extends CardsHelper {
         Configuration.timeout = 60000;      // Реквизиты на стенде грузятся медленно
         open(stand.getNewEfrApplicationUrl());
 
-        // =---> Предусловие: Выполнить вход в ЕФР
-        allureReport.messageWithConsole("Предусловие: Выполнить вход в ЕФР. rf_m_oper4");
+        // =---> Подготовка: вход в ЕФР
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_m_oper4");
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 

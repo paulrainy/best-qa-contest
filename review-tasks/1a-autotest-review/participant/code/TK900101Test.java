@@ -34,24 +34,24 @@ public class TK900101Test extends CardsHelper {
         selenideSetUp();
         open(stand.getNewEfrApplicationUrl());
 
-        // =---> Предусловие: Выполнить вход в ЕФР
-        allureReport.messageWithConsole("Предусловие: Выполнить вход в ЕФР. rf_card_mng1");
+        // =---> Подготовка: вход в ЕФР
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 
-        // =---> Шаги 1-2: Найти клиента, открыть карту
-        CardProfilePage cardPage = openCard("Шаги 1-2: Найти клиента и открыть карту", searchPage,
+        // =---> Шаг 1: Найти клиента, открыть карту
+        CardProfilePage cardPage = openCard("Шаг 1: Найти клиента и открыть карту", searchPage,
                 efrClient.getPassportSeries(), efrClient.getPassportNumber(), cardNumber);
-        checkCardStatus("Шаг 2: Статус карты 'Активна'", cardPage, "Активна");
+        checkCardStatus("Шаг 1: Статус карты 'Активна'", cardPage, "Активна");
 
-        // =---> Шаг 3: Заблокировать карту
-        blockCard("Шаг 3: Заблокировать карту с причиной 'Утеря'", cardPage, "Утеря");
-        checkCardStatus("Шаг 3: Статус карты 'Заблокирована'", cardPage, "Заблокирована");
-        checkButtonDisplayed("Шаг 3: Отображается кнопка 'Разблокировать'", "Разблокировать");
+        // =---> Шаг 2: Заблокировать карту
+        blockCard("Шаг 2: Заблокировать карту с причиной 'Утеря'", cardPage, "Утеря");
+        checkCardStatus("Шаг 2: Статус карты 'Заблокирована'", cardPage, "Заблокирована");
+        checkButtonDisplayed("Шаг 2: Отображается кнопка 'Разблокировать'", "Разблокировать");
         blockedCardClient = efrClient;
         blockedCardNumber = cardNumber;
 
-        // =---> Шаг 4: Запись в истории
-        checkHistoryRecord("Шаг 4: В истории есть запись 'Блокировка карты'", cardPage, "Блокировка карты");
+        // =---> Шаг 3: Запись в истории
+        checkHistoryRecord("Шаг 3: В истории есть запись 'Блокировка карты'", cardPage, "Блокировка карты");
     }
 }
