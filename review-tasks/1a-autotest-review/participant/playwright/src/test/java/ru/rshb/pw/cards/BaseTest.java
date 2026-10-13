@@ -32,7 +32,7 @@ public abstract class BaseTest {
     @BeforeAll
     static void launchBrowser() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(Config.headless()));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(Config.headless()).setExecutablePath(Config.browserPath()));
     }
 
     @AfterAll

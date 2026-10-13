@@ -1,0 +1,12 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="РКО ФЛ: текущий счёт" verbose="1">
+    <test name="rko_fl">
+        <classes>
+            <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.OpenCurrentAccountTest"/>
+            <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.CashDepositToCurrentAccountTest"/>
+            <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.ArrestOnCurrentAccountTest"/>
+            <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.CloseCurrentAccountTest"/>
+            <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.OpenAccountWithExpiredDocTest"/>
+        </classes>
+    </test>
+</suite>
