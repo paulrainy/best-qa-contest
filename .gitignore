@@ -6,9 +6,8 @@ venv
 *.zip
 target/
 *.iml
-# Всё, что песочницы скачивают при запуске: библиотеки Maven, настройки Maven, драйвер Chrome, Allure
+# Всё, что песочницы скачивают при запуске: библиотеки Maven, драйвер Chrome, Allure
 .m2/
-.mvn/
 .selenium/
 .allure/
 help-docs/
