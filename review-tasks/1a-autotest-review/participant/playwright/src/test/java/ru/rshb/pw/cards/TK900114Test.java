@@ -24,6 +24,6 @@ class TK900114Test extends BaseTest {
         // Шаг 2: открыть вкладку «Реквизиты»
         cardPage.openTab("Реквизиты");
         assertTrue(cardPage.isCardNumberMasked());
-        assertThat(page.getByText(cardInfo.holderName())).isVisible();
+        assertThat(page.getByText(cardInfo.holderName()).first()).isVisible();
     }
 }
