@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Кабинет инвестора</title>
+  <link rel="stylesheet" href="/cabinet/app.css">
+</head>
+<body>
+<header id="header" hidden>
+  <span class="logo">Кабинет инвестора</span>
+  <nav>
+    <a href="#/agreements">Договоры</a>
+    <a href="#/tax-reports">Справки</a>
+    <a href="#/profile">Профиль</a>
+  </nav>
+  <span class="user" data-testid="client-name"></span>
+  <button type="button" class="link" id="logout">Выйти</button>
+</header>
+<div id="notice" role="alert" hidden></div>
+<main id="app"></main>
+<script src="/cabinet/app.js"></script>
+</body>
+</html>
