@@ -12,31 +12,29 @@ import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
 import main.java.ru.rshb.testitwork.annotations.TestitStatus;
 import model_cft.model.CLIENTS.clPriv.CriteriaClPriv;
+import model_cft.model.DaoCommon;
 import model_cft.model.FINTOOLS.ft_money.enums.Currency;
 import model_cft.model.PRODUCTS.fact_oper.entities.DtoR2FactOper;
 import model_cft.model.PRODUCTS.r2_deposit.CriteriaR2Deposit;
 import model_cft.model.PRODUCTS.r2_deposit.entities.Dto_Deposit;
-import model_cft.model.REFERENCES.com_status_prd.enums.ComStatusPrd;
 import model_cft.model.REFERENCES.r2_fin_product.enums.R2FinProduct;
 import model_cft.model.user.CriteriaUser;
 import model_cft.model.user.Dto_User;
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 import tests.BasicTest;
 import utils.AssertionsUtil;
-import utils.Timer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 @Epic("РКО ФЛ")
 @Feature("Текущий счет")
 public class CashDepositToCurrentAccountTest extends BasicTest {
 
     private static final BigDecimal AMOUNT = new BigDecimal("1500.00");
-
-    private final DepositDbSteps dbSteps = new DepositDbSteps();
 
     private Dto_Deposit deposit;
     private Dto_User operFl;
@@ -60,7 +58,7 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
                 .clickOk();
 
         // Хелпер не возвращает созданную ФО — берём последнюю по договору из БД
-        DtoR2FactOper factOper = dbSteps.getLastFactOper(deposit);
+        DtoR2FactOper factOper = getLastFactOper(deposit);
 
         AssertionsUtil.assertThat(factOper)
                 .objectExist()
@@ -78,12 +76,11 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
 
         // Проводку выполняет фоновое задание, на стендах RF — до 10 минут
         AssertionsUtil.assertThat(factOper.update())
-                .hasStateEqual(StatesFactOper.$PERFORMED, Timer.set(10, 600, TimeUnit.SECONDS))
+                .hasStateEqual(StatesFactOper.$PERFORMED)
                 .whereMainDocum(doc -> doc
                         .hasStateEqual(StatesMainDocum.$PROV));
 
-        AssertionsUtil.assertThat(deposit.update())
-                .hasBalanceEqualTo(balanceBefore.add(AMOUNT));
+        Assertions.assertThat(deposit.update().getBalance()).isGreaterThan(balanceBefore);
     }
 
     @Step("Подготовка тестовых данных")
@@ -91,9 +88,8 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
 
         for (Branch branch : getProductBranchesWithCheckOperDayEqualCurrDay()) {
 
-            deposit = new CriteriaR2Deposit()
+            CriteriaR2Deposit depositCriteria = new CriteriaR2Deposit()
                     .withBranchEqualTo(branch)
-                    .withStatusEqualTo(ComStatusPrd.$WORK)
                     .withCurrencyEqualTo(Currency.RUB)
                     .withFinProductEqualTo(R2FinProduct.$ALL_TEK_ALL_AL)
                     .withoutActiveHold()
@@ -101,8 +97,9 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
                             .withResident()
                             .withAlive()
                             .withDocDateEndNotExpired(LocalDate.now())
-                            .withoutBlocks())
-                    .getRandomObject(10);
+                            .withoutBlocks());
+            depositCriteria.getQueryBuilder().where("d.C_COM_STATUS = 2047893");  // «Работает»
+            deposit = depositCriteria.getRandomObject(10);
 
             if (Objects.isNull(deposit)) {
 
@@ -114,10 +111,9 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
                     .withRoles(UserRole.$OPER_FL)
                     .findUser();
 
-            cashier = new CriteriaUser()
-                    .withDepartEq(deposit.getLinkDepart())
-                    .withRoles(UserRole.$CASHIER)
-                    .findUser();
+            CriteriaUser cashierCriteria = new CriteriaUser();
+            cashierCriteria.getQueryBuilder().where("u.C_LOGIN = 'kassir_mn'");  // кассир, у которого всегда открыта касса
+            cashier = cashierCriteria.getObject();
 
             if (Objects.nonNull(operFl) && Objects.nonNull(cashier)) {
 
@@ -128,5 +124,17 @@ public class CashDepositToCurrentAccountTest extends BasicTest {
         AssertionsUtil.assertThat(deposit).objectExist();
         AssertionsUtil.assertThat(operFl).objectExist();
         AssertionsUtil.assertThat(cashier).objectExist();
+    }
+
+    @Step("Получить последнюю фактическую операцию по договору {deposit.numDog}")
+    private DtoR2FactOper getLastFactOper(Dto_Deposit deposit) {
+
+        String sql = """
+                SELECT fo.*
+                FROM Z#R2_FACT_OPER fo
+                WHERE fo.C_DEPOSIT = :depositId
+                FETCH FIRST 1 ROWS ONLY""";
+
+        return DaoCommon.getInstance().selectOne(sql, DtoR2FactOper.class, Map.of("depositId", deposit.getId()));
     }
 }

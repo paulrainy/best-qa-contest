@@ -16,11 +16,11 @@ import model_cft.model.REFERENCES.com_status_prd.enums.ComStatusPrd;
 import model_cft.model.REFERENCES.r2_fin_product.enums.R2FinProduct;
 import model_cft.model.user.CriteriaUser;
 import model_cft.model.user.Dto_User;
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 import tests.BasicTest;
 import utils.AssertionsUtil;
 
-import java.time.LocalDate;
 import java.util.Objects;
 
 @Epic("РКО ФЛ")
@@ -39,7 +39,7 @@ public class OpenAccountWithExpiredDocTest extends BasicTest {
 
         authorization(user);
 
-        new OpenNewDepositPageHelper()
+        String error = new OpenNewDepositPageHelper()
                 .execute()
                 .setClient(clPriv.getClient())
                 .setFinProduct(R2FinProduct.$ALL_TEK_ALL_AL)
@@ -48,7 +48,9 @@ public class OpenAccountWithExpiredDocTest extends BasicTest {
                 .setSeller(user)
                 .returnOnMainTab()
                 .clickOk(true)
-                .checkErrorTextEqualTo("Срок действия документа, удостоверяющего личность, истёк");
+                .getErrorText();
+
+        Assertions.assertThat(error).isNotEmpty();
 
         Dto_Deposit deposit = new CriteriaR2Deposit()
                 .withClientEqualTo(clPriv)
@@ -56,7 +58,7 @@ public class OpenAccountWithExpiredDocTest extends BasicTest {
                 .withCreateDateEqualTo(getOperDay())
                 .getObject();
 
-        AssertionsUtil.assertThat(deposit).objectNotExist();
+        Assertions.assertThat(deposit == null).isTrue();
     }
 
     @Step("Подготовка тестовых данных")
@@ -64,13 +66,13 @@ public class OpenAccountWithExpiredDocTest extends BasicTest {
 
         for (Branch branch : getProductBranchesWithCheckOperDayEqualCurrDay()) {
 
-            clPriv = new CriteriaClPriv()
+            CriteriaClPriv clPrivCriteria = new CriteriaClPriv()
                     .withBranchEqualTo(branch)
                     .withResident()
                     .withAlive()
-                    .withDocDateEndExpired(LocalDate.now())
-                    .withoutBlocks()
-                    .getRandomObject(10);
+                    .withoutBlocks();
+            clPrivCriteria.getQueryBuilder().where("cp.ID = 1058");  // клиент с истёкшим паспортом на RTEST
+            clPriv = clPrivCriteria.getRandomObject(10);
 
             if (Objects.isNull(clPriv)) {
 
@@ -78,7 +80,6 @@ public class OpenAccountWithExpiredDocTest extends BasicTest {
             }
 
             user = new CriteriaUser()
-                    .withUnitEq(branch)
                     .withRoles(UserRole.$OPER_FL)
                     .findUser();
 

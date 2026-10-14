@@ -102,19 +102,6 @@ public class CriteriaClPriv extends ParametersBuilderBasic<DtoClPriv> {
     }
 
     /**
-     * У клиента нет исполнительных производств.
-     */
-    public CriteriaClPriv withoutExecutoryProcess() {
-
-        queryBuilder.where("""
-                cp.ID NOT IN (SELECT ep.C_CLIENT
-                              FROM Z#EXECUTORY_PROCESS ep)""");
-        addParameter("Исполнительные производства", "нет");
-
-        return this;
-    }
-
-    /**
      * У клиента заполнена форма CRS.
      */
     public CriteriaClPriv withCrs() {
@@ -125,22 +112,6 @@ public class CriteriaClPriv extends ParametersBuilderBasic<DtoClPriv> {
                         WHERE f.C_CLIENT = cp.ID
                           AND f.C_CRS_STATUS IS NOT NULL)""");
         addParameter("Форма CRS", "есть");
-
-        return this;
-    }
-
-    /**
-     * У клиента есть действующая форма FATCA.
-     */
-    public CriteriaClPriv withFatca() {
-
-        queryBuilder.where("""
-                EXISTS (SELECT 1
-                        FROM Z#SHB_FORMA_FATCA f
-                        WHERE f.C_CLIENT = cp.ID
-                          AND f.C_DATE_END IS NULL
-                           OR f.C_DATE_END >= DATE '%s')""".formatted(LocalDate.now()));
-        addParameter("Форма FATCA", "действует");
 
         return this;
     }

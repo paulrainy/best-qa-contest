@@ -23,10 +23,11 @@ final class CftDb {
 
     final Stand stand;
     private final Connection connection;
-    private final AtomicLong ids = new AtomicLong(1000);
+    private final AtomicLong ids;
 
     CftDb(Stand stand) throws SQLException {
         this.stand = stand;
+        this.ids = new AtomicLong(stand.idSequenceStart());
         this.connection = DriverManager.getConnection(stand.localJdbcUrl(), "sa", "");
     }
 
