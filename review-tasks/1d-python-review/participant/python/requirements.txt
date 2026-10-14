@@ -1,0 +1,8 @@
+pytest==9.1.1
+pytest-xdist==3.8.0
+requests==2.34.2
+PyHamcrest==2.1.0
+retrying==1.4.2
+allure-pytest==2.16.2
+pytest-playwright==0.10.0
+playwright==1.63.0
