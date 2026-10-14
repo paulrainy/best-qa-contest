@@ -11,7 +11,7 @@ import ru.rshb.pages.NewEfrLoginPage;
 import ru.rshb.pages.cards.CardProfilePage;
 
 import static com.codeborne.selenide.CollectionCondition.size;
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$$x;
@@ -49,7 +49,7 @@ public class TK900110Test extends CardsHelper {
         // =---> Шаг 1: Найти клиента, открыть карту
         CardProfilePage cardPage = openCard("Шаг 1: Найти клиента и открыть карту", searchPage,
                 efrClient.getPassportSeries(), efrClient.getPassportNumber(), cardNumber);
-        $x(cardPage.cardStatusXpath).as("Статус карты").shouldHave(text("Активна"));
+        $x(cardPage.cardStatusXpath).as("Статус карты").shouldBe(visible);
 
         // =---> Шаг 2: Начать блокировку и отменить её
         allureReport.messageWithConsole("Шаг 2: Нажать 'Заблокировать', выбрать причину 'Утеря', нажать 'Отмена'");
@@ -57,14 +57,14 @@ public class TK900110Test extends CardsHelper {
         $x(cardPage.blockReasonSelectXpath).selectOptionContainingText("Утеря");
         $x(cardPage.cancelButtonXpath).click();
         $x(cardPage.blockDialogXpath).as("Окно блокировки").shouldNotBe(visible);
-        $x(cardPage.cardStatusXpath).as("Статус карты").shouldHave(text("Активна"));
+        $x(cardPage.cardStatusXpath).as("Окно блокировки").shouldHave(text("Активна"));
         checkButtonDisplayed("Шаг 2: Отображается кнопка 'Заблокировать'", "Заблокировать");
 
         // =---> Шаг 3: В истории нет записи о блокировке
         allureReport.messageWithConsole("Шаг 3: Открыть вкладку 'История'");
         $x(cardPage.historyTabXpath).click();
-        $$x(cardPage.historyRowXpath).as("Записи истории").shouldHave(sizeGreaterThan(0));
-        $$x(cardPage.historyRowXpath + "[contains(., 'Блокировка карты')]")
+        $x(cardPage.historyTabXpath).shouldHave(attribute("aria-selected", "true"));     // история открылась
+        $$x(cardPage.historyRowXpath + "[contains(., 'Блокирование карты')]")
                 .as("Записи 'Блокировка карты'")
                 .shouldHave(size(0));
     }

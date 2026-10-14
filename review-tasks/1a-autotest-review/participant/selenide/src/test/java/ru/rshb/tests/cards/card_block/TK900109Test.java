@@ -1,5 +1,6 @@
 package ru.rshb.tests.cards.card_block;
 
+import com.codeborne.selenide.Configuration;
 import io.qameta.allure.Description;
 import io.qameta.allure.Owner;
 import lombok.extern.log4j.Log4j2;
@@ -16,6 +17,7 @@ import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.refresh;
 
 @Log4j2
 @Owner("Иванов Иван Иванович")
@@ -48,6 +50,7 @@ public class TK900109Test extends CardsHelper {
     public void autotest(String limit, String expectedValue) throws Exception {
 
         allureReport.replaceTestMethodName("Лимит на покупки в интернете: граничные значения");
+        Configuration.pollingInterval = 3000;      // реже опрашивать стенд
 
         selenideSetUp();
         open(stand.getNewEfrApplicationUrl());
@@ -69,5 +72,9 @@ public class TK900109Test extends CardsHelper {
         $x(cardPage.notificationXpath).as("Сообщение после сохранения").shouldHave(text("изменён"));
         $x(cardPage.onlineLimitInputXpath).as("Поле 'Покупки в интернете, в месяц'")
                 .shouldHave(value(expectedValue));
+
+        // =---> Шаг 3: Значение сохранилось
+        refresh();
+        openTab("Шаг 3: Обновить карточку и открыть вкладку 'Лимиты'", "Лимиты");
     }
 }

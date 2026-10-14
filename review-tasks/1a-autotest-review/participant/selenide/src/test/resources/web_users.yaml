@@ -5,3 +5,6 @@ rf_card_mng1:           # Клиентский менеджер
 rf_m_oper4:             # Менеджер-операционист
   login: rf_m_oper4
   password: Oper4#Playground
+rf_card_sup1:           # Старший менеджер (подтверждает разблокировку)
+  login: rf_card_sup1
+  password: Kart0chka#2026

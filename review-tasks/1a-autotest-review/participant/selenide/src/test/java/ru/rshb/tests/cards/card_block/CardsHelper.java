@@ -1,13 +1,11 @@
 package ru.rshb.tests.cards.card_block;
 
-import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import io.qameta.allure.Step;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import ru.rshb.entities.Stand;
 import ru.rshb.entities.WebUser;
-import ru.rshb.entities.efr_client.EfrClient;
 import ru.rshb.pages.NewEfrClientSearchPage;
 import ru.rshb.pages.cards.CardProfilePage;
 import ru.rshb.tests.BaseTest;
@@ -15,14 +13,13 @@ import ru.rshb.utils.EfrApiProcessing;
 
 import java.time.Duration;
 
-import static com.codeborne.selenide.CollectionCondition.size;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
 import static com.codeborne.selenide.Condition.attribute;
-import static com.codeborne.selenide.Condition.not;
+import static com.codeborne.selenide.Condition.exactText;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$$x;
 import static com.codeborne.selenide.Selenide.$x;
-import static org.assertj.core.api.Assertions.assertThat;
 
 @Log4j2
 public class CardsHelper extends BaseTest {
@@ -34,15 +31,8 @@ public class CardsHelper extends BaseTest {
     @Autowired
     protected EfrApiProcessing efrApiProcessing;
 
-    // Последняя заблокированная карта и её владелец
-    protected static EfrClient blockedCardClient;
-    protected static String blockedCardNumber;
-
     // Лимит на снятие наличных по умолчанию для новой дебетовой карты
     protected static final String DEFAULT_CASH_LIMIT = "100 000";
-
-    private static final String SUPERVISOR_LOGIN = "rf_card_sup1";
-    private static final String SUPERVISOR_PASSWORD = "Kart0chka#2026";
 
     /**
      * Находит клиента по паспорту и открывает карточку карты в продуктовом профиле.
@@ -54,8 +44,7 @@ public class CardsHelper extends BaseTest {
      */
     @Step("{message}")
     public CardProfilePage openCard(String message, NewEfrClientSearchPage searchPage,
-                                    String passportSeries, String passportNumber, String cardNumber)
-            throws InterruptedException {
+                                    String passportSeries, String passportNumber, String cardNumber) {
         log.info("=---> {}", message);
 
         // Найти клиента
@@ -67,7 +56,7 @@ public class CardsHelper extends BaseTest {
         // Открыть карту по последним 4 цифрам
         String lastDigits = cardNumber.substring(cardNumber.length() - 4);
         $x("//a[contains(text(),'" + lastDigits + "')]").click();
-        Thread.sleep(3000);     // Подождать прогрузку карточки
+        $x("//div[@data-id='cardProfile']").as("Карточка карты").shouldBe(visible);
         allureReport.messageWithConsole("Открыта карта *%s".formatted(lastDigits));
 
         return new CardProfilePage();
@@ -82,7 +71,7 @@ public class CardsHelper extends BaseTest {
     public void checkCardStatus(String message, CardProfilePage cardPage, String expectedStatus) {
         log.info("=---> {}", message);
 
-        $x(cardPage.cardStatusXpath).shouldBe(visible);
+        $x(cardPage.cardStatusXpath).as("Статус карты").shouldHave(exactText(expectedStatus));
         allureReport.messageWithConsole("Статус карты: '%s'".formatted(expectedStatus));
     }
 
@@ -106,14 +95,17 @@ public class CardsHelper extends BaseTest {
 
     /**
      * Разблокирует карту. Разблокировка требует подтверждения старшего менеджера.
+     *
+     * @param supervisorLogin    логин старшего менеджера
+     * @param supervisorPassword пароль старшего менеджера
      */
     @Step("{message}")
-    public void unblockCard(String message, CardProfilePage cardPage) {
+    public void unblockCard(String message, CardProfilePage cardPage, String supervisorLogin, String supervisorPassword) {
         log.info("=---> {}", message);
 
         $x(cardPage.unblockButtonXpath).click();
-        $x(cardPage.supervisorLoginXpath).setValue(SUPERVISOR_LOGIN);
-        $x(cardPage.supervisorPasswordXpath).setValue(SUPERVISOR_PASSWORD);
+        $x(cardPage.supervisorLoginXpath).setValue(supervisorLogin);
+        $x(cardPage.supervisorPasswordXpath).setValue(supervisorPassword);
         $x(cardPage.confirmButtonXpath).click();
 
         $x(cardPage.notificationXpath).shouldHave(text("Карта разблокирована"), Duration.ofSeconds(30));
@@ -142,16 +134,11 @@ public class CardsHelper extends BaseTest {
     public void checkHistoryRecord(String message, CardProfilePage cardPage, String operation) {
         log.info("=---> {}", message);
 
-        try {
-            $x(cardPage.historyTabXpath).click();
-            int records = $$x(cardPage.historyRowXpath + "[contains(., '" + operation + "')]").size();
-            assertThat(records)
-                    .withFailMessage("В истории нет записи '%s'", operation)
-                    .isGreaterThan(0);
-            allureReport.messageWithConsole("В истории есть запись '%s'".formatted(operation));
-        } catch (Throwable e) {
-            log.warn("История операций не прогрузилась: {}", e.getMessage());
-        }
+        $x(cardPage.historyTabXpath).click();
+        $$x(cardPage.historyRowXpath + "[contains(., '" + operation + "')]")
+                .as("Записи '%s' в истории".formatted(operation))
+                .shouldHave(sizeGreaterThan(0));
+        allureReport.messageWithConsole("В истории есть запись '%s'".formatted(operation));
     }
 
     /**
@@ -196,23 +183,6 @@ public class CardsHelper extends BaseTest {
         $x(cardPage.reissueReasonSelectXpath).selectOptionContainingText(reason);
         $x(cardPage.confirmButtonXpath).click();
         allureReport.messageWithConsole("Отправлена заявка на перевыпуск, причина '%s'".formatted(reason));
-    }
-
-    /**
-     * Проверяет, что после перевыпуска в продуктовом профиле две карты.
-     *
-     * @param oldCardNumber номер перевыпущенной карты
-     * @return последние 4 цифры новой карты
-     */
-    public String checkReissuedCards(String oldCardNumber) {
-        String oldDigits = oldCardNumber.substring(oldCardNumber.length() - 4);
-
-        ElementsCollection cardRows = $$x("//div[@data-id='productProfile']//tr[@data-id='cardRow']");
-        cardRows.shouldHave(size(2));
-
-        String newCardNumber = cardRows.filterBy(not(text(oldDigits))).first()
-                .$x(".//td[@data-id='cardNumber']").getText();
-        return newCardNumber.substring(newCardNumber.length() - 4);
     }
 
     /**
