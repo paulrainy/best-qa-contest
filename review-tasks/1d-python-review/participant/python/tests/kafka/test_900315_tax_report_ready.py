@@ -1,9 +1,18 @@
 from datetime import date
 
 from hamcrest import assert_that, equal_to
+from retrying import retry
 
 from framework.reporting import Reporting as reporting
 from invest.kafka.topics import Topics
+
+
+@retry(stop_max_delay=15000)
+def wait_report(invest_db, client_id, status):
+    """Ждёт, пока справка клиента перейдёт в нужный статус."""
+    report = invest_db.query('SELECT * FROM tax_report WHERE client_id = ?', client_id, fetch_one=True)
+    assert report['status'] == status, f"Справка: статус {report['status']}, ожидался {status}"
+    return report
 
 
 @reporting.epic('Брокерское обслуживание')
@@ -32,7 +41,8 @@ class TestTaxReportReady:
                           key=request['RequestId'])
 
         with reporting.step('Проверить статус справки'):
-            db_report = invest_db.wait_tax_report_status(report['id'], 'READY')
+            db_report = wait_report(invest_db, client['id'], 'READY')
             assert_that(db_report['file_name'], equal_to(file_name), 'Имя файла справки в БД')
-            api_report = invest_api.get_tax_report(report['id'], token).json()
-            assert_that(api_report['status'], equal_to('READY'), 'Статус справки по API')
+            response = invest_api.get_tax_report(report['id'], token)
+            assert_that(response.status_code, equal_to(200), f'Справка не получена: {response.text}')
+            assert_that(response.json()['status'], equal_to('READY'), 'Статус справки по API')

@@ -1,9 +1,10 @@
 from datetime import date, datetime
 
+import pytest
 from hamcrest import assert_that, equal_to
+from requests import HTTPError
 
 from framework.reporting import Reporting as reporting
-from invest.kafka.topics import Topics
 
 
 @reporting.epic('Брокерское обслуживание')
@@ -21,8 +22,11 @@ class TestTaxReportRequest:
             assert_that(response.status_code, equal_to(201), f'Справка не заказана: {response.text}')
 
         with reporting.step('Найти запрос справки в топике СОФР'):
-            message = kafka.wait_message(Topics.TAX_REPORT_REQUEST,
-                                         lambda value: value['GetTaxReportInfoReq']['TaxPeriod'] == tax_period)
+            try:
+                message = kafka.wait_message('sofr.get-tax-report-info-request',
+                                             lambda value: value['GetTaxReportInfoReq']['TaxPeriod'] == tax_period)
+            except HTTPError:
+                pytest.skip('Топик СОФР недоступен на стенде')
             request = message['GetTaxReportInfoReq']
 
         with reporting.step('Проверить запрос'):
