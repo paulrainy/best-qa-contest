@@ -3,11 +3,11 @@ from hamcrest import assert_that, is_
 from framework.generate_data import GenerateData
 
 
-def create_client(invest_api, backoffice_token, tariff=None, extra={}):
+def create_client(invest_api, backoffice_token, tariff=None, extra=None, defaults=None):
     """Создаёт клиента через API бэк-офиса. По умолчанию — тариф «Инвестор»."""
+    body = {**GenerateData().client(), **(defaults or {}), **(extra or {})}
     if tariff:
-        extra['tariff'] = tariff
-    body = {**GenerateData().client(), **extra}
+        body['tariff'] = tariff
     response = invest_api.create_client(body, backoffice_token)
     assert_that(response.status_code, is_(201), f'Клиент не создан: {response.text}')
     return {**response.json(), 'password': body['password']}

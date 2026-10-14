@@ -47,6 +47,9 @@ class InvestApi:
         return self._request('POST', f'/api/v1/clients/{client_id}/agreements', token, {'type': agreement_type})
 
     # клиент
+    def get_profile(self, token: str) -> requests.Response:
+        return self._request('GET', '/api/v1/profile', token)
+
     def get_agreements(self, token: str) -> requests.Response:
         return self._request('GET', '/api/v1/agreements', token)
 
@@ -67,6 +70,9 @@ class InvestApi:
 
     def order_tax_report(self, tax_period: int, token: str) -> requests.Response:
         return self._request('POST', '/api/v1/tax-reports', token, {'taxPeriod': tax_period})
+
+    def get_tax_reports(self, token: str) -> requests.Response:
+        return self._request('GET', '/api/v1/tax-reports', token)
 
     def get_tax_report(self, report_id: int, token: str) -> requests.Response:
         return self._request('GET', f'/api/v1/tax-reports/{report_id}', token)

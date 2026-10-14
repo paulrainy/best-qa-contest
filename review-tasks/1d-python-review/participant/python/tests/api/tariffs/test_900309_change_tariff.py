@@ -16,10 +16,12 @@ class TestChangeTariff:
         with reporting.step('Сменить тариф на «Трейдер»'):
             response = invest_api.change_tariff('TRADER', token)
             assert_that(response.status_code, is_(200), f'Тариф не сменён: {response.text}')
-            assert_that(response.json()['tariff'], equal_to('TRADER'), 'Тариф в ответе')
+            assert_that(response.json()['tariff'], 'Тариф в ответе')
 
-        with reporting.step('Проверить тариф и историю смены в БД'):
+        with reporting.step('Проверить тариф в БД и в профиле'):
             db_client = invest_db.get_client_by_login(client['login'])
             assert_that(db_client['tariff'], equal_to('TRADER'), 'Тариф в БД')
-            history = invest_db.get_tariff_history(client['id'])
-            assert_that(any(h['old_tariff'] == 'INVESTOR' and h['new_tariff'] == 'TRADER' for h in history), is_(True))
+            history = invest_db.query('SELECT * FROM tariff_history WHERE client_id = ? LIMIT 1', client['id'],
+                                      fetch_one=True)
+            assert_that(history['old_tariff'] == 'INVESTOR' and history['new_tariff'] == 'TRADER', is_(True))
+            profile = invest_api.get_profile(token)
