@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="РКО ФЛ: текущий счёт" verbose="1">
+<suite name="РКО ФЛ — текущий счёт" verbose="1">
     <test name="rko_fl">
         <classes>
             <class name="tests.PRODUCTS.R2_DEPOSIT.rko_fl.OpenCurrentAccountTest"/>
