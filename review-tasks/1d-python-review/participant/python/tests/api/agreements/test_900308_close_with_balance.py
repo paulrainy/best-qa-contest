@@ -25,7 +25,7 @@ class TestCloseWithBalance:
                 time.sleep(0.5)
 
         with reporting.step('Закрыть договор'):
-            # TODO: перенести в InvestApi
+            # Запрос на закрытие договора с остатком
             response = requests.post(f"http://localhost:18300/api/v1/agreements/{agreement['id']}/close",
                                      headers={'Authorization': f'Bearer {token}'})
 
