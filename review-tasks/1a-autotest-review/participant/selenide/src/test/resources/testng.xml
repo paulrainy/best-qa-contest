@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Карты: блокировка, лимиты, реквизиты" verbose="1">
+<suite name="Карты — блокировка, лимиты, реквизиты" verbose="1">
     <test name="card_block">
         <classes>
             <class name="ru.rshb.tests.cards.card_block.TK900101Test"/>

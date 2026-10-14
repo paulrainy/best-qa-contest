@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %c{1} - %msg%n"/>
         </Console>
     </Appenders>
@@ -9,6 +9,12 @@
         <Logger name="org.springframework" level="warn"/>
         <Logger name="io.github.bonigarcia" level="warn"/>
         <Logger name="com.codeborne.selenide" level="warn"/>
+        <!-- Яндекс Браузер отстаёт от Chrome на версию-две: для его Chromium в Selenium может не быть
+             CDP-модуля, и BiDi-соединение тогда не создаётся. Selenide снимает скриншоты другим способом,
+             логи браузера тестам не нужны — предупреждения об этом только мешают читать лог прогона -->
+        <Logger name="org.openqa.selenium.devtools.CdpVersionFinder" level="error"/>
+        <Logger name="com.codeborne.selenide.impl.BiDiUti" level="error"/>
+        <Logger name="com.codeborne.selenide.impl.WebdriverPhotographer" level="error"/>
         <Root level="info">
             <AppenderRef ref="Console"/>
         </Root>
