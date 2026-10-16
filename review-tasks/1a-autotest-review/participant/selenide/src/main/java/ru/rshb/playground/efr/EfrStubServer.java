@@ -1,5 +1,6 @@
 package ru.rshb.playground.efr;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.net.httpserver.HttpExchange;
@@ -100,6 +101,10 @@ public class EfrStubServer {
             }
         } catch (EfrException e) {
             sendJson(ex, e.status, Map.of("error", e.getMessage()));
+        } catch (JsonProcessingException e) {
+            sendJson(ex, 400, Map.of("error", "Неверный JSON в запросе: " + e.getOriginalMessage()));
+        } catch (IOException e) {
+            log.warn("Браузер закрылся, не дождавшись ответа: {} {}", ex.getRequestMethod(), path);
         } catch (Exception e) {
             log.error("Ошибка песочницы: {} {}", ex.getRequestMethod(), path, e);
             sendJson(ex, 500, Map.of("error", "Внутренняя ошибка: " + e.getMessage()));
