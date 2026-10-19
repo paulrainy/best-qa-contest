@@ -37,7 +37,7 @@ UTIL = [  # показатель, эталон, тест
 
 
 def change(old, new):
-    return pf.num((new - old) / old * 100, 1)
+    return pf.num((new - old) / old * 100, 1).replace('-', '−')
 
 
 def tables() -> str:
