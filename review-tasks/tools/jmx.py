@@ -510,7 +510,7 @@ def summary_report(name, filename='', enabled=True, comment=''):
 
 
 def backend_listener_influx(name, url, application, measurement='jmeter', summary_only=False,
-                            percentiles='90;95;99', samplers_regex='.*', test_title='', event_tags='',
+                            percentiles='90;95;99', samplers_regex='.*', test_title='Test name', event_tags='',
                             enabled=True, comment=''):
     variables = {
         'influxdbMetricsSender': 'org.apache.jmeter.visualizers.backend.influxdb.HttpMetricsSender',

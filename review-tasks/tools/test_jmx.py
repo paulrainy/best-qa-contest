@@ -121,3 +121,77 @@ def test_tree_lists_paths(tmp_path):
     task = make_task(tmp_path)
     text = build_jmx.tree(task, '01')
     assert 'Thread Group → POST /auth/login  [HTTPSamplerProxy]' in text
+
+
+def full_plan():
+    """План, в котором есть каждая фабрика jmx.py, — для проверки в настоящем JMeter."""
+    return jmx.test_plan('99 Все элементы', variables={'pacing': '15000'}, comment='проверка', children=[
+        jmx.http_defaults('HTTP Request Defaults', domain='${__P(efr.host)}', port='${__P(efr.port,443)}',
+                          protocol='https', connect_timeout=5000, response_timeout=30000, content_encoding='UTF-8'),
+        jmx.header_manager('HTTP Header Manager', [('Content-Type', 'application/json'),
+                                                    ('X-Request-Id', '${__UUID()}')]),
+        jmx.cookie_manager('HTTP Cookie Manager'),
+        jmx.user_variables('Переменные', {'amount': '100000'}),
+        jmx.backend_listener_influx('Backend Listener', 'http://influxdb-nt:8086/write?db=jmeter', 'efr-test'),
+        jmx.view_results_tree('View Results Tree', enabled=False),
+        jmx.summary_report('Summary Report', enabled=False),
+        jmx.thread_group('Thread Group', '${__P(threads,4)}', '${__P(rampup,4)}', '${__P(duration,3600)}', children=[
+            jmx.precise_throughput_timer('Precise Throughput Timer', 7200, duration='${__P(duration,3600)}'),
+            jmx.constant_throughput_timer('Constant Throughput Timer', 60.0, enabled=False),
+            jmx.once_only('Вход', children=[
+                jmx.csv_data_set('users_op01.csv', 'data/users_op01.csv', recycle=False, stop_thread=True),
+                jmx.http_request('POST /auth/login', 'POST', '/api/v1/auth/login', body='{"login":"${login}"}',
+                                 children=[jmx.json_extractor('JSON Extractor token', 'token', '$.token',
+                                                              default='token_NOT_FOUND')]),
+            ]),
+            jmx.transaction('ОП-01 Поиск клиента', children=[
+                jmx.http_request('GET /clients', 'GET', '/api/v1/clients', params=[('passport', '${passport}')],
+                                 keep_alive=False, embedded=True, connect_timeout=5000, response_timeout=30000,
+                                 children=[
+                                     jmx.regex_extractor('Regex clientId', 'clientId', '"id":"(.+?)"',
+                                                         default='clientId_NOT_FOUND'),
+                                     jmx.response_assertion('Response Assertion', ['"status":"ACTIVE"']),
+                                     jmx.response_assertion('Код 200', ['200'], field=jmx.RESPONSE_CODE,
+                                                            test_type=jmx.EQUALS),
+                                     jmx.json_assertion('JSON Assertion', '$.status', 'ACTIVE'),
+                                     jmx.duration_assertion('Duration Assertion', 800),
+                                     jmx.jsr223('post', 'JSR223 PostProcessor', 'vars.put("a", "1")'),
+                                 ]),
+                jmx.uniform_random_timer('Пауза', 3000, 4000.0),
+                jmx.constant_timer('Constant Timer', 1000),
+            ]),
+            jmx.if_controller('Если найден', '${__jexl3("${clientId}" != "clientId_NOT_FOUND")}', children=[
+                jmx.loop_controller('Loop Controller', 2, children=[jmx.debug_sampler('Debug Sampler')]),
+            ]),
+            jmx.jsr223('pre', 'JSR223 PreProcessor', 'vars.put("sig", "x")', cache=False),
+            jmx.beanshell_pre('BeanShell PreProcessor', 'vars.put("b", "2");'),
+            jmx.jsr223('sampler', 'JSR223 Sampler', 'SampleResult.setIgnore()'),
+            jmx.jdbc_config('JDBC Connection Configuration', 'efr', 'jdbc:postgresql://efr-nt-db01:5432/efr',
+                            'efr_report', '${__P(db.password)}', 10),
+            jmx.jdbc_request('ОП-09 Отчёт', 'efr', 'SELECT 1 WHERE ? = ?', args='${a},${a}', types='INTEGER,INTEGER'),
+            jmx.flow_control_action('Пейсинг', children=[
+                jmx.jsr223('timer', 'JSR223 Timer', 'return 0'),
+            ]),
+        ]),
+    ])
+
+
+@pytest.mark.skipif(not os.environ.get('JMETER_HOME'), reason='нет JMETER_HOME — JMeter не скачан')
+def test_jmeter_round_trip(tmp_path):
+    path = tmp_path / 'all.jmx'
+    path.write_text(jmx.render(full_plan()), encoding='utf-8')
+    code, output = build_jmx.check([path])
+    assert code == 0, output
+    assert f'OK {path}' in output
+
+
+@pytest.mark.skipif(not os.environ.get('JMETER_HOME'), reason='нет JMETER_HOME — JMeter не скачан')
+def test_jmeter_flags_misspelled_property(tmp_path):
+    sampler = jmx.http_request('GET /a', 'GET', '/a')
+    sampler.props.append(jmx.S('HTTPSampler.conect_timeout', '5000'))
+    plan = jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=[sampler])])
+    path = tmp_path / 'bad.jmx'
+    path.write_text(jmx.render(plan), encoding='utf-8')
+    code, output = build_jmx.check([path])
+    assert code == 1
+    assert 'Thread Group → GET /a: HTTPSampler.conect_timeout: наше «5000», GUI «»' in output
