@@ -25,6 +25,7 @@ COLUMNS = ['ID', 'Расположение', 'Наименование', 'Авт
 CASE_IDS = [str(n) for n in range(900401, 900421)]
 PER_BIQ = {'BIQ-90101': 7, 'BIQ-90102': 7, 'BIQ-90103': 6}
 SHARED_LOCATION = 'РТ_ЕФР -> Общие шаги'
+SHARED_COMMENT = 'Общий шаг '  # по этой пометке build_sheets.py узнаёт строки общих шагов
 SECTIONS = {'Предусловия': 'pre', 'Шаги': 'steps', 'Постусловия': 'post'}
 LABELS = {'pre': 'Предусловие', 'steps': 'Шаг', 'post': 'Постусловие'}
 WIDE = {'Расположение', 'Наименование', 'Предусловия', 'Шаги', 'Постусловия', 'Ожидаемый результат',
@@ -167,7 +168,7 @@ def write(cases: list, path: Path) -> None:
         for name, items in case.sections():
             column = {'pre': 'Предусловия', 'steps': 'Шаги', 'post': 'Постусловия'}[name]
             for number, item in enumerate(items, start=1):
-                comment = f'Общий шаг {item.shared} «{by_id[item.shared].name}»' if item.shared else ''
+                comment = f'{SHARED_COMMENT}{item.shared} «{by_id[item.shared].name}»' if item.shared else ''
                 put(sheet, row, {'№ шага': f'{LABELS[name]} {number}', column: item.text,
                                  'Ожидаемый результат': item.expected, 'Тестовые данные': item.data,
                                  'Комментарии': comment})

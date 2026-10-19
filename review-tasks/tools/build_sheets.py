@@ -73,8 +73,19 @@ def case_elements(task: Path) -> dict:
             elements[f'{case} Наименование'] = (row[col['Наименование']], '', False)
         elif row[col['№ шага']]:
             text = next(row[col[c]] for c in ('Предусловия', 'Шаги', 'Постусловия') if row[col[c]] is not None)
-            shared = str(row[col['Комментарии']] or '').startswith('Общий шаг ')
+            shared = str(row[col['Комментарии']] or '').startswith(build_testcases.SHARED_COMMENT)
             elements[f'{case} {row[col["№ шага"]]}'] = (text, row[col['Ожидаемый результат']] or '', shared)
+    return elements
+
+
+def source_elements(source: Path) -> dict:
+    """Те же элементы, что case_elements, но прямо из исходника — чтобы поймать несобранную выгрузку."""
+    elements = {}
+    for case in build_testcases.expand(build_testcases.parse(source)):
+        elements[f'{case.id} Наименование'] = (case.name, '', False)
+        for name, items in case.sections():
+            for number, item in enumerate(items, start=1):
+                elements[f'{case.id} {build_testcases.LABELS[name]} {number}'] = (item.text, item.expected, bool(item.shared))
     return elements
 
 
@@ -233,7 +244,16 @@ def show(defects, traps, task: Path):
 
 def build(task: Path):
     defects, traps = parse_key(task / 'jury' / 'answer-key.md')
-    check(defects, traps, case_elements(task) if is_cases(defects) else None)
+    elements = None
+    if is_cases(defects):
+        export = task / 'participant' / 'testcases.xlsx'
+        source = task / 'jury' / 'source' / 'testcases.md'
+        if not export.exists():
+            sys.exit('нет participant/testcases.xlsx — сначала запустите build_testcases.py')
+        elements = case_elements(task)
+        if source.exists() and elements != source_elements(source):
+            sys.exit('participant/testcases.xlsx старше исходника кейсов — запустите build_testcases.py')
+    check(defects, traps, elements)
     build_template(defects, task / 'participant' / 'answer-template.xlsx')
     build_scoring(defects, traps, task / 'jury' / 'scoring-sheet.xlsx')
 

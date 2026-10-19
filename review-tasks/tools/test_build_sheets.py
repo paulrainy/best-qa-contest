@@ -125,3 +125,27 @@ def test_show_prints_case_element(tmp_path, capsys):
     out = capsys.readouterr().out
     assert 'Д401.1 900401 Шаг 1: Шаг 1 | ОР: Результат 1' in out
     assert 'Л1 900401 Шаг 6: Шаг 6 | ОР: Результат 6' in out
+
+
+def test_case_key_needs_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'participant' / 'testcases.xlsx').unlink()
+    with pytest.raises(SystemExit, match='нет participant/testcases.xlsx'):
+        build_sheets.build(task)
+
+
+def test_case_key_accepts_built_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'jury' / 'source').mkdir()
+    (tmp_path / 'testcases.md').rename(task / 'jury' / 'source' / 'testcases.md')
+    build_sheets.build(task)
+
+
+def test_case_key_rejects_stale_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'jury' / 'source').mkdir()
+    source = task / 'jury' / 'source' / 'testcases.md'
+    edited = (tmp_path / 'testcases.md').read_text(encoding='utf-8').replace('- Шаг 3\n', '- Шаг 3 исправлен\n', 1)
+    source.write_text(edited, encoding='utf-8')
+    with pytest.raises(SystemExit, match='testcases.xlsx старше исходника'):
+        build_sheets.build(task)
