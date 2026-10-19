@@ -52,3 +52,100 @@ def test_rejects_broken_key(tmp_path, kwargs, message):
     task = make_task(tmp_path, **kwargs)
     with pytest.raises(SystemExit, match=message):
         build_sheets.build(task)
+
+
+# ---------- Задание 1б: место вида «Шаг N» ----------
+
+import build_testcases
+
+
+def make_case_task(tmp_path: Path, place=None, defects_of_first=5, shared_first=False) -> Path:
+    (tmp_path / 'jury').mkdir()
+    (tmp_path / 'participant').mkdir()
+    lines = ['| № | Кейс | Место | Категория | Суть | Засчитываем, если… |', '| --- | --- | --- | --- | --- | --- |']
+    for t in range(1, 21):
+        for d in range(1, (defects_of_first if t == 1 else 5) + 1):
+            where = place if place and t == 1 and d == 1 else f'Шаг {d}, ожидаемый результат'
+            lines.append(f'| Д4{t:02d}.{d} | 9004{t:02d} | {where} | BIQ | суть | признак |')
+    lines += ['', '| № | Где | Попадание | Почему верно |', '| --- | --- | --- | --- |']
+    lines += [f'| Л{n} | 9004{n:02d} Шаг 6 | замечание | потому что |' for n in range(1, 11)]
+    (tmp_path / 'jury' / 'answer-key.md').write_text('\n'.join(lines), encoding='utf-8')
+    steps = '\n'.join(f'- Шаг {n}\n  = Результат {n}' for n in range(1, 7))
+    source = ['# 900901 Общий шаг\nРасположение: РТ_ЕФР -> Общие шаги\n\n## Шаги\n- Войти\n  = Вошли\n']
+    for t in range(1, 21):
+        own = steps.replace('- Шаг 1\n  = Результат 1', '- @900901') if shared_first and t == 1 else steps
+        source.append(f'# 9004{t:02d} Кейс\nРасположение: BIQ\n\n## Шаги\n{own}\n')
+    src = tmp_path / 'testcases.md'
+    src.write_text('\n'.join(source), encoding='utf-8')
+    cases = build_testcases.expand(build_testcases.parse(src))
+    build_testcases.write(cases, tmp_path / 'participant' / 'testcases.xlsx')
+    return tmp_path
+
+
+def test_builds_case_sheets(tmp_path):
+    task = make_case_task(tmp_path)
+    build_sheets.build(task)
+
+    template = load_workbook(task / 'participant' / 'answer-template.xlsx').active
+    assert [template['A1'].value, template['B1'].value, template['A2'].value] == ['Кейс', 'Место', '900401']
+    assert template.cell(row=101, column=1).value == '900420'
+
+    sheet = load_workbook(task / 'jury' / 'scoring-sheet.xlsx').active
+    assert sheet['D1'].value == 'Категория'
+    assert sheet['A2'].value == 'Д401.1'
+    assert sheet['D2'].value == 'BIQ'
+    assert sheet['A104'].value == 'Л1'
+    assert sheet['G116'].value == '=MAX(0,SUM(G2:G101)-2*SUM(G104:G113))'
+
+
+@pytest.mark.parametrize('kwargs, message', [
+    ({'place': 'Шаг 6'}, 'Л1 и дефект в одном месте: 900401 Шаг 6'),
+    ({'place': 'Шаг 9'}, 'Д401.1: в кейсе 900401 нет элемента Шаг 9'),
+    ({'place': 'где-то в середине'}, 'Д401.1: не понял место «где-то в середине»'),
+    ({'shared_first': True}, r'Д401.1: дефект в общем шаге \(900401 Шаг 1\)'),
+    ({'defects_of_first': 4}, '900401: 4 дефекта'),
+])
+def test_rejects_broken_case_key(tmp_path, kwargs, message):
+    task = make_case_task(tmp_path, **kwargs)
+    with pytest.raises(SystemExit, match=message):
+        build_sheets.build(task)
+
+
+def test_whole_section_place_is_allowed(tmp_path):
+    build_sheets.build(make_case_task(tmp_path, place='Предусловия — нет клиента'))
+
+
+def test_place_may_name_other_case():
+    assert build_sheets.case_places('900401', 'Шаг 2; 900410 Предусловие 1') == {'900401 Шаг 2', '900410 Предусловие 1'}
+
+
+def test_show_prints_case_element(tmp_path, capsys):
+    task = make_case_task(tmp_path)
+    build_sheets.show(*build_sheets.parse_key(task / 'jury' / 'answer-key.md'), task)
+    out = capsys.readouterr().out
+    assert 'Д401.1 900401 Шаг 1: Шаг 1 | ОР: Результат 1' in out
+    assert 'Л1 900401 Шаг 6: Шаг 6 | ОР: Результат 6' in out
+
+
+def test_case_key_needs_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'participant' / 'testcases.xlsx').unlink()
+    with pytest.raises(SystemExit, match='нет participant/testcases.xlsx'):
+        build_sheets.build(task)
+
+
+def test_case_key_accepts_built_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'jury' / 'source').mkdir()
+    (tmp_path / 'testcases.md').rename(task / 'jury' / 'source' / 'testcases.md')
+    build_sheets.build(task)
+
+
+def test_case_key_rejects_stale_export(tmp_path):
+    task = make_case_task(tmp_path)
+    (task / 'jury' / 'source').mkdir()
+    source = task / 'jury' / 'source' / 'testcases.md'
+    edited = (tmp_path / 'testcases.md').read_text(encoding='utf-8').replace('- Шаг 3\n', '- Шаг 3 исправлен\n', 1)
+    source.write_text(edited, encoding='utf-8')
+    with pytest.raises(SystemExit, match='testcases.xlsx старше исходника'):
+        build_sheets.build(task)
