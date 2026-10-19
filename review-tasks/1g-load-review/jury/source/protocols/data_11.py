@@ -17,15 +17,17 @@ import nt_profile as pf
 # CPU efr-api, CPU адаптера, CPU БД, диск БД, CPU gen01, CPU gen02, HikariCP активных на экземпляр, ожидающих всего
 STEPS = [
     (50, '21:12', 0.996, 0.0, 0.02, 0.92, 22, 8, 18, 12, 26, 25, 9, 0),
-    (100, '21:25', 0.994, 0.0, 0.03, 1.00, 41, 15, 31, 21, 47, 45, 18, 0),
-    (125, '21:38', 0.989, 0.0, 0.04, 1.12, 50, 19, 37, 25, 58, 57, 25, 2),
-    (150, '21:51', 0.882, 1.8, 0.08, 1.32, 58, 22, 44, 29, 78, 76, 38, 35),
-    (175, '22:04', 0.804, 4.5, 0.15, 1.90, 60, 23, 45, 30, 86, 84, 40, 120),
-    (200, '22:17', 0.739, 7.9, 0.27, 2.60, 61, 24, 46, 31, 93, 91, 40, 210),
+    (100, '21:26', 0.994, 0.0, 0.03, 1.00, 41, 15, 31, 21, 47, 45, 18, 0),
+    (125, '21:41', 0.989, 0.0, 0.04, 1.12, 50, 19, 37, 25, 58, 57, 25, 2),
+    (150, '21:56', 0.882, 1.8, 0.08, 1.32, 58, 22, 44, 29, 78, 76, 38, 35),
+    (175, '22:12', 0.804, 4.5, 0.15, 1.90, 60, 23, 45, 30, 86, 84, 40, 120),
+    (200, '22:28', 0.739, 7.9, 0.27, 2.60, 61, 24, 46, 31, 93, 91, 40, 210),
 ]
 DAY = '2026-11-05'
 MEM_APP = [54, 58, 60, 62, 63, 63]  # память серверов efr-api, % (heap 8 из 16 ГБ плюс прочее)
 MEM_DB = [71, 72, 72, 73, 73, 73]  # shared_buffers и кэш ОС
+MEM_ADAPTER = [44, 47, 49, 50, 51, 51]
+MEM_GEN = [38, 46, 51, 57, 61, 64]  # heap JMeter на генераторах, % от 6 ГБ
 WARMUP = '21:00'
 STEP_MIN = 10
 # p95 на 100 %, мс
@@ -90,21 +92,27 @@ def tables() -> str:
              'HikariCP: ожидающих, всего']
     rows = [[name] + [s[6 + n] for s in STEPS] for n, name in enumerate(names)]
     rows.insert(1, ['Память efr-api, среднее по 4 серверам, %'] + [m for m in MEM_APP])
-    rows.insert(4, ['Память БД, %'] + [m for m in MEM_DB])
+    rows.insert(3, ['Память efr-cft-adapter, %'] + [m for m in MEM_ADAPTER])
+    rows.insert(5, ['Память БД, %'] + [m for m in MEM_DB])
+    rows.insert(10, ['Heap JMeter на генераторах, % от 6 ГБ'] + [m for m in MEM_GEN])
     out += ['', 'Таблица 5. Утилизация по ступеням', pf.table(['Показатель'] + [f'{s[0]} %' for s in STEPS], rows)]
     return '\n'.join(out)
 
 
 def series(rng):
-    """Ряды по 15 с: прогрев 10 мин на 50 %, ступени по 10 мин, между ними разрыв."""
-    blocks = [(0, STEP_MIN, STEPS[0])] + [(minute_of(s[1]), STEP_MIN, s) for s in STEPS]
+    """Ряды по 15 с: прогрев 10 мин на 50 %; каждая ступень — разгон 1 поток/с, затем 10 мин измерения."""
+    blocks = [(0, STEP_MIN, STEPS[0], 0.0)]
+    for s in STEPS:
+        ramp_min = step_threads(s[0]) / 60  # разгон 1 поток в секунду (методика 3.4)
+        blocks.append((minute_of(s[1]) - ramp_min, ramp_min, s, 1.0))
+        blocks.append((minute_of(s[1]), STEP_MIN, s, 0.0))
     t, rows = [], []
-    for start, length, s in blocks:
-        n = int(length * 4)
+    for start, length, s, rising in blocks:
+        n = max(1, int(length * 4))
         for i in range(n):
             t.append(start + i / 4)
             pct, _, share, e503, e500, mult, cpu_app, cpu_ad, cpu_db, disk, g1, g2, act, pend = s
-            ramp = 0.7 if i < 4 else 1.0
+            ramp = (i + 1) / n if rising else 1.0
             target = step_target(pct) / 3600
             delivered = target * share * ramp
             requests = sum(pf.target(c, pct) * REQUESTS[c] for c in pf.CODES) / 3600 * share * ramp
@@ -113,8 +121,9 @@ def series(rng):
                          max(0.0, charts.noisy(rng, requests * e500 / 100, 0.6)),
                          *charts.noisy(rng, [cpu_app, cpu_db, g1, g2], 0.04),
                          min(40.0, charts.noisy(rng, act, 0.04)), max(0.0, charts.noisy(rng, pend, 0.12)) if pend else 0.0])
-        t.append(start + length)
-        rows.append([np.nan] * 11)
+        if not rising:
+            t.append(start + length)
+            rows.append([np.nan] * 11)
     return charts.minutes(f'{DAY} {WARMUP}', t), np.array(rows, dtype=float)
 
 

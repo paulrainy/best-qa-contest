@@ -15,7 +15,8 @@ def plan(fixed):
     else:
         task_id = jmx.regex_extractor('Regex taskId', 'taskId', '"id":"(.+?)"', default='', match_no='0')  # 05.2, 05.3
     tasks = jmx.http_request('GET /api/v1/tasks', 'GET', '/api/v1/tasks', params=[('status', 'NEW')],
-                             children=[task_id], comment=EXAMPLE)
+                             children=[task_id, jmx.json_assertion('Задачи получены', '$.tasks[0].id', validate=False)],
+                             comment=EXAMPLE)
     take = jmx.http_request('POST /api/v1/tasks/{taskId}/take', 'POST', '/api/v1/tasks/${taskId}/take', body='{}',
                             children=[common.pause(),
                                       jmx.json_assertion('Задача взята', '$.status', 'IN_PROGRESS')])

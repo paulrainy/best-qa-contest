@@ -6,7 +6,7 @@
     "nt",
     "jmeter"
   ],
-  "timezone": "browser",
+  "timezone": "Europe/Moscow",
   "schemaVersion": 39,
   "version": 1,
   "editable": true,
@@ -451,6 +451,12 @@
           "rawQuery": true,
           "resultFormat": "table",
           "alias": "$tag_transaction"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
         }
       ]
     }

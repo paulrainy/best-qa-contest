@@ -1,5 +1,6 @@
--- Подготовка стенда EFR-NT к тесту стабильности 10.11.2026 (старт прогрева 22:00 МСК)
+-- Подготовка стенда EFR-NT к тесту стабильности 12.11.2026 (старт прогрева 22:00 МСК)
 -- БД efr на efr-nt-db01, PostgreSQL 15. Выполняет инженер НТ под efr_admin.
+SET search_path = efr;
 
 -- 1. Ночью перед тестом, по расписанию, с 01:00 МСК: перестроить раздутые таблицы
 --    (после прошлого теста client_documents вырос в 2,5 раза). Закончить до 05:00.
@@ -7,8 +8,10 @@ VACUUM FULL client_documents;
 ANALYZE client_documents;
 
 -- 2. Закончить не позже чем за 30 минут до старта прогрева: свежая статистика по таблицам, которые пишет тест
-VACUUM (ANALYZE) operations;
+VACUUM (ANALYZE) clients;
+VACUUM (ANALYZE) accounts;
 VACUUM (ANALYZE) deposits;
+VACUUM (ANALYZE) operations;
 VACUUM (ANALYZE) tasks;
 
 -- 3. Объём критичных таблиц против прома (выгрузка из прома от 01.11.2026)
@@ -34,11 +37,12 @@ FROM prod p
 JOIN nt USING (table_name)
 ORDER BY p.table_name;
 
--- 4. Автовакуум не отключаем: он работает как в проме. Проверяем, что нигде не выключен
+-- 4. Автовакуум не отключаем: он работает как в проме. Проверяем, что он включён для БД и для таблиц
+SHOW autovacuum;
 SELECT relname, reloptions
 FROM pg_class
 WHERE relnamespace = 'efr'::regnamespace
-  AND reloptions::text LIKE '%autovacuum_enabled=off%';
+  AND reloptions::text ~ 'autovacuum_enabled=(off|false|no|0)';
 
 -- 5. Очередь задач для ОП-05: задачи в статусе NEW
 SELECT count(*) AS new_tasks,

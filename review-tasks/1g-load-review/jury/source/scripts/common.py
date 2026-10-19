@@ -34,8 +34,9 @@ def auth():
 
 
 def backend():
+    # application — efr-<вид теста>-<ГГГГММДД> (методика 8.1), задаётся при запуске, как хост
     return jmx.backend_listener_influx('Backend Listener', 'http://influxdb-nt:8086/write?db=jmeter',
-                                       '${__P(application,efr-nt)}')
+                                       '${__P(application)}', test_title='ЕФР НТ ${__P(application)}')
 
 
 def start():

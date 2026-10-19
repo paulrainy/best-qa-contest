@@ -28,6 +28,7 @@ def plan(fixed):
     products = jmx.http_request('GET /api/v1/deposits/products', 'GET', '/api/v1/deposits/products', children=[
         jmx.json_extractor('JSON Extractor productCode', 'productCode', "$.products[?(@.currency == 'RUB')].code",
                            default='productCode_NOT_FOUND' if fixed else None),  # 04.2
+        jmx.json_assertion('Продукты получены', '$.products[0].code', validate=False),
     ])
     draft = jmx.http_request('POST /api/v1/deposits', 'POST', '/api/v1/deposits', body=DRAFT, children=[
         jmx.jsr223('pre', 'Сумма вклада', AMOUNT_FIXED if fixed else AMOUNT_BROKEN),  # 04.3

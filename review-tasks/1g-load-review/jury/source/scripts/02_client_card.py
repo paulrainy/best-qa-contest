@@ -9,7 +9,7 @@ def plan(fixed):
     card = jmx.http_request('GET /api/v1/clients/{clientId}', 'GET', '/api/v1/clients/${clientId}', children=[
         jmx.json_assertion('Карточка открыта', '$.clientId', '${clientId}'),
     ])
-    accounts_children = [jmx.json_assertion('Счета получены', '$.accounts')]
+    accounts_children = [jmx.json_assertion('Счета получены', '$.accounts[0].accountId', validate=False)]
     if fixed:
         accounts_children.insert(0, common.pause())
     accounts = jmx.http_request('GET /api/v1/clients/{clientId}/accounts', 'GET',

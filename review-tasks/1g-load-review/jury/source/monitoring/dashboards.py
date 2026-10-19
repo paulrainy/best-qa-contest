@@ -44,7 +44,7 @@ class Board:
 
 
 def dashboard(uid, title, tags, variables, board, time_from='now-6h'):
-    return {'uid': uid, 'title': title, 'tags': tags, 'timezone': 'browser', 'schemaVersion': 39, 'version': 1,
+    return {'uid': uid, 'title': title, 'tags': tags, 'timezone': 'Europe/Moscow', 'schemaVersion': 39, 'version': 1,
             'editable': True, 'refresh': '30s', 'time': {'from': time_from, 'to': 'now'},
             'templating': {'list': variables}, 'annotations': {'list': []}, 'links': [], 'panels': board.panels}
 
@@ -95,6 +95,7 @@ def jmeter(fixed):
         influx(f'SELECT sum("count") AS "Ошибок" FROM "jmeter" WHERE {APP} AND "statut" = \'ko\' AND {OPS} '
                'AND $timeFilter GROUP BY "transaction"', fmt='table'),
     ], width=24, options={'showHeader': True})
+    b.panels[-1]['transformations'] = [{'id': 'merge', 'options': {}}]
     variables = [
         {'name': 'application', 'label': 'Тест', 'type': 'query', 'datasource': INFLUX,
          'query': 'SHOW TAG VALUES FROM "jmeter" WITH KEY = "application"', 'refresh': 2, 'multi': False},
@@ -117,12 +118,12 @@ def app(fixed):
         f'sum by (uri) ({fn}(http_server_requests_seconds_count{{{sel}}}[$__interval]))', '{{uri}}')], unit='short')
     b.add('Интенсивность, запросов/с', 'timeseries', PROM, [prom(
         f'sum(rate(http_server_requests_seconds_count{{{sel}}}[1m]))', 'Все API')], unit='reqps')
-    inner = f'rate(http_server_requests_seconds_bucket{{{sel}}}[5m])'
+    inner = f'rate(http_server_requests_seconds_bucket{{{sel}, outcome="SUCCESS"}}[5m])'
     quantile = f'histogram_quantile(0.95, sum by (le, uri) ({inner}))' if fixed else \
         f'histogram_quantile(0.95, {inner})'  # 17.2
     b.add('p95 по API, все экземпляры', 'timeseries', PROM, [prom(quantile, '{{uri}}')], unit='s')
-    b.add('Ошибки 5xx', 'timeseries', PROM, [prom(
-        f'sum by (uri, status) (increase(http_server_requests_seconds_count{{{sel}, status=~"5.."}}[$__interval]))',
+    b.add('Ошибки 4xx и 5xx', 'timeseries', PROM, [prom(
+        f'sum by (uri, status) (increase(http_server_requests_seconds_count{{{sel}, status=~"[45].."}}[$__interval]))',
         '{{uri}} {{status}}')], unit='short')
     stacking = {'mode': 'none'} if fixed else {'mode': 'normal', 'group': 'A'}  # 17.3
     b.add('Heap по экземплярам', 'timeseries', PROM, [prom(

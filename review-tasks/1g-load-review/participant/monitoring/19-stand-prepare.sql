@@ -1,5 +1,6 @@
--- Подготовка стенда EFR-NT к тесту стабильности 10.11.2026 (старт прогрева 22:00 МСК)
+-- Подготовка стенда EFR-NT к тесту стабильности 12.11.2026 (старт прогрева 22:00 МСК)
 -- БД efr на efr-nt-db01, PostgreSQL 15. Выполняет инженер НТ под efr_admin.
+SET search_path = efr;
 
 -- 1. Ночью перед тестом, по расписанию, с 01:00 МСК: перестроить раздутые таблицы
 --    (после прошлого теста client_documents вырос в 2,5 раза). Закончить до 05:00.
@@ -7,8 +8,10 @@ VACUUM FULL client_documents;
 ANALYZE client_documents;
 
 -- 2. За 10 минут до старта прогрева: свежая статистика по таблицам, которые пишет тест
-VACUUM (ANALYZE) operations;
+VACUUM (ANALYZE) clients;
+VACUUM (ANALYZE) accounts;
 VACUUM (ANALYZE) deposits;
+VACUUM (ANALYZE) operations;
 VACUUM (ANALYZE) tasks;
 
 -- 3. Объём критичных таблиц против прома (выгрузка из прома от 01.11.2026)

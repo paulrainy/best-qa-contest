@@ -6,7 +6,7 @@
     "nt",
     "prometheus"
   ],
-  "timezone": "browser",
+  "timezone": "Europe/Moscow",
   "schemaVersion": 39,
   "version": 1,
   "editable": true,
@@ -172,7 +172,7 @@
             "type": "prometheus",
             "uid": "prometheus-nt"
           },
-          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=\"efr-api\", instance=~\"$instance\"}[5m]))",
+          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=\"efr-api\", instance=~\"$instance\", outcome=\"SUCCESS\"}[5m]))",
           "legendFormat": "{{uri}}",
           "range": true
         }
@@ -181,7 +181,7 @@
     {
       "id": 4,
       "type": "timeseries",
-      "title": "Ошибки 5xx",
+      "title": "Ошибки 4xx и 5xx",
       "gridPos": {
         "x": 12,
         "y": 8,
@@ -218,7 +218,7 @@
             "type": "prometheus",
             "uid": "prometheus-nt"
           },
-          "expr": "sum by (uri, status) (increase(http_server_requests_seconds_count{job=\"efr-api\", instance=~\"$instance\", status=~\"5..\"}[$__interval]))",
+          "expr": "sum by (uri, status) (increase(http_server_requests_seconds_count{job=\"efr-api\", instance=~\"$instance\", status=~\"[45]..\"}[$__interval]))",
           "legendFormat": "{{uri}} {{status}}",
           "range": true
         }

@@ -40,7 +40,7 @@ def plan(fixed):
     props = common.thread_props(5)
     if not fixed:
         props['rampup'] = '${__P(rampup,1)}'  # 10.4
-    return jmx.test_plan('ОП-10 Проверка по спискам финмониторинга', variables={'pacing': '10000'}, children=[
+    return jmx.test_plan('ОП-10 Проверка клиента по спискам финмониторинга', variables={'pacing': '10000'}, children=[
         common.defaults(),
         common.headers(),
         common.backend(),
@@ -48,7 +48,7 @@ def plan(fixed):
             common.start(),
             common.login('users_op10.csv'),
             common.data('clients.csv'),
-            jmx.transaction('ОП-10 Проверка по спискам финмониторинга', children=[common.auth(), request]),
+            jmx.transaction('ОП-10 Проверка клиента по спискам финмониторинга', children=[common.auth(), request]),
             common.pacing(),
         ]),
     ])

@@ -57,7 +57,7 @@
             </elementProp>
             <elementProp name="application" elementType="Argument">
               <stringProp name="Argument.name">application</stringProp>
-              <stringProp name="Argument.value">${__P(application,efr-nt)}</stringProp>
+              <stringProp name="Argument.value">${__P(application)}</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="measurement" elementType="Argument">
@@ -82,7 +82,7 @@
             </elementProp>
             <elementProp name="testTitle" elementType="Argument">
               <stringProp name="Argument.name">testTitle</stringProp>
-              <stringProp name="Argument.value">Test name</stringProp>
+              <stringProp name="Argument.value">ЕФР НТ ${__P(application)}</stringProp>
               <stringProp name="Argument.metadata">=</stringProp>
             </elementProp>
             <elementProp name="eventTags" elementType="Argument">
@@ -154,14 +154,14 @@ ORDER BY o.operation_type, o.status</stringProp>
             <stringProp name="variableNames"></stringProp>
           </JDBCSampler>
           <hashTree>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Отчёт получен">
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Есть строки отчёта">
               <collectionProp name="Asserion.test_strings">
-                <stringProp name="-1432962286">operation_type</stringProp>
+                <stringProp name="1711350397">operation_type[^\n]*\n\S</stringProp>
               </collectionProp>
               <stringProp name="Assertion.custom_message"></stringProp>
               <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
               <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">16</intProp>
+              <intProp name="Assertion.test_type">2</intProp>
             </ResponseAssertion>
             <hashTree/>
           </hashTree>

@@ -6,7 +6,7 @@
     "nt",
     "zabbix"
   ],
-  "timezone": "browser",
+  "timezone": "Europe/Moscow",
   "schemaVersion": 39,
   "version": 1,
   "editable": true,

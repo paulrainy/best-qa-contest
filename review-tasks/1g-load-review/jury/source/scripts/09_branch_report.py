@@ -25,7 +25,9 @@ def plan(fixed):
     if fixed:
         report = jmx.jdbc_request('SELECT отчёт отделения', 'efr', QUERY, query_type='Prepared Select Statement',
                                   args='${branch_id},${op_date},${op_date}', types='INTEGER,DATE,DATE', children=[
-                                      jmx.response_assertion('Отчёт получен', ['operation_type']),
+                                      # в ответе Store as String первая строка — заголовки, за ней строки отчёта
+                                      jmx.response_assertion('Есть строки отчёта', ['operation_type[^\\n]*\\n\\S'],
+                                                             test_type=jmx.CONTAINS),
                                   ])
     else:
         report = jmx.jdbc_request('SELECT отчёт отделения', 'efr', QUERY_INLINE,
