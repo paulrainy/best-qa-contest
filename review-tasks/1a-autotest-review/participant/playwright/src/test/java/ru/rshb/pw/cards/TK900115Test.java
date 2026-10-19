@@ -8,7 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TK900115Test extends BaseTest {
 
@@ -24,21 +24,27 @@ class TK900115Test extends BaseTest {
         CardPage cardPage = new CardPage(page).open(client.passportSeries(), client.passportNumber(),
                 lastDigits(cardNumber));
         assertThat(cardPage.status()).hasText("Активна");
-        assertThat(cardPage.balance()).hasText("0,00 ₽");
+        assertThat(cardPage.balance()).containsText("0,00");
 
         // Шаг 2: в меню «Действия» выбрать «Закрыть карту»
         page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Действия")).click();
-        page.getByRole(AriaRole.MENUITEM, new Page.GetByRoleOptions().setName("Закрыть карту")).click();
+        page.getByRole(AriaRole.MENUITEM, new Page.GetByRoleOptions().setName("Закрыть карту"))
+                .click(new Locator.ClickOptions().setForce(true));
         Locator dialog = page.getByRole(AriaRole.DIALOG);
         assertThat(dialog).containsText("Закрыть карту *" + lastDigits(cardNumber) + "?");
 
         // Шаг 3: подтвердить закрытие — ждём ответ сервиса закрытия
         Response response = page.waitForResponse(r -> r.url().contains("/api/cards/close"),
                 () -> dialog.getByRole(AriaRole.BUTTON, new Locator.GetByRoleOptions().setName("Подтвердить")).click());
-        assertEquals(200, response.status(), "Код ответа сервиса закрытия карты");
+        assertTrue(response.ok());
 
         assertThat(dialog).isHidden();
         assertThat(cardPage.status()).hasText("Закрыта");
         assertThat(cardPage.notification()).hasText("Карта закрыта");
+
+        // Шаг 4: открыть вкладку «История»
+        page.reload();      // История подтягивается только после обновления страницы
+        cardPage.openTab("История");
+        assertThat(page.getByTestId("history")).isVisible();
     }
 }

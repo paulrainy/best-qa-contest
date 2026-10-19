@@ -2,7 +2,6 @@ package ru.rshb.pw.cards;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
-import com.microsoft.playwright.PlaywrightException;
 import com.microsoft.playwright.options.AriaRole;
 import io.qameta.allure.Step;
 
@@ -79,14 +78,8 @@ public class CardPage {
         button("Сохранить").click();
     }
 
-    public boolean isCardNumberMasked() {
-        try {
-            Locator cardNumber = page.getByTestId("requisites").getByTestId("cardNumber");
-            cardNumber.waitFor(new Locator.WaitForOptions().setTimeout(5000));
-            return cardNumber.textContent().startsWith("•••• ");
-        } catch (PlaywrightException e) {
-            return false;
-        }
+    public Locator requisite(String testId) {
+        return page.getByTestId("requisites").getByTestId(testId);
     }
 
     private Locator button(String name) {

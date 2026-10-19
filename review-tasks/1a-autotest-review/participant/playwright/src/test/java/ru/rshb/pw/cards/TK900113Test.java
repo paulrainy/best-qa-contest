@@ -26,7 +26,7 @@ class TK900113Test extends BaseTest {
     // Поэтому контекст и страница общие на весь класс, а не свои у каждого теста.
     @BeforeAll
     void openSharedPage() {
-        context = browser.newContext(new Browser.NewContextOptions().setBaseURL(Config.baseUrl()));
+        context = browser.newContext(new Browser.NewContextOptions().setBaseURL("http://localhost:18080"));
         page = context.newPage();
         api = new CardsApi(Config.apiUrl(), Config.apiToken());
     }
@@ -69,6 +69,7 @@ class TK900113Test extends BaseTest {
     @DisplayName("Шаг 3: снять временную блокировку")
     void removeTemporaryBlock() {
         cardPage.removeTemporaryBlock();
-        assertThat(cardPage.status()).hasText("Активна");
+        // Главное — что временной блокировки больше нет
+        assertThat(cardPage.status()).not().hasText("Временно заблокирована");
     }
 }

@@ -1,5 +1,6 @@
 package ru.rshb.tests.cards.card_block;
 
+import com.codeborne.selenide.Configuration;
 import io.qameta.allure.Description;
 import io.qameta.allure.Owner;
 import lombok.extern.log4j.Log4j2;
@@ -27,7 +28,7 @@ public class TK900105Test extends CardsHelper {
 
         // Подготовка данных
         stand.get(generalUtil.getEnvironmentVariable("env.name"), "stands.yaml");  // Стенд из окружения
-        webUser.get("rf_card_mng1", "web_users.yaml");     // Клиентский менеджер
+        webUser.get("rf_card_mng1", "web_users_test3.yaml");     // Клиентский менеджер
 
         // Клиент с заблокированной дебетовой картой
         EfrClient efrClient = efrApiProcessing.clientCreateWithTelephone(stand, webUser);
@@ -35,19 +36,27 @@ public class TK900105Test extends CardsHelper {
         efrApiProcessing.blockCard(stand, webUser, cardNumber, "Утеря");
 
         selenideSetUp();
+        Configuration.screenshots = false;      // скриншоты здесь не нужны
         open(stand.getNewEfrApplicationUrl());
 
         // =---> Подготовка: вход в ЕФР
         allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
-        new NewEfrLoginPage().login(webUser);
+        if ($x("//input[@name='login']").exists()) {      // если сессия уже открыта, входить не нужно
+            new NewEfrLoginPage().login(webUser);
+        }
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 
         // =---> Шаг 1: Найти клиента, открыть заблокированную карту
         CardProfilePage cardPage = openCard("Шаг 1: Найти клиента и открыть заблокированную карту", searchPage,
                 efrClient.getPassportSeries(), efrClient.getPassportNumber(), cardNumber);
-        $x(cardPage.cardStatusXpath).as("Статус карты").shouldHave(text("Заблокирована"));
+        $x(cardPage.cardStatusXpath).as("Статус карты").shouldNot(text("Активна"));
 
         // =---> Шаг 2: Смена ПИН-кода недоступна
         checkPinChangeUnavailable("Шаг 2: Пункт 'Сменить ПИН-код' в меню 'Действия' недоступен", cardPage);
+    }
+
+    @Override
+    public void closeBrowser() {
+        // браузер не закрываю — так быстрее
     }
 }

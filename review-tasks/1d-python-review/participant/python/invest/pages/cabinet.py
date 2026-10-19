@@ -35,9 +35,6 @@ class AgreementPage:
     def balance_locator(self) -> Locator:
         return self.page.get_by_test_id('agreement-balance')
 
-    def balance(self) -> str:
-        return self.balance_locator().inner_text()
-
     def order_rows(self) -> Locator:
         return self.page.get_by_test_id('order-row')
 

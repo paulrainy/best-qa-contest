@@ -12,18 +12,11 @@ import utils.builderSql.QueryBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Map;
 
 /**
  * Билдер SQL-запроса для поиска договоров «Розница. Депозиты».
  */
 public class CriteriaR2Deposit extends ParametersBuilderBasic<Dto_Deposit> {
-
-    // ID записей справочника Z#COM_STATUS_PRD — чтобы не джойнить справочник в каждом запросе
-    private static final Map<ComStatusPrd, Long> STATUS_IDS = Map.of(
-            ComStatusPrd.$WAIT_CONF, 2047892L,
-            ComStatusPrd.$WORK, 2047893L,
-            ComStatusPrd.$CLOSE, 2047897L);
 
     public CriteriaR2Deposit() {
 
@@ -50,7 +43,9 @@ public class CriteriaR2Deposit extends ParametersBuilderBasic<Dto_Deposit> {
      */
     public CriteriaR2Deposit withStatusEqualTo(ComStatusPrd status) {
 
-        queryBuilder.where("d.C_COM_STATUS = %d".formatted(STATUS_IDS.get(status)));
+        queryBuilder
+                .join("INNER JOIN Z#COM_STATUS_PRD st ON st.ID = d.C_COM_STATUS")
+                .where("st.C_CODE = '%s'".formatted(status.getCode()));
         addParameter("Состояние", status.getDescription());
 
         return this;
@@ -131,9 +126,11 @@ public class CriteriaR2Deposit extends ParametersBuilderBasic<Dto_Deposit> {
      */
     public CriteriaR2Deposit withoutActiveCard() {
 
-        queryBuilder
-                .join("LEFT JOIN Z#R2_IP_CARDS ic ON ic.C_DEPOSIT = d.ID")
-                .where("ic.C_STATE <> 'ACTIVE'");
+        queryBuilder.where("""
+                NOT EXISTS (SELECT 1
+                            FROM Z#R2_IP_CARDS ic
+                            WHERE ic.C_DEPOSIT = d.ID
+                              AND ic.C_STATE = 'ACTIVE')""");
         addParameter("Действующие карты", "нет");
 
         return this;

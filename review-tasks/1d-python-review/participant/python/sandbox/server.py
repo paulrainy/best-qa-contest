@@ -77,13 +77,13 @@ def make_handler(service: InvestService):
                     match = re.fullmatch(pattern, path)
                     if m != method or not match:
                         continue
+                    time.sleep(0.1)
                     token = (self.headers.get('Authorization') or '').removeprefix('Bearer ').strip()
                     ctx = Match(match)
                     if role == 'backoffice':
                         service.backoffice_user(token)
                     elif role == 'client':
                         ctx.client = service.client_id(token)
-                    time.sleep(0.1)
                     result = handler(service, ctx, body)
                     status, payload = result if isinstance(result, tuple) else (200, result)
                     return self.send(status, payload)

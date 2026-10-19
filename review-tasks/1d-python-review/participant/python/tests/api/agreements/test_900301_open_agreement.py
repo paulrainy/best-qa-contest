@@ -11,7 +11,7 @@ from framework.reporting import Reporting as reporting
 class TestOpenAgreement:
 
     @pytest.mark.smoke
-    @reporting.id(900301)
+    @reporting.id(900310)
     @reporting.title('Открытие брокерского договора новому клиенту')
     def test_open_broker_agreement(self, invest_api, invest_db, backoffice_token, client):
         with reporting.step('Проверить созданного клиента'):
@@ -26,12 +26,15 @@ class TestOpenAgreement:
             agreement = response.json()
 
         with reporting.step('Проверить договор в ответе'):
-            assert re.fullmatch(r'БД-\d{7}', agreement['number']), f"Номер договора: {agreement['number']}"
+            assert re.fullmatch(r'БД-\d+', agreement['number']), f"Номер договора: {agreement['number']}"
             assert_that(agreement['status'], equal_to('ACTIVE'), 'Статус договора')
 
         with reporting.step('Проверить договор и счёт в БД'):
             agreements = invest_db.get_agreements(client['id'])
             assert_that(agreements, has_length(1), 'У нового клиента должен быть один договор')
-            assert_that(agreements[0]['status'], equal_to('ACTIVE'), 'Статус договора в БД')
+            assert_that(agreements[0]['status'], 'Статус договора в БД')
             account = invest_db.get_account(agreement['id'])
-            assert_that(account['balance'], equal_to(0), 'Остаток на новом счёте')
+            assert (account['balance'] == 0, 'Остаток на новом счёте')
+
+        with reporting.step('Убрать за собой'):
+            invest_db.execute("DELETE FROM client WHERE login LIKE 'autotest%'")

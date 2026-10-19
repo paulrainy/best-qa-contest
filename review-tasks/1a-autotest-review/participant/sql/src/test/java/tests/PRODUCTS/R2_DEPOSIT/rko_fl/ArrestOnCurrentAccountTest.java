@@ -7,6 +7,7 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
 import main.java.ru.rshb.testitwork.annotations.TestitStatus;
+import model_cft.model.DaoCommon;
 import model_cft.model.FINTOOLS.ft_money.enums.Currency;
 import model_cft.model.PRODUCTS.r2DepHold.enums.R2HoldKind;
 import model_cft.model.PRODUCTS.r2_deposit.CriteriaR2Deposit;
@@ -21,6 +22,7 @@ import tests.BasicTest;
 import utils.AssertionsUtil;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.Objects;
 
 @Epic("РКО ФЛ")
@@ -29,38 +31,20 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
 
     private static final BigDecimal ARREST_SUM = new BigDecimal("5000.00");
 
-    private final DepositDbSteps dbSteps = new DepositDbSteps();
-
     private Dto_Deposit deposit;
     private Dto_User user;
 
     /**
-     * MAIN (ORACLE): RTEST, INTEST.
+     * Стенды: RTEST, INTEST (Oracle), PGRF1RT (PostgreSQL).
      */
     @Test(groups = {"@900118", "parallel"},
             description = "Наложение ареста на текущий счёт")
     @TestitStatus(autoTestId = "1100118", autoTestExternalId = "@900118")
     public void tm_900118_ArrestOnCurrentAccount() {
 
-        body();
-    }
-
-    /**
-     * RF (POSTGRES): PGRF1RT, RF2RT.
-     */
-    @Test(groups = {"@900218", "parallel"},
-            description = "Наложение ареста на текущий счёт")
-    @TestitStatus(autoTestId = "1100218", autoTestExternalId = "@900218")
-    public void tm_900218_ArrestOnCurrentAccount() {
-
-        body();
-    }
-
-    private void body() {
-
         setup();
 
-        BigDecimal availableBefore = dbSteps.getAvailableBalance(deposit);
+        BigDecimal availableBefore = getAvailableBalance(deposit);
 
         authorization(user);
 
@@ -71,10 +55,10 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
                 .setReason("Постановление ФССП № 12345/26/77001-ИП")
                 .clickOk();
 
-        Assertions.assertThat(dbSteps.countHolds(deposit))
+        Assertions.assertThat(countHolds(deposit))
                 .isPositive();
 
-        Assertions.assertThat(dbSteps.getAvailableBalance(deposit))
+        Assertions.assertThat(getAvailableBalance(deposit))
                 .as("Доступный остаток уменьшился на сумму ареста")
                 .isEqualByComparingTo(availableBefore.subtract(ARREST_SUM));
     }
@@ -91,7 +75,7 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
                     .withFinProductEqualTo(R2FinProduct.$ALL_TEK_ALL_AL)
                     .withBalanceGreaterThanOrEqualTo(new BigDecimal("10000"))
                     .withoutActiveHold()
-                    .getRandomObject(10);
+                    .getObject();
 
             if (Objects.isNull(deposit)) {
 
@@ -111,5 +95,30 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
 
         AssertionsUtil.assertThat(deposit).objectExist();
         AssertionsUtil.assertThat(user).objectExist();
+    }
+
+    private long countHolds(Dto_Deposit deposit) {
+
+        String sql = """
+                SELECT COUNT(*)
+                FROM Z#R2_DEP_HOLD h
+                WHERE h.C_DEPOSIT = :depositId""";
+
+        return DaoCommon.getInstance().selectValue(sql, Long.class, Map.of("depositId", deposit.getId()));
+    }
+
+    private BigDecimal getAvailableBalance(Dto_Deposit deposit) {
+
+        String sql = """
+                SELECT a.C_SALDO - NVL(SUM(h.C_SUM), 0)
+                FROM Z#R2_DEPOSIT d
+                INNER JOIN Z#AC_FIN a ON a.ID = d.C_ACCOUNT
+                LEFT JOIN Z#R2_DEP_HOLD h ON h.C_DEPOSIT = d.ID
+                                         AND h.C_STATE = 'ACTIVE'
+                                         AND h.C_DATE_BEGIN <= SYSDATE
+                WHERE d.ID = :depositId
+                GROUP BY a.C_SALDO""";
+
+        return DaoCommon.getInstance().selectValue(sql, BigDecimal.class, Map.of("depositId", deposit.getId()));
     }
 }

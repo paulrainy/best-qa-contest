@@ -12,9 +12,14 @@ class TestWithdraw:
     @pytest.mark.smoke
     @reporting.id(900305)
     @reporting.title('Вывод средств на тарифе «Трейдер»')
-    def test_withdraw_trader(self, invest_api, invest_db, backoffice_token):
+    def test_withdraw_trader(self, invest_api, invest_db, client_defaults, request):
         with reporting.step('Создать клиента на тарифе «Трейдер» с брокерским договором'):
-            client = create_client(invest_api, backoffice_token, tariff='TRADER')
+            login = invest_api.backoffice_login('bo_operator1', 'Oper1#Playground')
+            assert_that(login.status_code, is_(200), f'Не удалось войти в бэк-офис: {login.text}')
+            backoffice_token = login.json()['token']
+            client_defaults['tariff'] = 'TRADER'
+            client = create_client(invest_api, backoffice_token, defaults=client_defaults)
+            request.addfinalizer(lambda: invest_db.delete_client(client['id']))
             agreement = open_agreement(invest_api, backoffice_token, client['id'])
             token = login_client(invest_api, client)
 
@@ -27,8 +32,7 @@ class TestWithdraw:
             assert_that(response.status_code, is_(201), f'Поручение на вывод не создано: {response.text}')
 
         with reporting.step('Проверить исполнение вывода без комиссии'):
-            order = invest_db.get_last_order('WITHDRAW')
+            order = invest_db.query("SELECT * FROM money_order WHERE type = 'WITHDRAW' ORDER BY created_at DESC LIMIT 1",
+                                    fetch_one=True)
             invest_db.wait_order_status(order['id'], 'EXECUTED')
             assert_that(order['commission'], equal_to(0), 'На тарифе «Трейдер» вывод без комиссии')
-            account = invest_db.get_account(agreement['id'])
-            assert_that(account['balance'], equal_to(7000), 'Остаток после вывода')

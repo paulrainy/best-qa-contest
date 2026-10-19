@@ -72,7 +72,7 @@ public class OpenNewDepositPageHelper {
     }
 
     /**
-     * Нажать «ОК» в негативном тесте: ошибку не проверяет, её текст доступен в checkErrorTextEqualTo.
+     * Нажать «ОК» в негативном тесте: ошибку не проверяет, её текст доступен в checkErrorTextEqualTo и getErrorText.
      */
     @Step("Нажать «ОК» (ожидается ошибка: {expectError})")
     public OpenNewDepositPageHelper clickOk(boolean expectError) {
@@ -96,6 +96,13 @@ public class OpenNewDepositPageHelper {
             throw new AssertionError("Текст ошибки: ожидался «%s», фактически «%s»".formatted(expected, error));
         }
         return this;
+    }
+
+    /**
+     * Текст ошибки, которую ЦФТ вернул после clickOk(true), или null, если ошибки не было.
+     */
+    public String getErrorText() {
+        return error;
     }
 
     /**

@@ -1,4 +1,4 @@
-from hamcrest import assert_that, equal_to, has_length
+from hamcrest import assert_that, equal_to, is_
 
 from framework.reporting import Reporting as reporting
 from invest.kafka.topics import Topics
@@ -25,4 +25,4 @@ class TestDuplicatePayment:
 
         with reporting.step('Проверить, что деньги зачислены один раз'):
             assert_that(invest_db.get_account(agreement['id'])['balance'], equal_to(1000), 'Остаток на счёте')
-            assert_that(invest_db.get_orders(agreement['id']), has_length(1), 'Поручений на пополнение')
+            assert_that(len(invest_db.get_orders(agreement['id'])) == 1, is_(True))

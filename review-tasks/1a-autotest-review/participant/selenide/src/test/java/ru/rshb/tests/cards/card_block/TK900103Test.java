@@ -9,7 +9,9 @@ import ru.rshb.pages.NewEfrClientSearchPage;
 import ru.rshb.pages.NewEfrLoginPage;
 import ru.rshb.pages.cards.CardProfilePage;
 
+import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
+import static com.codeborne.selenide.Selenide.refresh;
 
 @Log4j2
 @Owner("Иванов Иван Иванович")
@@ -35,10 +37,15 @@ public class TK900103Test extends CardsHelper {
 
         // =---> Шаг 1: Найти клиента, открыть заблокированную карту
         CardProfilePage cardPage = openCard("Шаг 1: Найти клиента и открыть заблокированную карту", searchPage,
-                blockedCardClient.getPassportSeries(), blockedCardClient.getPassportNumber(), blockedCardNumber);
+                TK900101Test.blockedCardClient.getPassportSeries(), TK900101Test.blockedCardClient.getPassportNumber(),
+                TK900101Test.blockedCardNumber);
 
         // =---> Шаг 2: Разблокировать карту
-        unblockCard("Шаг 2: Разблокировать карту с подтверждением старшего менеджера", cardPage);
+        unblockCard("Шаг 2: Разблокировать карту с подтверждением старшего менеджера", cardPage,
+                "rf_card_sup1", "Kart0chka#2026");
+        while (!$x(cardPage.cardStatusXpath).getText().equals("Активна")) {
+            refresh();      // ждём, пока процессинг применит разблокировку
+        }
         checkCardStatus("Шаг 2: Статус карты 'Активна'", cardPage, "Активна");
         checkButtonDisplayed("Шаг 2: Отображается кнопка 'Заблокировать'", "Заблокировать");
     }

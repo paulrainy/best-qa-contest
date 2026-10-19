@@ -1,11 +1,12 @@
+import logging
 import time
 import uuid
 from datetime import datetime
 
-from requests import HTTPError
-
 from framework.config import Config
 from invest.kafka.topics import Topics
+
+log = logging.getLogger('kafka')
 
 
 class KafkaSteps:
@@ -16,24 +17,22 @@ class KafkaSteps:
         self.cluster_id = Config.kafka_cluster()
 
     def read_messages(self, topic, seconds_ago=60):
-        try:
-            return self.qa_kafka.subscribe(topic, self.cluster_id, seconds_ago=seconds_ago)['messages']
-        except HTTPError as error:
-            if error.response.status_code == 400 and 'does not exist' in error.response.text:
-                print(f'[KAFKA] топик {topic} не найден')
-                return []
-            raise
+        return self.qa_kafka.subscribe(topic, self.cluster_id, seconds_ago=seconds_ago)['messages']
 
-    def wait_message(self, topic, condition, timeout=15):
-        """Ждёт сообщение, для которого condition(value) истинно, и возвращает его value."""
+    def wait_record(self, topic, condition, timeout=15):
+        """Ждёт сообщение, для которого condition(value) истинно, и возвращает его целиком: key и value."""
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             for message in reversed(self.read_messages(topic)):
                 if condition(message['value']):
-                    return message['value']
-            print(f'[KAFKA] в топике {topic} пока нет нужного сообщения')
+                    return message
+            log.info('В топике %s пока нет нужного сообщения', topic)
             time.sleep(0.5)
         raise AssertionError(f'Сообщение в топике {topic} не пришло за {timeout} с')
+
+    def wait_message(self, topic, condition, timeout=15):
+        """Ждёт сообщение, для которого condition(value) истинно, и возвращает его value."""
+        return self.wait_record(topic, condition, timeout)['value']
 
     def send_payment(self, agreement_number, amount, payment_id=None):
         """Поступление на брокерский счёт — так его присылает ЦФТ."""

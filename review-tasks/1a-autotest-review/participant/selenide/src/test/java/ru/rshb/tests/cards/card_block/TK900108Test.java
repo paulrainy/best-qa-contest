@@ -24,11 +24,11 @@ public class TK900108Test extends CardsHelper {
     @TestitStatus(autoTestId = "1900108", autoTestExternalId = "@900108")
     public void autotest() throws Exception {
 
-        allureReport.replaceTestMethodName("Разблокировка без подтверждения старшего менеджера");
+        allureReport.replaceTestMethodName("Разблокировка карты");
 
         // Подготовка данных
         stand.get(generalUtil.getEnvironmentVariable("env.name"), "stands.yaml");  // Стенд из окружения
-        webUser.get("rf_card_mng1", "web_users.yaml");     // Клиентский менеджер
+        webUser.get("rf_card_sup1", "web_users.yaml");     // Старший менеджер: через API карту блокирует только он
 
         // Клиент с заблокированной дебетовой картой
         EfrClient efrClient = efrApiProcessing.clientCreateWithTelephone(stand, webUser);
@@ -39,7 +39,7 @@ public class TK900108Test extends CardsHelper {
         open(stand.getNewEfrApplicationUrl());
 
         // =---> Подготовка: вход в ЕФР
-        allureReport.messageWithConsole("Подготовка: вход в ЕФР. rf_card_mng1");
+        allureReport.messageWithConsole("Подготовка: вход в ЕФР. %s".formatted(webUser.getLogin()));
         new NewEfrLoginPage().login(webUser);
         NewEfrClientSearchPage searchPage = new NewEfrClientSearchPage();
 

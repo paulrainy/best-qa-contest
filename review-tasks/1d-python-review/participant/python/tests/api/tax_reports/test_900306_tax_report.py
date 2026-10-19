@@ -1,6 +1,7 @@
 from hamcrest import assert_that, equal_to, has_length, is_
 
 from framework.reporting import Reporting as reporting
+from invest.db.invest_db import InvestDb
 
 
 @reporting.epic('Брокерское обслуживание')
@@ -9,8 +10,9 @@ class TestTaxReport:
 
     @reporting.id(900306)
     @reporting.title('Заказ справки НДФЛ за прошлый год')
-    def test_order_tax_report(self, invest_api, invest_db, client_with_agreement):
+    def test_order_tax_report(self, invest_api, client_with_agreement):
         client, agreement, token = client_with_agreement
+        invest_db = InvestDb('build/invest.db')
         tax_period = 2025
 
         with reporting.step(f'Заказать справку НДФЛ за {tax_period} год'):
@@ -18,6 +20,7 @@ class TestTaxReport:
             assert_that(response.status_code, is_(201), f'Справка не заказана: {response.text}')
 
         with reporting.step('Проверить заявку на справку в БД'):
-            reports = invest_db.get_today_tax_reports(client['id'])
+            reports = invest_db.query("SELECT * FROM tax_report WHERE client_id = ? AND date(registered_at) = date('now')"
+                                      ' ORDER BY id DESC', client['id'])
             assert_that(reports, has_length(1), 'Заявок на справку за сегодня')
             assert_that(reports[0]['tax_period'], equal_to(tax_period), 'Налоговый период')

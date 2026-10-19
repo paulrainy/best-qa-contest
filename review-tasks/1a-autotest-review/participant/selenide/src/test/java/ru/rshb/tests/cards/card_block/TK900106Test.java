@@ -10,17 +10,17 @@ import ru.rshb.pages.NewEfrClientSearchPage;
 import ru.rshb.pages.NewEfrLoginPage;
 import ru.rshb.pages.cards.CardProfilePage;
 
-import static com.codeborne.selenide.Condition.value;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.$x;
 import static com.codeborne.selenide.Selenide.open;
 import static com.codeborne.selenide.Selenide.refresh;
+import static org.testng.Assert.assertEquals;
 
 @Log4j2
 @Owner("Иванов Иван Иванович")
 public class TK900106Test extends CardsHelper {
 
-    @Test(groups = {"@900106"})
+    @Test(groups = {"@900106"}, dependsOnGroups = {"@900102"})  // сначала убедиться, что лимит вообще меняется
     @Description("TK:@900106, АТ:1900106")
     @TestitStatus(autoTestId = "1900106", autoTestExternalId = "@900106")
     public void autotest() throws Exception {
@@ -55,7 +55,6 @@ public class TK900106Test extends CardsHelper {
         // =---> Шаг 3: Лимит не изменился
         refresh();
         openTab("Шаг 3: Обновить карточку и открыть вкладку 'Лимиты'", "Лимиты");
-        $x(cardPage.cashLimitInputXpath).as("Поле 'Снятие наличных, в месяц'")
-                .shouldHave(value(DEFAULT_CASH_LIMIT));
+        assertEquals(DEFAULT_CASH_LIMIT, $x(cardPage.cashLimitInputXpath).getValue(), "Лимит после обновления");
     }
 }

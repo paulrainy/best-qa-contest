@@ -19,7 +19,7 @@ public class TK900102Test extends CardsHelper {
 
     @Test(groups = {"@900102"})
     @Description("TK:@900102, АТ:1900102")
-    @TestitStatus(autoTestId = "1900102", autoTestExternalId = "@900102")
+    @TestitStatus(autoTestId = "1900101", autoTestExternalId = "@900101")
     public void autotest() throws Exception {
 
         allureReport.replaceTestMethodName("Изменение лимита на снятие наличных");

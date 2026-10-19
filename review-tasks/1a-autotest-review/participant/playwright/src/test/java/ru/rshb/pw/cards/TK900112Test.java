@@ -1,9 +1,11 @@
 package ru.rshb.pw.cards;
 
+import com.microsoft.playwright.options.LoadState;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TK900112Test extends BaseTest {
 
@@ -26,8 +28,10 @@ class TK900112Test extends BaseTest {
         // Шаг 2: установить лимит 150 000
         cardPage.setTransferLimit("150000");
         assertThat(cardPage.notification()).hasText("Лимит изменён");
+        assertEquals("150 000", page.querySelector("input[name='transferLimit']").inputValue());
 
         // Шаг 3: обновить страницу
         page.reload();
+        page.waitForLoadState(LoadState.NETWORKIDLE);
     }
 }

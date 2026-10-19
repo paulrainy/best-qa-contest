@@ -14,3 +14,4 @@ target/
 .allure/
 build/
 help-docs/
+review-tasks/tools/.venv/

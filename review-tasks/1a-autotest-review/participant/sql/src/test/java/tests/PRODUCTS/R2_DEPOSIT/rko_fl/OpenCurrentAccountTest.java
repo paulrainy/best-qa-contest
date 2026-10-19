@@ -8,7 +8,6 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Step;
 import main.java.ru.rshb.testitwork.annotations.TestitStatus;
-import model_cft.model.CHARTS_OF_ACCOUNTS.pl_usv.enums.BalanceAccount;
 import model_cft.model.CLIENTS.clPriv.CriteriaClPriv;
 import model_cft.model.CLIENTS.clPriv.DtoClPriv;
 import model_cft.model.FINTOOLS.ft_money.enums.Currency;
@@ -23,6 +22,7 @@ import utils.AssertionsUtil;
 import utils.Timer;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 @Epic("РКО ФЛ")
@@ -62,31 +62,35 @@ public class OpenCurrentAccountTest extends BasicTest {
         AssertionsUtil.assertThat(deposit.update())
                 .hasStateEqual(ComStatusPrd.$WORK)
                 .whereR2AnnAccount(Timer.setDefault(), account -> account
-                        .hasStatusEqualTo(ComStatusPrd.$OPEN))
-                .hasAccountStartWith(BalanceAccount.$40817);
+                        .hasStatusEqualTo(ComStatusPrd.$OPEN));
     }
 
     @Step("Подготовка тестовых данных")
     private void setup() {
 
-        for (Branch branch : getProductBranchesWithCheckOperDayEqualCurrDay()) {
+        for (Branch branch : List.of(Branch.$MOSCOW)) {  // на RTEST клиенты с FATCA только в этом филиале
 
             user = new CriteriaUser()
                     .withUnitEq(branch)
                     .withRoles(UserRole.$OPER_FL)
                     .findUser();
 
-            clPriv = new CriteriaClPriv()
+            CriteriaClPriv clPrivCriteria = new CriteriaClPriv()
                     .withBranchEqualTo(branch)
                     .withResident()
                     .withAlive()
                     .withNameNotEqualTo("Иванов Иван Иванович")
                     .withDocDateEndNotExpired(LocalDate.now())
                     .withoutBlocks()
-                    .withoutExecutoryProcess()
-                    .withCrs()
-                    .withFatca()
-                    .getRandomObject(10);
+                    .withCrs();
+            clPrivCriteria.getQueryBuilder().where("cp.ID NOT IN (SELECT ep.C_CLIENT FROM Z#EXECUTORY_PROCESS ep)");  // в CriteriaClPriv такого метода нет
+            clPrivCriteria.getQueryBuilder().where("""
+                    EXISTS (SELECT 1
+                            FROM Z#SHB_FORMA_FATCA f
+                            WHERE f.C_CLIENT = cp.ID
+                              AND f.C_DATE_END IS NULL
+                               OR f.C_DATE_END >= DATE '%s')""".formatted(LocalDate.now()));
+            clPriv = clPrivCriteria.getRandomObject(10);
 
             if (Objects.nonNull(user) && Objects.nonNull(clPriv)) {
 
