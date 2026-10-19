@@ -80,7 +80,9 @@ def java_hash(text: str) -> int:
 def prop_xml(prop, depth: int) -> list[str]:
     pad = INDENT * depth
     if isinstance(prop, S):
-        return [f'{pad}<stringProp name={quoteattr(prop.name)}>{escape(prop.value)}</stringProp>']
+        # CR пишем сущностью, как JMeter: иначе разбор XML превратит CRLF в LF
+        value = escape(prop.value).replace('\r', '&#xd;')
+        return [f'{pad}<stringProp name={quoteattr(prop.name)}>{value}</stringProp>']
     if isinstance(prop, B):
         return [f'{pad}<boolProp name={quoteattr(prop.name)}>{str(prop.value).lower()}</boolProp>']
     if isinstance(prop, I):
@@ -265,6 +267,7 @@ def http_request(name, method, path, body=None, params=(), keep_alive=True, embe
                  connect_timeout=None, response_timeout=None, domain=None, port=None, protocol=None,
                  follow_redirects=True, content_encoding=None, children=(), enabled=True, comment=''):
     if body is not None:
+        body = body.replace('\r\n', '\n').replace('\n', '\r\n')  # GUI хранит тело с CRLF
         items = [E('', 'HTTPArgument', [B('HTTPArgument.always_encode', False), S('Argument.value', body),
                                         S('Argument.metadata', '=')])]
     else:
@@ -522,3 +525,13 @@ def backend_listener_influx(name, url, application, measurement='jmeter', summar
         _arguments('arguments', variables),
         S('classname', 'org.apache.jmeter.visualizers.backend.influxdb.InfluxdbBackendListenerClient'),
     ], enabled=enabled, comment=comment)
+
+
+def auth_manager(name, url, username, password, enabled=True, comment=''):
+    """HTTP Authorization Manager, механизм BASIC (по умолчанию, в файл не пишется)."""
+    item = E('', 'Authorization', [S('Authorization.url', url), S('Authorization.username', username),
+                                   S('Authorization.password', password), S('Authorization.domain', ''),
+                                   S('Authorization.realm', '')])
+    return _el('AuthManager', 'AuthPanel', 'AuthManager', name,
+               [C('AuthManager.auth_list', [item]), B('AuthManager.controlledByThreadGroup', False)],
+               enabled=enabled, comment=comment)

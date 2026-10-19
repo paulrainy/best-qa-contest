@@ -131,6 +131,7 @@ def full_plan():
         jmx.header_manager('HTTP Header Manager', [('Content-Type', 'application/json'),
                                                     ('X-Request-Id', '${__UUID()}')]),
         jmx.cookie_manager('HTTP Cookie Manager'),
+        jmx.auth_manager('HTTP Authorization Manager', 'https://${__P(cft.host)}', 'nt_cft', '${__P(cft.password)}'),
         jmx.user_variables('Переменные', {'amount': '100000'}),
         jmx.backend_listener_influx('Backend Listener', 'http://influxdb-nt:8086/write?db=jmeter', 'efr-test'),
         jmx.view_results_tree('View Results Tree', enabled=False),
@@ -195,3 +196,23 @@ def test_jmeter_flags_misspelled_property(tmp_path):
     code, output = build_jmx.check([path])
     assert code == 1
     assert 'Thread Group → GET /a: HTTPSampler.conect_timeout: наше «5000», GUI «»' in output
+
+
+def test_sources_can_import_helpers(tmp_path):
+    task = make_task(tmp_path)
+    scripts = task / 'jury' / 'source' / 'scripts'
+    (scripts / 'helpers_1g.py').write_text("NAME = 'GET /from-helper'\n", encoding='utf-8')
+    (scripts / '02_helper.py').write_text(
+        "import jmx\nimport helpers_1g\nFILE = '02-helper'\n\n\ndef plan(fixed):\n"
+        "    return jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=[\n"
+        "        jmx.http_request(helpers_1g.NAME, 'GET', '/h')])])\n", encoding='utf-8')
+    assert 'Thread Group → GET /from-helper' in build_jmx.tree(task, '02')
+
+
+def test_multiline_body_saved_with_crlf_like_gui():
+    plan = jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=[
+        jmx.http_request('POST /a', 'POST', '/a', body='{\n  "a": 1\n}')])])
+    text = jmx.render(plan)
+    assert '{&#xd;\n  &quot;a&quot;: 1&#xd;\n}' in text or '{&#xd;\n  "a": 1&#xd;\n}' in text
+    value = ET.fromstring(text.encode('utf-8')).find('.//elementProp[@elementType="HTTPArgument"]/stringProp[@name="Argument.value"]').text
+    assert value == '{\r\n  "a": 1\r\n}'

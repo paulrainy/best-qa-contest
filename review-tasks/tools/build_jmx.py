@@ -21,7 +21,10 @@ JAVA = os.environ.get('JAVA', '/opt/homebrew/opt/openjdk@21/bin/java')
 
 def load_sources(task: Path) -> dict:
     sources = {}
-    for path in sorted((task / 'jury' / 'source' / 'scripts').glob('[0-9][0-9]_*.py')):
+    folder = task / 'jury' / 'source' / 'scripts'
+    if str(folder) not in sys.path:
+        sys.path.insert(0, str(folder))  # исходники импортируют общие части из своей папки (common.py)
+    for path in sorted(folder.glob('[0-9][0-9]_*.py')):
         spec = importlib.util.spec_from_file_location(f'scenario_{path.stem}', path)
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
