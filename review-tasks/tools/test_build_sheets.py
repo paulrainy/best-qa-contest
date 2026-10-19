@@ -149,3 +149,141 @@ def test_case_key_rejects_stale_export(tmp_path):
     source.write_text(edited, encoding='utf-8')
     with pytest.raises(SystemExit, match='testcases.xlsx старше исходника'):
         build_sheets.build(task)
+
+
+# ---------- Задание 1г: сценарии, протоколы, дашборды, SQL ----------
+
+import json
+
+import jmx
+import load_places
+
+
+def write_jmx(path: Path):
+    samplers = [jmx.http_request(f'S{n}', 'GET', f'/s{n}') for n in range(1, 7)]
+    plan = jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=samplers)])
+    path.write_text(jmx.render(plan), encoding='utf-8')
+
+
+def write_dashboard(path: Path):
+    panels = [{'id': n, 'title': f'P{n}', 'type': 'timeseries', 'gridPos': {'x': 0, 'y': n, 'w': 12, 'h': 8},
+               'datasource': {'type': 'influxdb', 'uid': 'influxdb-nt'}, 'targets': [{'refId': 'A', 'query': 'q'}]}
+              for n in range(1, 7)]
+    data = {'title': 'D', 'uid': path.stem, 'schemaVersion': 39, 'panels': panels, 'templating': {'list': []}}
+    path.write_text(json.dumps(data), encoding='utf-8')
+
+
+LOAD_PLACE = {'jmx': '`Thread Group → S{n}`', 'sql': 'строка {n}', 'json': 'Панель «P{n}»'}
+
+
+def make_load_task(tmp_path: Path, monkeypatch, place=None, category=None, number=None, defects_of_first=5,
+                   trap_place=None, units=range(1, 21), traps=10) -> Path:
+    # До сборщика протоколов единицы 11–15 в фикстуре — SQL
+    for unit in range(11, 16):
+        monkeypatch.setitem(load_places.KINDS, f'{unit:02d}', 'sql')
+    (tmp_path / 'jury').mkdir()
+    for folder in ('scripts', 'monitoring'):
+        (tmp_path / 'participant' / folder).mkdir(parents=True)
+    lines = ['| № | Единица | Место | Категория | Суть | Засчитываем, если… |', '| --- | --- | --- | --- | --- | --- |']
+    categories = ['М', '1', '2', '3', '4']
+    for u in units:
+        unit = f'{u:02d}'
+        kind = load_places.KINDS[unit]
+        if kind == 'jmx':
+            write_jmx(tmp_path / 'participant' / 'scripts' / f'{unit}-s.jmx')
+        elif kind == 'json':
+            write_dashboard(tmp_path / 'participant' / 'monitoring' / f'{unit}-d.json')
+        else:
+            (tmp_path / 'participant' / 'monitoring' / f'{unit}-q.sql').write_text(
+                ''.join(f'SELECT {n};\n' for n in range(1, 9)), encoding='utf-8')
+        for d in range(1, (defects_of_first if u == 1 else 5) + 1):
+            first = u == 1 and d == 1
+            where = place if place and first else LOAD_PLACE[kind].format(n=d)
+            cat = category if category and first else categories[d - 1]
+            num = number if number and first else f'Д{unit}.{d}'
+            lines.append(f'| {num} | {unit} | {where} | {cat} | суть | признак |')
+    lines += ['', '| № | Единица | Где | Попадание | Почему верно |', '| --- | --- | --- | --- | --- |']
+    for n in range(1, traps + 1):
+        where = trap_place if trap_place and n == 1 else '`Thread Group → S6`'
+        lines.append(f'| Л{n} | {n:02d} | {where} | замечание | потому что |')
+    (tmp_path / 'jury' / 'answer-key.md').write_text('\n'.join(lines), encoding='utf-8')
+    return tmp_path
+
+
+def test_builds_load_sheets(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch)
+    build_sheets.build(task)
+
+    template = load_workbook(task / 'participant' / 'answer-template.xlsx').active
+    assert [template['A1'].value, template['B1'].value, template['A2'].value] == ['Единица', 'Место', '01']
+    assert template.cell(row=101, column=1).value == '20'
+
+    sheet = load_workbook(task / 'jury' / 'scoring-sheet.xlsx').active
+    assert sheet['B1'].value == 'Единица / где'
+    assert sheet['D1'].value == 'Категория'
+    assert sheet['A2'].value == 'Д01.1'
+    assert sheet['A104'].value == 'Л1'
+    assert sheet['B104'].value == '01'
+    assert sheet['G116'].value == '=MAX(0,SUM(G2:G101)-2*SUM(G104:G113))'
+
+
+@pytest.mark.parametrize('kwargs, message', [
+    ({'place': '`Thread Group → S9`'}, 'Д01.1: в единице 01 нет места jmx:Thread Group → S9'),
+    ({'trap_place': '`Thread Group → S1`'}, 'Л1 и дефект в одном месте: 01 jmx:Thread Group → S1'),
+    ({'category': '7'}, 'Д01.1: категория «7»'),
+    ({'number': 'Д02.1'}, 'Д02.1: номер не совпадает с единицей 01'),
+    ({'place': 'где-то'}, 'Д01.1: не понял место «где-то»'),
+    ({'defects_of_first': 4}, '01: 4 дефекта'),
+])
+def test_rejects_broken_load_key(tmp_path, monkeypatch, kwargs, message):
+    task = make_load_task(tmp_path, monkeypatch, **kwargs)
+    with pytest.raises(SystemExit, match=message):
+        build_sheets.build(task)
+
+
+def test_partial_skips_counts(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch, units=[1], traps=1)
+    build_sheets.build(task, partial=True)
+    assert not (task / 'participant' / 'answer-template.xlsx').exists()
+
+
+def test_partial_still_checks_places(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch, units=[1], traps=1, place='`Thread Group → S9`')
+    with pytest.raises(SystemExit, match='нет места jmx:Thread Group → S9'):
+        build_sheets.build(task, partial=True)
+
+
+SCENARIO = '''
+import jmx
+
+FILE = '01-s'
+
+
+def plan(fixed):
+    samplers = [jmx.http_request(f'S{n}', 'GET', f'/s{n}') for n in range(1, 7)]
+    return jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=samplers)])
+'''
+
+
+def test_rejects_stale_jmx(tmp_path, monkeypatch):
+    import build_jmx
+    task = make_load_task(tmp_path, monkeypatch)
+    (task / 'jury' / 'source' / 'scripts').mkdir(parents=True)
+    (task / 'jury' / 'source' / 'scripts' / '01_s.py').write_text(SCENARIO, encoding='utf-8')
+    build_jmx.build(task)
+    build_sheets.build(task)
+    path = task / 'participant' / 'scripts' / '01-s.jmx'
+    path.write_text(path.read_text(encoding='utf-8').replace('/s1<', '/s1x<'), encoding='utf-8')
+    with pytest.raises(SystemExit, match='сценарий 01 старше исходника — запустите build_jmx.py'):
+        build_sheets.build(task)
+
+
+def test_show_prints_load_places(tmp_path, monkeypatch, capsys):
+    task = make_load_task(tmp_path, monkeypatch)
+    build_sheets.show(*build_sheets.parse_key(task / 'jury' / 'answer-key.md'), task)
+    out = capsys.readouterr().out
+    assert 'Д01.1 01 jmx:Thread Group → S1: HTTPSamplerProxy' in out
+    assert 'HTTPSampler.path=/s1' in out
+    assert 'Д16.2 16 панель:P2: timeseries' in out
+    assert 'Д19.3 19 строка:3: SELECT 3;' in out
+    assert 'Л1 01 jmx:Thread Group → S6' in out

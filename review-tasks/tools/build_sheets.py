@@ -8,6 +8,12 @@
 Задание 1б (ревью тест-кейсов): в строке дефекта есть колонка «Категория», место пишется как «Шаг 3»,
 «Предусловие 1», «Наименование». Ключ сверяется с participant/testcases.xlsx: элемент должен быть в кейсе
 и не должен быть взят из общего шага. --show печатает текст элементов из выгрузки.
+
+Задание 1г (ревью материалов НТ): единица — две цифры (01–20), у дефекта категория «М» или 1–5, у ловушки
+тоже есть колонка единицы. Место: путь в дереве .jmx в обратных кавычках, «Панель «…»», «Переменная host»,
+«Дашборд», «строка 14», «Раздел 12.2», «Таблица 3», «Рисунок 2», «Шапка», «Название». Каждое место сверяется
+с файлом единицы, сценарии и протоколы — с исходниками. --partial проверяет только места, пока ключ
+пишется по частям, и листы не пишет.
 """
 import re
 import sys
@@ -19,15 +25,17 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.worksheet.datavalidation import DataValidation
 
 import build_testcases
+import load_places
 
 TESTS = 20
 DEFECTS_PER_TEST = 5
 TRAPS = 10
-ROW = re.compile(r'^\|\s*(Д\d{3}\.\d|Л\d{1,2})\s*\|(.*)\|\s*$')
+ROW = re.compile(r'^\|\s*(Д\d{2,3}\.\d|Л\d{1,2})\s*\|(.*)\|\s*$')
 PLACE = re.compile(r'`([^`:]+):(\d+)(?:–(\d+))?`')
 ELEMENT = re.compile(r'(?:(\d{6}) )?(Наименование|Предусловие \d+|Шаг \d+|Постусловие \d+)')
 SECTION = re.compile(r'Предусловия|Шаги|Постусловия')
 CASE_CELLS = 5  # кейс, место, категория, суть, засчитываем — у кода на одну меньше
+CATEGORIES = {'М', '1', '2', '3', '4', '5'}
 HEADER = Font(bold=True)
 FILL = PatternFill('solid', fgColor='DDEBF7')
 WRAP = Alignment(wrap_text=True, vertical='top')
@@ -51,8 +59,15 @@ def places(text: str) -> set:
     return found
 
 
+def kind_of(defects) -> str:
+    """code — 1а и 1д, cases — 1б, load — 1г (единица из двух цифр)."""
+    if not defects or len(defects[0]) - 1 != CASE_CELLS:
+        return 'code'
+    return 'load' if re.fullmatch(r'\d{2}', defects[0][1]) else 'cases'
+
+
 def is_cases(defects) -> bool:
-    return bool(defects) and len(defects[0]) - 1 == CASE_CELLS
+    return kind_of(defects) == 'cases'
 
 
 def case_places(case: str, text: str) -> set:
@@ -114,17 +129,68 @@ def check_cases(defects, traps, elements) -> list:
     return errors
 
 
-def check(defects, traps, elements=None):
+def protocol_stale(unit: str, source: Path, task: Path) -> bool:
+    import build_protocols
+    from docx import Document
+    docx = task / 'participant' / 'protocols' / f'{source.stem}.docx'
+    return not docx.exists() or Document(docx).core_properties.identifier != build_protocols.source_hash(source)
+
+
+def check_load(defects, traps, task: Path) -> list:
+    errors, files, cache = [], load_places.unit_files(task), {}
+
+    def keys_of(number, unit, place):
+        kind = load_places.KINDS.get(unit)
+        if kind is None:
+            errors.append(f'{number}: нет единицы {unit}')
+            return set()
+        keys = load_places.place_keys(kind, place)
+        if not keys:
+            errors.append(f'{number}: не понял место «{place}»')
+            return set()
+        if unit not in files:
+            errors.append(f'{number}: нет файла единицы {unit}')
+            return keys
+        if unit not in cache:
+            cache[unit] = load_places.targets(kind, files[unit])
+        for key in sorted(keys - cache[unit]):
+            errors.append(f'{number}: в единице {unit} нет места {key}')
+        return keys
+
+    defect_places = set()
+    for number, unit, place, category, *_ in defects:
+        if number[1:3] != unit:
+            errors.append(f'{number}: номер не совпадает с единицей {unit}')
+        if category not in CATEGORIES:
+            errors.append(f'{number}: категория «{category}», нужна М или 1–5')
+        defect_places |= {(unit, key) for key in keys_of(number, unit, place)}
+    for number, unit, place, *_ in traps:
+        for key in sorted(keys_of(number, unit, place)):
+            if (unit, key) in defect_places:
+                errors.append(f'{number} и дефект в одном месте: {unit} {key}')
+    if (task / 'jury' / 'source' / 'scripts').exists():
+        import build_jmx
+        errors += [f'сценарий {unit} старше исходника — запустите build_jmx.py' for unit in build_jmx.stale(task)]
+    for unit, source in sorted(files.items()):
+        if load_places.KINDS[unit] == 'protocol' and protocol_stale(unit, source, task):
+            errors.append(f'протокол {unit} старше исходника — запустите build_protocols.py')
+    return errors
+
+
+def check(defects, traps, elements=None, task=None, partial=False):
     errors = []
     per_test = Counter(row[1] for row in defects)
-    if len(per_test) != TESTS:
-        errors.append(f'тестов {len(per_test)}, нужно {TESTS}')
-    for test, count in per_test.items():
-        if count != DEFECTS_PER_TEST:
-            errors.append(f'{test}: {count} дефекта, нужно {DEFECTS_PER_TEST}')
-    if len(traps) != TRAPS:
-        errors.append(f'ловушек {len(traps)}, нужно {TRAPS}')
-    if is_cases(defects):
+    if not partial:
+        if len(per_test) != TESTS:
+            errors.append(f'тестов {len(per_test)}, нужно {TESTS}')
+        for test, count in per_test.items():
+            if count != DEFECTS_PER_TEST:
+                errors.append(f'{test}: {count} дефекта, нужно {DEFECTS_PER_TEST}')
+        if len(traps) != TRAPS:
+            errors.append(f'ловушек {len(traps)}, нужно {TRAPS}')
+    if kind_of(defects) == 'load':
+        errors += check_load(defects, traps, task)
+    elif is_cases(defects):
         errors += check_cases(defects, traps, elements or {})
     else:
         defect_places = set().union(*(places(row[2]) for row in defects)) if defects else set()
@@ -152,7 +218,7 @@ def build_template(defects, path: Path):
     book = Workbook()
     sheet = book.active
     sheet.title = 'Ответ'
-    first = ['Кейс', 'Место'] if is_cases(defects) else ['Тест', 'Файл:строка']
+    first = {'cases': ['Кейс', 'Место'], 'load': ['Единица', 'Место']}.get(kind_of(defects), ['Тест', 'Файл:строка'])
     header(sheet, [*first, 'Что не так', 'Почему это проблема', 'Как исправить'], [12, 28, 50, 50, 50])
     tests = list(dict.fromkeys(row[1] for row in defects))
     row = 2
@@ -169,9 +235,11 @@ def build_scoring(defects, traps, path: Path):
     book = Workbook()
     sheet = book.active
     sheet.title = 'Подсчёт'
-    cases = is_cases(defects)
+    kind = kind_of(defects)
+    cases = kind in ('cases', 'load')
     if cases:
-        header(sheet, ['№', 'Кейс / где', 'Место', 'Категория', 'Суть', 'Засчитываем, если…', '0 или 1'],
+        unit = 'Единица / где' if kind == 'load' else 'Кейс / где'
+        header(sheet, ['№', unit, 'Место', 'Категория', 'Суть', 'Засчитываем, если…', '0 или 1'],
                [9, 14, 30, 11, 45, 55, 9])
     else:
         header(sheet, ['№', 'Тест / где', 'Место', 'Суть', 'Засчитываем, если…', '0 или 1'], [9, 14, 30, 45, 55, 9])
@@ -189,7 +257,7 @@ def build_scoring(defects, traps, path: Path):
         row += 1
     last_defect = row - 1
     row += 1
-    what = 'кейс верен' if cases else 'код корректен'
+    what = {'cases': 'кейс верен', 'load': 'место верно'}.get(kind, 'код корректен')
     where = 'место верно' if cases else 'код верен'
     gap = [''] if cases else []
     for col, value in enumerate(['Ловушки', '', '', *gap, f'Почему {what}',
@@ -199,8 +267,9 @@ def build_scoring(defects, traps, path: Path):
         cell.font, cell.alignment = HEADER, WRAP
     row += 1
     first_trap = row
-    for number, place, hit, why in traps:
-        for col, value in enumerate([number, '', place, *gap, why, hit], start=1):
+    for trap in traps:
+        number, unit, place, hit, why = trap if kind == 'load' else (trap[0], '', *trap[1:])
+        for col, value in enumerate([number, unit, place, *gap, why, hit], start=1):
             sheet.cell(row=row, column=col, value=plain(value)).alignment = WRAP
         zero_one.add(sheet.cell(row=row, column=score))
         row += 1
@@ -222,7 +291,22 @@ def show_cases(defects, traps, task: Path):
             print(f'{row[0]} {element}: {text}{tail}'.replace('\n', ' / '))
 
 
+def show_load(defects, traps, task: Path):
+    files = load_places.unit_files(task)
+    for row in defects + traps:
+        number, unit, place = row[0], row[1], row[2]
+        kind = load_places.KINDS.get(unit)
+        if kind is None or unit not in files:
+            print(f'{number} {unit}: нет файла единицы')
+            continue
+        for key in sorted(load_places.place_keys(kind, place)):
+            print(f'{number} {unit} {key}: {load_places.describe(kind, files[unit], key)}')
+
+
 def show(defects, traps, task: Path):
+    if kind_of(defects) == 'load':
+        show_load(defects, traps, task)
+        return
     if is_cases(defects):
         show_cases(defects, traps, task)
         return
@@ -242,8 +326,20 @@ def show(defects, traps, task: Path):
                     print(f'{row[0]} {label}:{n}: {lines[n - 1].strip() if n <= len(lines) else "<нет строки>"}')
 
 
-def build(task: Path):
+def summary(defects) -> str:
+    counts = Counter(row[3] for row in defects)
+    return 'Категории: ' + ', '.join(f'{c} — {counts.get(c, 0)}' for c in ['М', '1', '2', '3', '4', '5'])
+
+
+def build(task: Path, partial=False):
     defects, traps = parse_key(task / 'jury' / 'answer-key.md')
+    if kind_of(defects) == 'load':
+        check(defects, traps, task=task, partial=partial)
+        if not partial:
+            build_template(defects, task / 'participant' / 'answer-template.xlsx')
+            build_scoring(defects, traps, task / 'jury' / 'scoring-sheet.xlsx')
+        print(summary(defects))
+        return
     elements = None
     if is_cases(defects):
         export = task / 'participant' / 'testcases.xlsx'
@@ -265,5 +361,5 @@ if __name__ == '__main__':
     if '--show' in sys.argv:
         show(*parse_key(target / 'jury' / 'answer-key.md'), target)
     else:
-        build(target)
-        print(f'Готово: {target.name}')
+        build(target, partial='--partial' in sys.argv)
+        print(f'Готово: {target.name}' + (' (только проверка мест)' if '--partial' in sys.argv else ''))
