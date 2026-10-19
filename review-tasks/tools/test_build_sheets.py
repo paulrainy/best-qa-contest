@@ -287,3 +287,12 @@ def test_show_prints_load_places(tmp_path, monkeypatch, capsys):
     assert 'Д16.2 16 панель:P2: timeseries' in out
     assert 'Д19.3 19 строка:3: SELECT 3;' in out
     assert 'Л1 01 jmx:Thread Group → S6' in out
+
+
+def test_rejects_load_row_with_extra_cells(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch)
+    key = task / 'jury' / 'answer-key.md'
+    key.write_text(key.read_text(encoding='utf-8').replace('| суть | признак |', '| суть (a|b) | признак |', 1),
+                   encoding='utf-8')
+    with pytest.raises(SystemExit, match=r'Д01.1: в строке 6 ячеек, нужно 5 — нет ли «\|» в тексте'):
+        build_sheets.build(task)

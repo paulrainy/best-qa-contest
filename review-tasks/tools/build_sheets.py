@@ -61,9 +61,9 @@ def places(text: str) -> set:
 
 def kind_of(defects) -> str:
     """code — 1а и 1д, cases — 1б, load — 1г (единица из двух цифр)."""
-    if not defects or len(defects[0]) - 1 != CASE_CELLS:
-        return 'code'
-    return 'load' if re.fullmatch(r'\d{2}', defects[0][1]) else 'cases'
+    if defects and len(defects[0]) > 1 and re.fullmatch(r'\d{2}', defects[0][1]):
+        return 'load'
+    return 'cases' if defects and len(defects[0]) - 1 == CASE_CELLS else 'code'
 
 
 def is_cases(defects) -> bool:
@@ -157,6 +157,10 @@ def check_load(defects, traps, task: Path) -> list:
             errors.append(f'{number}: в единице {unit} нет места {key}')
         return keys
 
+    for row in defects + traps:
+        need = CASE_CELLS if row[0].startswith('Д') else 4
+        if len(row) - 1 != need:
+            errors.append(f'{row[0]}: в строке {len(row) - 1} ячеек, нужно {need} — нет ли «|» в тексте')
     defect_places = set()
     for number, unit, place, category, *_ in defects:
         if number[1:3] != unit:
