@@ -173,14 +173,21 @@ def write_dashboard(path: Path):
     path.write_text(json.dumps(data), encoding='utf-8')
 
 
-LOAD_PLACE = {'jmx': '`Thread Group → S{n}`', 'sql': 'строка {n}', 'json': 'Панель «P{n}»'}
+LOAD_PLACE = {'jmx': '`Thread Group → S{n}`', 'sql': 'строка {n}', 'json': 'Панель «P{n}»', 'protocol': 'Раздел {n}'}
+
+PROTOCOL = '# Протокол\n\n' + '\n'.join(f'## {n}. Раздел {n}\nТекст.\n' for n in range(1, 7))
+
+
+def write_protocol(task: Path, unit: str):
+    import build_protocols
+    source = task / 'jury' / 'source' / 'protocols' / f'{unit}-p.md'
+    source.parent.mkdir(parents=True, exist_ok=True)
+    source.write_text(PROTOCOL, encoding='utf-8')
+    build_protocols.write(build_protocols.parse(source), source, task / 'participant' / 'protocols' / f'{unit}-p.docx')
 
 
 def make_load_task(tmp_path: Path, monkeypatch, place=None, category=None, number=None, defects_of_first=5,
                    trap_place=None, units=range(1, 21), traps=10) -> Path:
-    # До сборщика протоколов единицы 11–15 в фикстуре — SQL
-    for unit in range(11, 16):
-        monkeypatch.setitem(load_places.KINDS, f'{unit:02d}', 'sql')
     (tmp_path / 'jury').mkdir()
     for folder in ('scripts', 'monitoring'):
         (tmp_path / 'participant' / folder).mkdir(parents=True)
@@ -191,6 +198,8 @@ def make_load_task(tmp_path: Path, monkeypatch, place=None, category=None, numbe
         kind = load_places.KINDS[unit]
         if kind == 'jmx':
             write_jmx(tmp_path / 'participant' / 'scripts' / f'{unit}-s.jmx')
+        elif kind == 'protocol':
+            write_protocol(tmp_path, unit)
         elif kind == 'json':
             write_dashboard(tmp_path / 'participant' / 'monitoring' / f'{unit}-d.json')
         else:
@@ -296,3 +305,18 @@ def test_rejects_load_row_with_extra_cells(tmp_path, monkeypatch):
                    encoding='utf-8')
     with pytest.raises(SystemExit, match=r'Д01.1: в строке 6 ячеек, нужно 5 — нет ли «\|» в тексте'):
         build_sheets.build(task)
+
+
+def test_rejects_stale_protocol(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch)
+    build_sheets.build(task)
+    source = task / 'jury' / 'source' / 'protocols' / '11-p.md'
+    source.write_text(PROTOCOL.replace('Текст.', 'Новый текст.', 1), encoding='utf-8')
+    with pytest.raises(SystemExit, match='протокол 11 старше исходника — запустите build_protocols.py'):
+        build_sheets.build(task)
+
+
+def test_show_prints_protocol_place(tmp_path, monkeypatch, capsys):
+    task = make_load_task(tmp_path, monkeypatch)
+    build_sheets.show(*build_sheets.parse_key(task / 'jury' / 'answer-key.md'), task)
+    assert 'Д11.2 11 раздел:2: 2. Раздел 2' in capsys.readouterr().out
