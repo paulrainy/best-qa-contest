@@ -219,7 +219,10 @@ def build(task: Path) -> list:
     built = []
     for md in sorted((task / 'jury' / 'source' / 'protocols').glob('[0-9][0-9]-*.md')):
         out = task / 'participant' / 'protocols' / f'{md.stem}.docx'
-        write(parse(md), md, out)
+        protocol = parse(md)
+        if out.exists() and Document(out).core_properties.identifier == source_hash(md):
+            continue  # документ актуален: не пересобираем, чтобы не менять файл без причины
+        write(protocol, md, out)
         built.append(out)
     return built
 
@@ -228,4 +231,4 @@ if __name__ == '__main__':
     if '--help' in sys.argv or len(sys.argv) < 2:
         sys.exit(__doc__)
     done = build(Path(sys.argv[1]).resolve())
-    print('Готово:', ', '.join(p.name for p in done))
+    print('Готово:', ', '.join(p.name for p in done) or 'все документы актуальны')

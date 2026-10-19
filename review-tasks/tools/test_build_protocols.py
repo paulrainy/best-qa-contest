@@ -113,3 +113,15 @@ def test_build_writes_participant_docx(tmp_path):
     source(folder)
     bp.build(task)
     assert (task / 'participant' / 'protocols' / '11-max.docx').exists()
+
+
+def test_build_skips_up_to_date(tmp_path):
+    task = tmp_path / 'task'
+    folder = task / 'jury' / 'source' / 'protocols'
+    folder.mkdir(parents=True)
+    source(folder)
+    bp.build(task)
+    out = task / 'participant' / 'protocols' / '11-max.docx'
+    before = out.read_bytes()
+    assert bp.build(task) == []
+    assert out.read_bytes() == before
