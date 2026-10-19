@@ -320,3 +320,25 @@ def test_show_prints_protocol_place(tmp_path, monkeypatch, capsys):
     task = make_load_task(tmp_path, monkeypatch)
     build_sheets.show(*build_sheets.parse_key(task / 'jury' / 'answer-key.md'), task)
     assert 'Д11.2 11 раздел:2: 2. Раздел 2' in capsys.readouterr().out
+
+
+def test_rejects_broken_fixed_dashboard(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch)
+    fixed = task / 'jury' / 'fixed' / 'monitoring'
+    fixed.mkdir(parents=True)
+    (fixed / '16-d.json').write_text('{"title": ', encoding='utf-8')
+    with pytest.raises(SystemExit, match='16-d.json: не разбирается'):
+        build_sheets.build(task)
+
+
+CHARTS_STUB = '''
+def check(unit):
+    return ['Таблица 1. Ступени'] if unit == '11' else []
+'''
+
+
+def test_rejects_protocol_tables_out_of_sync_with_charts(tmp_path, monkeypatch):
+    task = make_load_task(tmp_path, monkeypatch)
+    (task / 'jury' / 'source' / 'protocols' / 'charts.py').write_text(CHARTS_STUB, encoding='utf-8')
+    with pytest.raises(SystemExit, match='протокол 11: таблицы не совпадают с данными графиков: Таблица 1. Ступени'):
+        build_sheets.build(task)

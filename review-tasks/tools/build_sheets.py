@@ -178,7 +178,28 @@ def check_load(defects, traps, task: Path) -> list:
     for unit, source in sorted(files.items()):
         if load_places.KINDS[unit] == 'protocol' and protocol_stale(unit, source, task):
             errors.append(f'протокол {unit} старше исходника — запустите build_protocols.py')
+    for dashboard in sorted((task / 'jury' / 'fixed' / 'monitoring').glob('*.json')):
+        errors += [f'исправленный дашборд {e}' for e in load_places.check_dashboard(dashboard)]
+    errors += charts_mismatch(task, files)
     return errors
+
+
+def charts_mismatch(task: Path, files: dict) -> list:
+    """Таблицы протоколов против данных графиков: charts.check(unit) из jury/source/protocols."""
+    path = task / 'jury' / 'source' / 'protocols' / 'charts.py'
+    if not path.exists():
+        return []
+    import importlib.util
+    sys.path.insert(0, str(path.parent))
+    try:
+        spec = importlib.util.spec_from_file_location(f'charts_{abs(hash(str(path)))}', path)
+        charts = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(charts)
+        units = [u for u in sorted(files) if load_places.KINDS[u] == 'protocol']
+        return [f'протокол {u}: таблицы не совпадают с данными графиков: ' + '; '.join(missing)
+                for u in units if (missing := charts.check(u))]
+    finally:
+        sys.path.remove(str(path.parent))
 
 
 def check(defects, traps, elements=None, task=None, partial=False):
