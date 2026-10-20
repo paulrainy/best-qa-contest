@@ -1,0 +1,464 @@
+{
+  "uid": "efr-nt-jmeter",
+  "title": "ЕФР НТ — JMeter",
+  "tags": [
+    "efr",
+    "nt",
+    "jmeter"
+  ],
+  "timezone": "Europe/Moscow",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "application",
+        "label": "Тест",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-nt"
+        },
+        "query": "SHOW TAG VALUES FROM \"jmeter\" WITH KEY = \"application\"",
+        "refresh": 2,
+        "multi": false
+      },
+      {
+        "name": "transaction",
+        "label": "Операция",
+        "type": "query",
+        "datasource": {
+          "type": "influxdb",
+          "uid": "influxdb-nt"
+        },
+        "query": "SHOW TAG VALUES FROM \"jmeter\" WITH KEY = \"transaction\" WHERE \"application\" =~ /^$application$/",
+        "regex": "/^ОП-/",
+        "refresh": 2,
+        "multi": true,
+        "includeAll": true
+      }
+    ]
+  },
+  "annotations": {
+    "list": []
+  },
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Активные потоки",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT max(\"maxAT\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"transaction\" = 'internal' AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "Потоки"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Интенсивность по операциям",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT sum(\"count\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'all' AND \"transaction\" =~ /^$transaction$/ GROUP BY time($__interval), \"transaction\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_transaction"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Среднее время отклика",
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT mean(\"avg\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY time($__interval), \"transaction\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_transaction"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "95-й перцентиль по окнам",
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT max(\"pct95.0\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY time($__interval), \"transaction\" fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_transaction"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "95-й перцентиль за тест",
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "colorMode": "value"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT mean(\"pct95.0\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY \"transaction\"",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_transaction"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "95-й перцентиль ОП-01",
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT max(\"pct95.0\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" = 'ОП-01 Поиск клиента по паспорту' AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "p95 ОП-01"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Ошибки по операциям",
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT sum(\"count\") FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY time($__interval), \"transaction\" fill(0)",
+          "rawQuery": true,
+          "resultFormat": "time_series",
+          "alias": "$tag_transaction"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "table",
+      "title": "Таблица операций",
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "influxdb",
+        "uid": "influxdb-nt"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT sum(\"count\") AS \"Запросов\" FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'all' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY \"transaction\"",
+          "rawQuery": true,
+          "resultFormat": "table",
+          "alias": "$tag_transaction"
+        },
+        {
+          "refId": "B",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT max(\"pct95.0\") AS \"Худший p95 окна, мс\" FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ok' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY \"transaction\"",
+          "rawQuery": true,
+          "resultFormat": "table",
+          "alias": "$tag_transaction"
+        },
+        {
+          "refId": "C",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "influxdb-nt"
+          },
+          "query": "SELECT sum(\"count\") AS \"Ошибок\" FROM \"jmeter\" WHERE \"application\" =~ /^$application$/ AND \"statut\" = 'ko' AND \"transaction\" =~ /^$transaction$/ AND $timeFilter GROUP BY \"transaction\"",
+          "rawQuery": true,
+          "resultFormat": "table",
+          "alias": "$tag_transaction"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        }
+      ]
+    }
+  ]
+}

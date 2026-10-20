@@ -1,4 +1,4 @@
-"""Выгрузка Test IT для задания 1б из текстового исходника кейсов.
+"""Выгрузка Test IT для задания 1b из текстового исходника кейсов.
 
 Запуск: python build_testcases.py ../1b-testcase-review [--partial] [--dump ID]
 Собирает jury/source/testcases.md → participant/testcases.xlsx
