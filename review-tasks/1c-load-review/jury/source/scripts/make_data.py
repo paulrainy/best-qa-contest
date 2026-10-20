@@ -1,4 +1,4 @@
-"""CSV для сценариев 1г. Запуск из папки tools: .venv/bin/python ../1g-load-review/jury/source/scripts/make_data.py
+"""CSV для сценариев 1c. Запуск из папки tools: .venv/bin/python ../1c-load-review/jury/source/scripts/make_data.py
 
 Пишет participant/scripts/data/ и, где данные исправленной версии отличаются, jury/fixed/scripts/data/.
 Данные вымышленные, генерация детерминирована (seed).

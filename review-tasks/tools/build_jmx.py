@@ -1,6 +1,6 @@
-"""Сценарии JMeter задания 1г из исходников на Python.
+"""Сценарии JMeter задания 1c из исходников на Python.
 
-Запуск: python build_jmx.py ../1g-load-review [--tree NN]
+Запуск: python build_jmx.py ../1c-load-review [--tree NN]
 Исходники — jury/source/scripts/NN_<операция>.py. В каждом FILE = 'NN-<операция>' и plan(fixed) -> jmx.El.
 Пишет participant/scripts/<FILE>.jmx (plan(False), с дефектами) и jury/fixed/scripts/<FILE>.jmx (plan(True)).
 --tree NN печатает все пути плана с классом элемента — по ним пишется место в ключе.

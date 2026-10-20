@@ -54,7 +54,7 @@ def test_rejects_broken_key(tmp_path, kwargs, message):
         build_sheets.build(task)
 
 
-# ---------- Задание 1б: место вида «Шаг N» ----------
+# ---------- Задание 1b: место вида «Шаг N» ----------
 
 import build_testcases
 
@@ -151,7 +151,7 @@ def test_case_key_rejects_stale_export(tmp_path):
         build_sheets.build(task)
 
 
-# ---------- Задание 1г: сценарии, протоколы, дашборды, SQL ----------
+# ---------- Задание 1c: сценарии, протоколы, дашборды, SQL ----------
 
 import json
 

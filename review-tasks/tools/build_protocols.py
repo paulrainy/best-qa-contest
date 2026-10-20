@@ -1,6 +1,6 @@
-"""Протоколы НТ задания 1г: Markdown-исходник → .docx.
+"""Протоколы НТ задания 1c: Markdown-исходник → .docx.
 
-Запуск: python build_protocols.py ../1g-load-review
+Запуск: python build_protocols.py ../1c-load-review
 Читает jury/source/protocols/NN-*.md, пишет participant/protocols/NN-*.docx.
 
 Исходник:

@@ -1,9 +1,9 @@
-"""Графики протоколов 1г в стиле Grafana и Zabbix.
+"""Графики протоколов 1c в стиле Grafana и Zabbix.
 
 Запуск из папки tools:
-    .venv/bin/python ../1g-load-review/jury/source/protocols/charts.py 11 12   — нарисовать графики протоколов
-    .venv/bin/python ../1g-load-review/jury/source/protocols/charts.py --tables 11 — таблицы средних в Markdown
-    .venv/bin/python ../1g-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables
+    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py 11 12   — нарисовать графики протоколов
+    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --tables 11 — таблицы средних в Markdown
+    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables
 
 Числа каждого протокола задаёт его модуль data_NN.py рядом: константы ступеней или интервалов и функция
 series(), которая строит ряды по формулам с шумом и фиксированным seed. Таблицы протокола берутся из --tables,

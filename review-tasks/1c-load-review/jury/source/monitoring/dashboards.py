@@ -1,5 +1,5 @@
-"""Дашборды Grafana 16–18 задания 1г. Запуск из папки tools:
-.venv/bin/python ../1g-load-review/jury/source/monitoring/dashboards.py
+"""Дашборды Grafana 16–18 задания 1c. Запуск из папки tools:
+.venv/bin/python ../1c-load-review/jury/source/monitoring/dashboards.py
 
 Пишет participant/monitoring/NN-*.json (с дефектами) и jury/fixed/monitoring/NN-*.json (исправленные).
 Дефекты помечены номерами из ключа. JSON сокращён до полей, которые влияют на вид и запросы.

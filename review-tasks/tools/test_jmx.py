@@ -201,11 +201,11 @@ def test_jmeter_flags_misspelled_property(tmp_path):
 def test_sources_can_import_helpers(tmp_path):
     task = make_task(tmp_path)
     scripts = task / 'jury' / 'source' / 'scripts'
-    (scripts / 'helpers_1g.py').write_text("NAME = 'GET /from-helper'\n", encoding='utf-8')
+    (scripts / 'helpers_1c.py').write_text("NAME = 'GET /from-helper'\n", encoding='utf-8')
     (scripts / '02_helper.py').write_text(
-        "import jmx\nimport helpers_1g\nFILE = '02-helper'\n\n\ndef plan(fixed):\n"
+        "import jmx\nimport helpers_1c\nFILE = '02-helper'\n\n\ndef plan(fixed):\n"
         "    return jmx.test_plan('x', [jmx.thread_group('Thread Group', 1, 1, children=[\n"
-        "        jmx.http_request(helpers_1g.NAME, 'GET', '/h')])])\n", encoding='utf-8')
+        "        jmx.http_request(helpers_1c.NAME, 'GET', '/h')])])\n", encoding='utf-8')
     assert 'Thread Group → GET /from-helper' in build_jmx.tree(task, '02')
 
 
