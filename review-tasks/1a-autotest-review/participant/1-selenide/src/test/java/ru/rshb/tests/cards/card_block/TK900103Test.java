@@ -39,6 +39,7 @@ public class TK900103Test extends CardsHelper {
         CardProfilePage cardPage = openCard("Шаг 1: Найти клиента и открыть заблокированную карту", searchPage,
                 TK900101Test.blockedCardClient.getPassportSeries(), TK900101Test.blockedCardClient.getPassportNumber(),
                 TK900101Test.blockedCardNumber);
+        // Статус после открытия не проверяем: карта заведомо заблокирована
 
         // =---> Шаг 2: Разблокировать карту
         unblockCard("Шаг 2: Разблокировать карту с подтверждением старшего менеджера", cardPage,

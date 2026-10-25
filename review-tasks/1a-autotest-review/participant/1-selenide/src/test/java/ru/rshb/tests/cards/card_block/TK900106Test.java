@@ -51,10 +51,11 @@ public class TK900106Test extends CardsHelper {
         // =---> Шаг 2: Ввести сумму на 1 ₽ больше максимальной
         setCashLimit("Шаг 2: Ввести лимит 500 001 ₽ и сохранить", cardPage, "500001");
         $x(cardPage.successNotificationXpath).as("Сообщение 'Лимит изменён'").shouldNotBe(visible);
+        allureReport.messageWithConsole("Шаг 2: Отображается ошибка 'Превышен максимальный лимит 500 000 ₽'");
 
         // =---> Шаг 3: Лимит не изменился
         refresh();
         openTab("Шаг 3: Обновить карточку и открыть вкладку 'Лимиты'", "Лимиты");
-        assertEquals(DEFAULT_CASH_LIMIT, $x(cardPage.cashLimitInputXpath).getValue(), "Лимит после обновления");
+        assertEquals($x(cardPage.cashLimitInputXpath).getValue(), DEFAULT_CASH_LIMIT, "Лимит после обновления");
     }
 }
