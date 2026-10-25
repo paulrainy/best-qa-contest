@@ -20,3 +20,4 @@ class TestSecondIis:
 
         with reporting.step('Проверить, что второй ИИС не открыт'):
             assert_that(response.status_code, is_not(201), 'Второй ИИС не должен открываться')
+            # Текст ошибки на стендах разный, поэтому проверяем только код ответа

@@ -32,3 +32,4 @@ class TestTaxReportRequest:
         with reporting.step('Проверить запрос'):
             request_time = datetime.fromisoformat(request['RequestTime'])
             assert_that(request_time.date(), equal_to(date.today()), 'Дата запроса')
+            # Номера договоров СОФР берёт из своей базы, в запросе их не проверяем

@@ -2,7 +2,8 @@
 
 Запуск: python build_sheets.py ../1a-autotest-review [--show]
 Читает jury/answer-key.md, пишет participant/answer-template.xlsx и jury/scoring-sheet.xlsx.
-Падает, если тестов не 20, в тесте не 5 дефектов, ловушек не 10 или дефект и ловушка указывают на одну строку.
+Падает, если тестов не 20, в тесте не 5 дефектов, ловушек не 10, дефект и ловушка указывают на одну строку
+или два дефекта — на одну строку кода.
 --show печатает строки кода, на которые ссылается ключ, — для сверки глазами.
 
 Задание 1b (ревью тест-кейсов): в строке дефекта есть колонка «Категория», место пишется как «Шаг 3»,
@@ -39,6 +40,8 @@ CATEGORIES = {'М', '1', '2', '3', '4', '5'}
 HEADER = Font(bold=True)
 FILL = PatternFill('solid', fgColor='DDEBF7')
 WRAP = Alignment(wrap_text=True, vertical='top')
+FOUND = 'Найден (1/0)'    # столбец отметок проверяющего: 1 — дефект найден
+CAUGHT = 'Попался (1/0)'  # тот же столбец в блоке ловушек: 1 — участник попал в ловушку
 
 
 def parse_key(key: Path):
@@ -219,6 +222,13 @@ def check(defects, traps, elements=None, task=None, partial=False):
         errors += check_cases(defects, traps, elements or {})
     else:
         defect_places = set().union(*(places(row[2]) for row in defects)) if defects else set()
+        owners = {}
+        for row in defects:
+            for place in places(row[2]):
+                owners.setdefault(place, []).append(row[0])
+        for place, numbers in sorted(owners.items()):
+            if len(numbers) > 1:
+                errors.append(f'{" и ".join(numbers)} в одной строке: {place}')
         for row in traps:
             for place in sorted(places(row[1]) & defect_places):
                 errors.append(f'{row[0]} и дефект в одной строке: {place}')
@@ -244,13 +254,13 @@ def build_template(defects, path: Path):
     sheet = book.active
     sheet.title = 'Ответ'
     first = {'cases': ['Кейс', 'Место'], 'load': ['Единица', 'Место']}.get(kind_of(defects), ['Тест', 'Файл:строка'])
-    header(sheet, [*first, 'Что не так', 'Почему это проблема', 'Как исправить'], [12, 28, 50, 50, 50])
+    header(sheet, [*first, 'Замечание'], [12, 28, 100])
     tests = list(dict.fromkeys(row[1] for row in defects))
     row = 2
     for test in tests:
         for _ in range(DEFECTS_PER_TEST):
             sheet.cell(row=row, column=1, value=test)
-            for col in range(2, 6):
+            for col in range(2, 4):
                 sheet.cell(row=row, column=col).alignment = WRAP
             row += 1
     book.save(path)
@@ -264,10 +274,10 @@ def build_scoring(defects, traps, path: Path):
     cases = kind in ('cases', 'load')
     if cases:
         unit = 'Единица / где' if kind == 'load' else 'Кейс / где'
-        header(sheet, ['№', unit, 'Место', 'Категория', 'Суть', 'Засчитываем, если…', '0 или 1'],
-               [9, 14, 30, 11, 45, 55, 9])
+        header(sheet, ['№', unit, 'Место', 'Категория', 'Суть', 'Засчитываем, если…', FOUND],
+               [9, 14, 30, 11, 45, 55, 12])
     else:
-        header(sheet, ['№', 'Тест / где', 'Место', 'Суть', 'Засчитываем, если…', '0 или 1'], [9, 14, 30, 45, 55, 9])
+        header(sheet, ['№', 'Тест / где', 'Место', 'Суть', 'Засчитываем, если…', FOUND], [9, 14, 30, 45, 55, 12])
     score = 7 if cases else 6
     letter = 'G' if cases else 'F'
     zero_one = DataValidation(type='whole', operator='between', formula1='0', formula2='1', allow_blank=True,
@@ -286,8 +296,8 @@ def build_scoring(defects, traps, path: Path):
     where = 'место верно' if cases else 'код верен'
     gap = [''] if cases else []
     for col, value in enumerate(['Ловушки', '', '', *gap, f'Почему {what}',
-                                 'Ставим 1, если участник предлагает «исправить» это место. '
-                                 f'Если сам объяснил, почему {where}, — 0. Каждая ловушка −2 балла'], start=1):
+                                 'Ставим 1, если участник считает это место ошибкой. '
+                                 f'Если сам объяснил, почему {where}, — 0. Каждая ловушка −2 балла', CAUGHT], start=1):
         cell = sheet.cell(row=row, column=col, value=value)
         cell.font, cell.alignment = HEADER, WRAP
     row += 1
