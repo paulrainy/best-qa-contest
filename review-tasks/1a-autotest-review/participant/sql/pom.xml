@@ -7,7 +7,7 @@
     <groupId>ru.rshb.contest</groupId>
     <artifactId>autotest-review-sql</artifactId>
     <version>1.0</version>
-    <name>Песочница задания 1а: Java + SQL</name>
+    <name>Песочница задания 1a: Java + SQL</name>
 
     <properties>
         <maven.compiler.release>17</maven.compiler.release>
