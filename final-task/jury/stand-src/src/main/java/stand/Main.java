@@ -46,6 +46,8 @@ public class Main {
         }
         System.out.println("  БД (только чтение): jdbc:h2:tcp://localhost:" + cfg.str("db.port") + "/mem:stand"
                 + "  (логин " + cfg.str("db.user") + " / " + cfg.str("db.password") + ")");
+        System.out.println("  БД (протокол PostgreSQL): localhost:" + cfg.str("db.pg.port") + ", база stand"
+                + "  (логин " + cfg.str("db.user") + " / " + cfg.str("db.password") + ")");
         System.out.println("  Веб-консоль БД:    http://localhost:" + cfg.str("db.console.port") + "/");
         System.out.println("  Метрики:           http://localhost:" + cfg.str("http.port") + "/metrics");
         System.out.println("Остановить: Ctrl+C");

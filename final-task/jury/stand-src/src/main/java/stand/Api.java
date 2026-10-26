@@ -175,6 +175,7 @@ final class Api {
             notifications.pause();
             mq.redeclareAndPurge();
             db.reset();
+            db.linkPgReplica();
             clock.reset();
             accounting.clearAttempts();
             accounting.start();

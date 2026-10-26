@@ -86,6 +86,33 @@
                     </archive>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.7.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>proguard</goal></goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <proguardVersion>7.10.0</proguardVersion>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>transfer-stand.jar</outjar>
+                    <obfuscate>true</obfuscate>
+                    <includeDependency>true</includeDependency>
+                    <attach>false</attach>
+                    <proguardInclude>${project.basedir}/proguard.pro</proguardInclude>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.guardsquare</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>7.10.0</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
         </plugins>
     </build>
 </project>

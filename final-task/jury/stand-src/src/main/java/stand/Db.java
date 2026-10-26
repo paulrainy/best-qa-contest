@@ -51,7 +51,41 @@ final class Db {
         reset();
         Server.createTcpServer("-tcpPort", cfg.str("db.port")).start();
         Server.createWebServer("-webPort", cfg.str("db.console.port")).start();
+        // Протокол PostgreSQL (psycopg из Python, драйвер PostgreSQL в DBeaver), база «stand».
+        // H2 по этому протоколу требует прав администратора, поэтому участник подключается к отдельной базе,
+        // где таблицы основной базы подключены только на чтение.
+        linkPgReplica();
+        Server.createPgServer("-pgPort", cfg.str("db.pg.port"), "-key", DB_NAME, "mem:" + DB_NAME + "_pg").start();
         System.out.println("  БД запущена");
+    }
+
+    private static final String[] TABLES = {"clients", "accounts", "transfers", "postings", "notifications"};
+
+    /** Пересоздаёт в базе для протокола PostgreSQL ссылки на таблицы основной базы (только чтение). */
+    synchronized void linkPgReplica() throws SQLException {
+        String user = cfg.str("db.user");
+        String password = cfg.str("db.password");
+        try (Connection c = java.sql.DriverManager.getConnection("jdbc:h2:mem:" + DB_NAME + "_pg;DB_CLOSE_DELAY=-1;"
+                + "MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH", user, password);
+             Statement s = c.createStatement()) {
+            s.execute("CREATE SCHEMA IF NOT EXISTS src");
+            for (String t : TABLES) {
+                s.execute("DROP VIEW IF EXISTS public." + t);
+                s.execute("DROP TABLE IF EXISTS src." + t);
+                s.execute("CREATE LINKED TABLE src." + t + "('org.h2.Driver', 'jdbc:h2:mem:" + DB_NAME + "', '"
+                        + user.toUpperCase() + "', '" + password.replace("'", "''") + "', 'PUBLIC', '"
+                        + t.toUpperCase() + "') READONLY");
+                StringBuilder cols = new StringBuilder();
+                try (ResultSet rs = c.getMetaData().getColumns(null, "src", t, null)) {
+                    while (rs.next()) {
+                        String col = rs.getString("COLUMN_NAME");
+                        cols.append(cols.length() == 0 ? "" : ", ").append('"').append(col).append("\" AS ")
+                                .append(col.toLowerCase());
+                    }
+                }
+                s.execute("CREATE VIEW public." + t + " AS SELECT " + cols + " FROM src." + t);
+            }
+        }
     }
 
     Connection connection() throws SQLException {
