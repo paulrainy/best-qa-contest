@@ -151,7 +151,11 @@
 | Запустить на другом стенде | `mvn test -Dstand=PGRF1RT` |
 | Открыть отчёт Allure после прогона | `mvn allure:serve` |
 
-В PowerShell параметры с точкой берите в кавычки, например `mvn test "-Dcft.port=18091"`.
+В PowerShell параметры с точкой берите в кавычки, например:
+
+```powershell
+mvn test "-Dcft.port=18091"
+```
 
 В Git Bash на Windows русский текст в консоли выводится кракозябрами. Один раз выполните в Git Bash:
 
