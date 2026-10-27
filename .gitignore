@@ -15,3 +15,8 @@ target/
 build/
 help-docs/
 review-tasks/tools/.venv/
+# Финальный кейс: собранный стенд и файлы, которые он создаёт при запуске
+final-task/participant/stand/lib/
+final-task/participant/stand/transfer-stand.jar
+final-task/participant/stand/test-data/
+~$scoring-sheet.xlsx
