@@ -31,7 +31,8 @@ class TestCloseWithBalance:
             assert_that(response.json()['errorMessage'], equal_to('Для закрытия договора выведите денежные средства'),
                         'Текст ошибки')
             assert_that(invest_db.get_agreements(client['id'])[0]['status'], equal_to('ACTIVE'), 'Статус договора')
-            agreement_api = invest_api.get_agreement(agreement['id'], token)
-            assert_that(agreement_api.json()['status'], equal_to('ACTIVE'), 'Статус договора по API')
             account = invest_db.get_account(agreement['id'])
-            assert_that(account['balance'], equal_to(1000), 'Остаток на счёте')
+            assert_that(account['balance'], equal_to(1000), 'Остаток на счёте после отказа')
+            agreement_api = invest_api.get_agreement(agreement['id'], token)
+            assert_that(agreement_api.status_code, equal_to(200), f'Договор не получен: {agreement_api.text}')
+            assert_that(agreement_api.json()['status'], equal_to('ACTIVE'), 'Статус договора по API после отказа')

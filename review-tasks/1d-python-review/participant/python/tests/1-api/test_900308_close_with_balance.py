@@ -1,7 +1,7 @@
 import time
 
 import requests
-from hamcrest import assert_that, contains_string, equal_to
+from hamcrest import assert_that, contains_string, equal_to, greater_than
 
 from framework.reporting import Reporting as reporting
 
@@ -33,4 +33,8 @@ class TestCloseWithBalance:
             assert_that(response.json()['errorMessage'], contains_string('выведите'), 'Текст ошибки')
             assert_that(response.status_code, equal_to(409), 'Код ответа')
             assert_that(invest_db.get_agreements(client['id'])[0]['status'], equal_to('ACTIVE'), 'Статус договора')
+            account = invest_db.get_account(agreement['id'])
+            assert_that(account['balance'], greater_than(0), 'Остаток на счёте после отказа')
             agreement_api = invest_api.get_agreement(agreement['id'], token)
+            assert_that(agreement_api.status_code, equal_to(200), f'Договор не получен: {agreement_api.text}')
+            assert_that(agreement['status'], equal_to('ACTIVE'), 'Статус договора по API после отказа')
