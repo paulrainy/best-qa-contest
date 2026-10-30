@@ -55,6 +55,10 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
                 .setReason("Постановление ФССП № 12345/26/77001-ИП")
                 .clickOk();
 
+        Assertions.assertThat(getHoldKind(deposit))
+                .as("Вид действующей блокировки на 5 000,00 за операционный день")
+                .isIn(R2HoldKind.$ARREST.getCode(), R2HoldKind.$BLOCK.getCode());
+
         Assertions.assertThat(countHolds(deposit))
                 .isPositive();
 
@@ -107,10 +111,28 @@ public class ArrestOnCurrentAccountTest extends BasicTest {
         return DaoCommon.getInstance().selectValue(sql, Long.class, Map.of("depositId", deposit.getId()));
     }
 
+    @Step("Получить вид действующей блокировки на 5 000,00 по договору {deposit.numDog}")
+    private String getHoldKind(Dto_Deposit deposit) {
+
+        String sql = """
+                SELECT h.C_KIND
+                FROM Z#R2_DEP_HOLD h
+                WHERE h.C_DEPOSIT = :depositId
+                  AND h.C_SUM = :sum
+                  AND h.C_STATE = 'ACTIVE'
+                  AND h.C_DATE_BEGIN = :operDay
+                ORDER BY h.ID DESC
+                FETCH FIRST 1 ROWS ONLY""";
+
+        return DaoCommon.getInstance().selectValue(sql, String.class,
+                Map.of("depositId", deposit.getId(), "sum", ARREST_SUM, "operDay", getOperDay()));
+    }
+
+    @Step("Получить доступный остаток по договору {deposit.numDog}")
     private BigDecimal getAvailableBalance(Dto_Deposit deposit) {
 
         String sql = """
-                SELECT a.C_SALDO - NVL(SUM(h.C_SUM), 0)
+                SELECT a.C_SALDO - COALESCE(SUM(h.C_SUM), 0)
                 FROM Z#R2_DEPOSIT d
                 INNER JOIN Z#AC_FIN a ON a.ID = d.C_ACCOUNT
                 LEFT JOIN Z#R2_DEP_HOLD h ON h.C_DEPOSIT = d.ID

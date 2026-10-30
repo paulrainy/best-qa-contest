@@ -20,6 +20,7 @@ class TK900111Test extends BaseTest {
         // Шаг 1: найти клиента, открыть карту
         CardPage cardPage = new CardPage(page).open(client.passportSeries(), client.passportNumber(),
                 lastDigits(cardNumber));
+        assertThat(cardPage.status()).not().hasText("Закрыта");
 
         // Шаг 2: заблокировать с причиной «Компрометация»
         cardPage.block("Компрометация");

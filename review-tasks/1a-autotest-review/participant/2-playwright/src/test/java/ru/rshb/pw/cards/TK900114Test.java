@@ -27,7 +27,7 @@ class TK900114Test extends BaseTest {
         // Шаг 2: открыть вкладку «Реквизиты»
         // Обычный click по вкладке на стенде иногда не срабатывает
         page.getByRole(AriaRole.TAB, new Page.GetByRoleOptions().setName("Реквизиты")).dispatchEvent("click");
-        assertTrue(isCardNumberMasked());
+        assertTrue(isCardNumberMasked(), "В реквизитах должна отображаться маска номера карты");
         assertThat(page.getByText(cardInfo.holderName()).first()).isVisible();
         assertThat(page.locator("xpath=(//dd)[3]")).hasText(cardInfo.expiry());
     }

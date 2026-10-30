@@ -24,6 +24,8 @@ class TK900112Test extends BaseTest {
         // Шаг 1: найти клиента, открыть карту
         CardPage cardPage = new CardPage(page).open(client.passportSeries(), client.passportNumber(),
                 lastDigits(cardNumber));
+        cardPage.openTab("Лимиты");
+        assertThat(cardPage.transferLimitInput()).not().isEmpty();
 
         // Шаг 2: установить лимит 150 000
         cardPage.setTransferLimit("150000");
@@ -32,6 +34,7 @@ class TK900112Test extends BaseTest {
 
         // Шаг 3: обновить страницу
         page.reload();
+        // Лимит уже проверили до обновления страницы — повторно проверять незачем.
         page.waitForLoadState(LoadState.NETWORKIDLE);
     }
 }

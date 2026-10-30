@@ -1,6 +1,7 @@
 package ru.rshb.pw.cards;
 
 import com.microsoft.playwright.Browser;
+import com.microsoft.playwright.Page;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -62,6 +63,8 @@ class TK900113Test extends BaseTest {
     void blockTemporarily() {
         cardPage.blockTemporarily();
         assertThat(cardPage.status()).hasText("Временно заблокирована");
+        assertThat(page.getByText("Снять временную блокировку", new Page.GetByTextOptions().setExact(true)))
+                .isEnabled();
     }
 
     @Test
