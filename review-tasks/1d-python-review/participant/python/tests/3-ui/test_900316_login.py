@@ -21,4 +21,5 @@ class TestCabinetLogin:
 
         with reporting.step('Проверить договор в списке'):
             row = page.get_by_test_id('agreement-row').first
+            expect(row.locator('td').nth(1)).not_to_be_empty()
             expect(row.get_by_test_id('agreement-row-balance')).to_have_text('0,00 ₽')
