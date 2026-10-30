@@ -16,6 +16,7 @@ import model_cft.model.REFERENCES.com_status_prd.enums.ComStatusPrd;
 import model_cft.model.REFERENCES.r2_fin_product.enums.R2FinProduct;
 import model_cft.model.user.CriteriaUser;
 import model_cft.model.user.Dto_User;
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 import tests.BasicTest;
 import utils.AssertionsUtil;
@@ -63,6 +64,7 @@ public class OpenCurrentAccountTest extends BasicTest {
                 .hasStateEqual(ComStatusPrd.$WORK)
                 .whereR2AnnAccount(Timer.setDefault(), account -> account
                         .hasStatusEqualTo(ComStatusPrd.$OPEN));
+        Assertions.assertThat(deposit.getAccount().getNumber()).startsWith("408");
     }
 
     @Step("Подготовка тестовых данных")
@@ -99,5 +101,6 @@ public class OpenCurrentAccountTest extends BasicTest {
         }
 
         AssertionsUtil.assertThat(clPriv).objectExist();
+        Assertions.assertThat(user).as("Операционист найден");
     }
 }

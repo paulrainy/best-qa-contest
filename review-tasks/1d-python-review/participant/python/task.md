@@ -5,14 +5,14 @@
 Коллега написал автотесты на сервис брокерского обслуживания `invest-api` и просит вас проверить их, прежде чем они попадут в общий проект. Одни тесты вызывают API сервиса и проверяют результат в его БД, другие проверяют обмен сообщениями с соседними системами через Kafka, третьи проходят сценарии в веб-кабинете инвестора через Playwright.
 
 1. Проверить нужно код автотестов в двух папках:
-   - `tests/` — общие фикстуры `tests/conftest.py` и тесты:
-     - 10 тестов на API и БД в `tests/api/`, разложенных по функциям сервиса: `test_900301_*.py` … `test_900310_*.py`;
-     - 5 тестов на Kafka в `tests/kafka/` со своими фикстурами `tests/kafka/conftest.py`: `test_900311_*.py` … `test_900315_*.py`;
-     - 5 тестов на Playwright в `tests/ui/` со своими фикстурами `tests/ui/conftest.py`: `test_900316_*.py` … `test_900320_*.py`;
+   - `tests/` — общие фикстуры в `tests/conftest.py` и тесты:
+     - 10 тестов на API и БД в `tests/1-api/`: `test_900301_*.py` … `test_900310_*.py`;
+     - 5 тестов на Kafka в `tests/2-kafka/` со своими фикстурами `tests/2-kafka/conftest.py`: `test_900311_*.py` … `test_900315_*.py`;
+     - 5 тестов на Playwright в `tests/3-ui/` со своими фикстурами `tests/3-ui/conftest.py`: `test_900316_*.py` … `test_900320_*.py`;
    - `invest/` — код, который тесты используют: шаги `invest/steps/clients.py`, SQL-запросы к БД сервиса `invest/db/invest_db.py`, работа с Kafka `invest/kafka/`, page object'ы кабинета `invest/pages/cabinet.py`.
-2. Каждый тест написан по тест-кейсу из Test IT. Тест-кейсы — в конце этого файла.
+2. Тест-кейсы для каждого теста находятся в конце этого файла.
 3. Найдите в тестах всё, что сделано неправильно или плохо.
-4. Запишите каждую проблему отдельной строкой в таблицу. Как оформить таблицу — в разделе «Формат ответа».
+4. Запишите каждую проблему отдельной строкой в таблицу `answer-template.xlsx`.
 
 Папки `framework/` и `sandbox/` и корневой `conftest.py` проверять не нужно. В `framework/` — общий каркас проекта: клиент API, подключение к БД, отчёт. В `sandbox/` — песочница, маленький сервис, на котором запускаются тесты. Считайте, что в них всё правильно.
 
@@ -20,7 +20,7 @@
 
 ## Формат ответа
 
-Заполните таблицу `answer-template.xlsx` в папке `participant/`. В ней по 5 строк на каждый тест, строки можно добавлять.
+Заполните таблицу `answer-template.xlsx`. В ней по 5 строк на каждый тест, строки можно добавлять или убирать.
 
 | Тест | Файл:строка | Замечание |
 | --- | --- | --- |
@@ -40,165 +40,41 @@
 
 ## Что есть в проекте
 
-- **`InvestApi`** (`framework/api/invest_api.py`) — методы API. Каждый возвращает `requests.Response` как есть, код ответа не проверяет.
-- **`DbClient`** (`framework/db/db_client.py`) — подключение к БД сервиса:
-  - `query(sql, *args, fetch_one=False)` выполняет запрос и возвращает строки словарями `{'колонка': значение}`; с `fetch_one=True` — первую строку или `None`;
-  - `execute(sql, *args)` выполняет изменение и сразу фиксирует его (commit).
-- **`Reporting`** (`framework/reporting.py`) — шаги и метки отчёта Allure, `id` связывает тест с кейсом Test IT.
-- **`QAServiceKafkaClient`** (`framework/kafka/qa_service.py`) — доступ к Kafka. Со стендов к Kafka напрямую не подключиться, поэтому сообщения читаются и отправляются через HTTP-сервис QA Service:
-  - `subscribe(topic, cluster_id, seconds_ago=60, limit=100)` — сообщения топика за последние `seconds_ago` секунд, не больше `limit`, по возрастанию offset. Каждое сообщение — словарь с полями `topic`, `partition`, `offset`, `timestamp` (миллисекунды), `key`, `value`. Если такого топика нет, QA Service отвечает 400, и метод бросает `requests.HTTPError`;
-  - `send(topic, cluster_id, value, key=None)` — отправка сообщения.
-- **Фикстуры pytest-playwright** — `page`, `context`, `browser`, `base_url` и другие. Каждый тест получает свой `page` в новом контексте браузера. Браузер — установленный на компьютере, его выбирает корневой `conftest.py`.
-- **`Config`** (`framework/config.py`) — адрес стенда, QA Service, идентификатор кластера Kafka и служебные учётные записи из переменных окружения, по умолчанию — песочница.
+- `tests/1-api/`, `tests/2-kafka/`, `tests/3-ui/` — тесты на API и БД, Kafka и Playwright соответственно.
+- `invest/` — шаги тестов, SQL-запросы, работа с Kafka и страницами кабинета.
+- `framework/` — готовые клиенты и настройки. Методы `InvestApi` возвращают `requests.Response` и сами не проверяют код ответа.
+- БД — SQLite. Даты хранятся текстом `YYYY-MM-DD HH:MM:SS`, время местное. Стенд общий: другие команды и прогоны тоже создают клиентов и поручения.
+- Kafka доступна через HTTP-сервис QA Service; сообщения внешних систем тесты отправляют сами.
 
-### Схема БД сервиса
-
-БД сервиса — SQLite. Даты и время хранятся текстом в формате `YYYY-MM-DD HH:MM:SS`, время местное.
-
-| Таблица | Что хранит | Колонки |
-| --- | --- | --- |
-| `client` | Клиенты | `id`, `login`, `password`, `last_name`, `first_name`, `middle_name`, `phone`, `tariff` (`INVESTOR` — «Инвестор», `TRADER` — «Трейдер»), `status` (`ACTIVE`, `LOCKED`), `failed_logins` — неудачных входов подряд, `created_at` |
-| `agreement` | Договоры | `id`, `client_id`, `number`, `type` (`BROKER` — брокерский договор, `IIS` — ИИС), `status` (`ACTIVE`, `CLOSED`), `opened_at`, `closed_at` |
-| `account` | Денежные счета договоров | `id`, `agreement_id`, `currency`, `balance` |
-| `money_order` | Поручения на пополнение и вывод | `id`, `agreement_id`, `type` (`REFILL`, `WITHDRAW`), `amount`, `commission`, `status` (`NEW`, `EXECUTED`), `created_at`, `executed_at` |
-| `tax_report` | Заявки на справки НДФЛ | `id`, `client_id`, `tax_period` — год, `status` (`ORDERED` — заказана, `READY` — готова), `request_id` — идентификатор запроса в СОФР, `file_name` — файл готовой справки, `registered_at` |
-| `incoming_payment` | Поступления из ЦФТ, уже зачисленные на счёт | `payment_id`, `order_id` — поручение на пополнение, `received_at` |
-| `tariff_history` | История смены тарифа | `id`, `client_id`, `old_tariff`, `new_tariff`, `changed_at` |
-
-Стенд общий: на нём работают другие команды и другие прогоны автотестов, клиенты стенда пополняют счета.
-
-### Топики Kafka
-
-Кластер Kafka стенда — `invest-kafka`. Время в сообщениях — местное, без часового пояса.
-
-| Топик | Кто пишет → кто читает | Что в сообщении |
-| --- | --- | --- |
-| `invest.client-events` | сервис → другие системы | Событие о клиенте: `{"eventType": "CLIENT_CREATED", "clientId": 17, "login": "…", "tariff": "INVESTOR", "eventTime": "2026-10-13T14:05:12.345"}` |
-| `invest.money-orders` | сервис → другие системы | Статус денежного поручения, при каждой смене статуса: `{"eventType": "MONEY_ORDER_STATUS", "orderId": 42, "agreementId": 9, "agreementNumber": "БД-1234567", "type": "REFILL", "amount": "1000.00", "status": "EXECUTED", "source": "CFT", "eventTime": "…"}`. `source` — откуда поручение: `API` или `CFT` |
-| `cft.incoming-payments` | ЦФТ → сервис | Поступление денег на брокерский счёт: `{"PaymentId": "…", "AgreementNumber": "БД-1234567", "Amount": "1000.00", "Currency": "RUB", "PaymentTime": "…"}`. Ключ сообщения — номер договора. Сервис зачисляет поступление сразу, без задержки, и создаёт исполненное поручение на пополнение. ЦФТ может доставить одно и то же поступление повторно — сервис узнаёт его по `PaymentId` и второй раз не зачисляет |
-| `sofr.get-tax-report-info-request` | сервис → СОФР | Запрос справки НДФЛ: `{"GetTaxReportInfoReq": {"RequestId": "…", "ClientId": 17, "AgreementNumbers": ["БД-1234567"], "TaxPeriod": "2025", "RequestTime": "…"}}`. В `AgreementNumbers` — все брокерские договоры клиента |
-| `sofr.get-tax-report-info-response` | СОФР → сервис | Справка готова: `{"RequestId": "…", "Status": "READY", "FileName": "…"}`. Сервис переводит заявку с этим `RequestId` в статус `READY` |
-
-На тестовом стенде ЦФТ и СОФР нет, поэтому их сообщения тесты отправляют сами.
+Подробности методов, схема БД и форматы сообщений — в [справке по проекту](project-reference.md). Обращайтесь к ней по мере необходимости.
 
 ## Как запустить тесты
 
-### Что нужно установить
-
-- **Python 3.10** или новее. Проверить: `python --version`. На Windows, если команда `python` не находится, попробуйте `py --version` и дальше пишите `py` вместо `python`.
-- Для тестов на Playwright — **Яндекс Браузер** или **Google Chrome**. Если установлен Яндекс Браузер, тесты идут в нём, иначе в Chrome. Отдельно скачивать браузеры для Playwright (`playwright install`) не нужно.
-
-Стенд не нужен. Тесты работают с песочницей, она запускается сама вместе с тестами.
-
-### Первый запуск
-
-1. Откройте терминал в этой папке — там, где лежит `requirements.txt`.
-2. Создайте виртуальное окружение. Оно появится в папке `.venv` здесь же, в систему ничего не ставится:
-
-   ```bash
-   python -m venv .venv
-   ```
-
-3. Активируйте окружение:
-
-   | Терминал | Команда |
-   | --- | --- |
-   | PowerShell | `.venv\Scripts\Activate.ps1` |
-   | cmd | `.venv\Scripts\activate.bat` |
-   | Git Bash | `source .venv/Scripts/activate` |
-   | macOS, Linux | `source .venv/bin/activate` |
-
-   В начале строки терминала появится `(.venv)`.
-
-4. Установите библиотеки:
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. Запустите все тесты:
-
-   ```bash
-   pytest
-   ```
-
-6. В конце pytest напишет, сколько тестов прошло и сколько упало.
-
-В следующий раз достаточно открыть терминал в этой папке, активировать окружение (шаг 3) и запустить `pytest`.
-
-Другие варианты запуска:
-
-| Что нужно | Команда |
-| --- | --- |
-| Запустить один тест | `pytest tests/api/orders/test_900305_withdraw.py` |
-| Запустить тесты одной папки | `pytest tests/api/orders`, `pytest tests/kafka` или `pytest tests/ui` |
-| Видеть браузер во время UI-тестов | `pytest tests/ui --headed` |
-| Запустить UI-тесты в Chrome, хотя установлен Яндекс Браузер | `BROWSER=chrome pytest tests/ui` (в PowerShell — `$env:BROWSER="chrome"; pytest tests/ui`) |
-| Видеть запросы к API и БД прямо во время прогона | `pytest -o log_cli=true` |
-| Запустить тесты параллельно в 4 потока, как в CI | `pytest -n 4` |
-
-### Запуск из PyCharm
-
-1. File → Open → выберите эту папку.
-2. Settings → Project → Python Interpreter → Add Interpreter → Add Local Interpreter → Existing → укажите `.venv\Scripts\python.exe` (на macOS и Linux — `.venv/bin/python`). Если окружение ещё не создано, выберите здесь же **Generate new** с папкой `.venv` и установите библиотеки из `requirements.txt` — PyCharm предложит это сам.
-3. Откройте любой тест и нажмите зелёную стрелку рядом с именем класса. Все тесты сразу: правой кнопкой по папке `tests` → Run.
-
-### Где смотреть результат
-
-- **Вывод в консоли** — какие тесты прошли и с какой ошибкой упали остальные. У упавших тестов pytest показывает запросы к API и БД (раздел `Captured log`).
-- **Отчёт Allure** — результаты пишутся в `build/allure-results`. Посмотреть их можно командой `allure serve build/allure-results`, если у вас установлен Allure. Без него тесты работают так же.
-
-- **Скриншот и трейс упавшего UI-теста** — в папке `build/test-results`. Трейс `trace.zip` можно открыть на https://trace.playwright.dev: перетащите файл на страницу, он откроется в вашем браузере и никуда не отправляется. В трейсе видны каждое действие теста и страница до и после него.
-
-То, что тест зелёный, ещё не значит, что к нему нет замечаний.
-
-### Посмотреть песочницу своими руками
-
-Можно запустить песочницу отдельно и вызывать API самому, например из Postman или curl:
+Откройте терминал в этой папке, рядом с `pyproject.toml`. Для запуска используйте **uv**:
 
 ```bash
-python -m sandbox
+uv sync
+uv run pytest
 ```
 
-API — http://localhost:18300/api/v1/, кабинет инвестора — http://localhost:18300/cabinet/. Остановить — Ctrl+C в терминале.
+`uv` сам создаст `.venv` с Python 3.11 и установит зависимости из `uv.lock`; при необходимости скачает Python. Активировать окружение, вызывать системный `python` или `pip` не нужно. При следующих запусках достаточно `uv run pytest`.
 
-| Кто | Логин | Пароль |
-| --- | --- | --- |
-| Сотрудник бэк-офиса — создаёт клиентов и открывает договоры | `bo_operator1` | `Oper1#Playground` |
-| Клиенты стенда | `ivanova_ma`, `petrov_sv`, `smirnov_ap`, `kuznetsova_ei`, `volkov_dn`, `inv_client_lock` | `Client#Playground` |
+Для UI-тестов нужен установленный Яндекс Браузер или Google Chrome. Скачивать браузер через `playwright install` не нужно. Песочница запускается автоматически.
 
-Методы API — в `framework/api/invest_api.py`. Токен из ответа на вход передаётся в заголовке `Authorization: Bearer <токен>`.
-
-QA Service — http://localhost:18300/qa-service/api/kafka/: `POST subscribe` и `POST send` с телом, как в `framework/kafka/qa_service.py`, `GET clusters` — список топиков.
-
-БД песочницы — файл `build/invest.db`. Его можно открыть в DBeaver (тип подключения SQLite) и выполнять свои запросы.
-
-Что полезно знать про песочницу:
-
-- данные хранятся, пока она запущена; при следующем запуске база создаётся заново;
-- поручения на пополнение и вывод через API исполняются примерно через 1,5–2,5 секунды после создания, как процессинг на стенде;
-- входящие топики сервис читает каждые полсекунды;
-- Kafka песочницы хранит сообщения, пока песочница запущена;
-- клиенты стенда каждую секунду пополняют счета — как на общем стенде, где идёт своя жизнь;
-- если песочница уже запущена через `python -m sandbox`, тесты будут работать с ней и свою не поднимут.
-
-### Можно ли что-то менять
-
-Да. Запускайте тесты в любом порядке, правьте их, правьте песочницу в `sandbox/` — например, чтобы проверить, заметит ли тест ошибку в сервисе. Сдавать изменённый код не нужно: оценивается только таблица замечаний.
-
-### Если не запускается
-
-| Что видно | Что делать |
+| Что запустить | Команда |
 | --- | --- |
-| `python: command not found` или открывается Microsoft Store | Python не установлен или его нет в `PATH`. На Windows попробуйте команду `py`. |
-| `python -m venv` пишет, что модуля нет | На Linux поставьте пакет `python3-venv`. |
-| PowerShell не даёт выполнить `Activate.ps1` | Выполните один раз `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` или активируйте окружение из cmd. |
-| `pip` не может скачать библиотеки | Нет доступа к PyPI. Укажите корпоративное зеркало: `pip install -r requirements.txt -i <адрес зеркала>` или возьмите у коллег настроенный `pip.ini`. |
-| «Не найден ни Яндекс Браузер, ни Google Chrome» или UI-тесты открывают не тот браузер | Браузер установлен в нестандартную папку. Укажите путь к нему: `BROWSER_PATH="C:\путь\к\browser.exe" pytest tests/ui` (в PowerShell — `$env:BROWSER_PATH="C:\путь\к\browser.exe"; pytest tests/ui`). |
-| UI-тесты падают с ошибкой про драйвер Playwright или `node` | Не запустился Node.js, который Playwright берёт из своего пакета. Его могла заблокировать защита компьютера. Если на компьютере установлен Node.js, укажите путь к нему: `PLAYWRIGHT_NODEJS_PATH="C:\Program Files\nodejs\node.exe" pytest tests/ui`. |
-| `pytest: command not found` | Не активировано окружение (шаг 3) или библиотеки не установлены (шаг 4). |
-| Все тесты сразу падают с ошибкой соединения | Порт 18300 занят другой программой. Закройте её или запустите на другом порту: `INVEST_SANDBOX_PORT=18301 pytest` (в PowerShell — `$env:INVEST_SANDBOX_PORT=18301; pytest`). |
-| В Git Bash вместо русского текста кракозябры | Выполните `export PYTHONUTF8=1` и запустите снова. На работу тестов это не влияет. |
+| Один тест | `uv run pytest tests/1-api/test_900305_withdraw.py` |
+| Только API и БД | `uv run pytest tests/1-api` |
+| Только Kafka | `uv run pytest tests/2-kafka` |
+| UI с видимым браузером | `uv run pytest tests/3-ui --headed` |
+| Все тесты в 4 потока | `uv run pytest -n 4` |
+| С запросами API и БД в консоли | `uv run pytest -o log_cli=true` |
+
+Установка uv, настройка PyCharm, запуск песочницы вручную и решение проблем — в [гайде по uv](uv-guide.md).
+
+Результат виден в консоли; данные Allure — в `build/allure-results`, скриншоты и трейсы UI — в `build/test-results`. Зелёный тест тоже может содержать дефекты.
+
+Можно менять код и песочницу, запускать тесты по одному и в любом порядке. Сдавать изменённый проект не нужно: оценивается таблица замечаний.
 
 ## Тест-кейсы
 

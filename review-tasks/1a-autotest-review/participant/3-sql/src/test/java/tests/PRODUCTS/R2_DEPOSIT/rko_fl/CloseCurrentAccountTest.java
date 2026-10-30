@@ -17,6 +17,7 @@ import model_cft.model.user.CriteriaUser;
 import model_cft.model.user.Dto_User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.assertj.core.api.Assertions;
 import org.testng.annotations.Test;
 import tests.BasicTest;
 import utils.AssertionsUtil;
@@ -54,6 +55,9 @@ public class CloseCurrentAccountTest extends BasicTest {
         AssertionsUtil.assertThat(deposit.update())
                 .hasStateEqual(ComStatusPrd.$CLOSE)
                 .hasDateCloseEqualTo(deposit.getDateClose());
+        Assertions.assertThat(deposit.getAccount().getStatusCode())
+                .as("Счёт договора закрыт")
+                .isNotEqualTo(ComStatusPrd.$OPEN.getCode());
     }
 
     @Step("Подготовка тестовых данных")

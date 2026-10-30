@@ -15,7 +15,7 @@
 
 ## Формат ответа
 
-Заполните таблицу `answer-template.xlsx` в папке `participant/`. В ней по 5 строк на каждый тест, строки можно добавлять.
+Заполните таблицу `answer-template.xlsx`. В ней по 5 строк на каждый тест, строки можно добавлять.
 
 | Тест | Файл:строка | Замечание |
 | --- | --- | --- |
@@ -63,7 +63,11 @@
 | Запустить в Chrome, хотя установлен Яндекс Браузер | `mvn test -Dbrowser=chrome` |
 | Открыть отчёт Allure после прогона | `mvn allure:serve` |
 
-В PowerShell параметры с точкой берите в кавычки: `mvn test "-Dselenide.headless=true"`.
+В PowerShell параметры с точкой берите в кавычки:
+
+```powershell
+mvn test "-Dselenide.headless=true"
+```
 
 В Git Bash на Windows русский текст в консоли выводится кракозябрами. Один раз выполните в Git Bash:
 

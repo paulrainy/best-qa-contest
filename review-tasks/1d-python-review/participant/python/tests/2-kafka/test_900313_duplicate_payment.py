@@ -22,6 +22,8 @@ class TestDuplicatePayment:
 
         with reporting.step('Отправить то же поступление повторно'):
             kafka.send_payment(agreement['number'], 1000, payment_id=PAYMENT_ID)
+            kafka.wait_message(Topics.MONEY_ORDERS, lambda value: value['agreementId'] == agreement['id']
+                               and value['status'] == 'EXECUTED')
 
         with reporting.step('Проверить, что деньги зачислены один раз'):
             assert_that(invest_db.get_account(agreement['id'])['balance'], equal_to(1000), 'Остаток на счёте')

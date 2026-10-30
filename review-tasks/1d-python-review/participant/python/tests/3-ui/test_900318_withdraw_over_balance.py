@@ -27,6 +27,7 @@ class TestCabinetWithdrawOverBalance:
             agreement_page.withdraw(5001)
 
         with reporting.step('Проверить отказ'):
+            # Остаток повторно не проверяем: при отказе он не меняется.
             try:
                 expect(cabinet.get_by_role('alert')).to_have_text('Недостаточно средств для вывода')
             except AssertionError:

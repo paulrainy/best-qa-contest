@@ -28,7 +28,7 @@ class TestWithdrawOverBalance:
 
         with reporting.step('Проверить, что поручение не создано, а остаток не изменился'):
             withdrawals = invest_db.query("SELECT COUNT(*) AS cnt FROM money_order WHERE agreement_id = ?"
-                                          " AND type = 'WITHDRAW' AND created_at = date('now')", agreement['id'],
+                                          " AND type = 'REFILL'", agreement['id'],
                                           fetch_one=True)['cnt']
             assert_that(withdrawals, equal_to(0), 'Создано поручение на вывод')
             account = invest_db.get_account(agreement['id'])
