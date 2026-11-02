@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "efr-sandbox-1b",
+      "runtimeExecutable": "mvn",
+      "runtimeArgs": ["-q", "-f", "review-tasks/1b-testcase-review/participant/sandbox/pom.xml", "compile", "exec:java"],
+      "port": 18081
+    }
+  ]
+}
