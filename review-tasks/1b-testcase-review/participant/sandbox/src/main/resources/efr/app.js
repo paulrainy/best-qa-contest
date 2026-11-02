@@ -31,8 +31,8 @@ function status(value){return h('span',{className:'status '+(value==='На по�
 function input(label,name,value='',type='text',attrs={}){const id='field-'+(++fieldNumber);return h('div',{className:'field'},h('label',{for:id},label),h('input',{id,name,type,value,...attrs}));}
 function select(label,name,options,value=''){const id='field-'+(++fieldNumber);return h('div',{className:'field'},h('label',{for:id},label),h('select',{id,name},options.map(option=>{const [v,t]=Array.isArray(option)?option:[option,option];return h('option',{value:v,selected:String(v)===String(value)},t);})));}
 function values(form){return Object.fromEntries(new FormData(form));}
-function modal(title,...children){const overlay=document.getElementById('overlay');overlay.replaceChildren(h('div',{className:'modal-backdrop'},h('section',{className:'modal',role:'dialog','aria-label':title},h('h2',{},title),...children,errorBox())));}
-function closeModal(){document.getElementById('overlay').replaceChildren();}
+function modal(title,...children){const overlay=document.getElementById('overlay');app.inert=true;overlay.replaceChildren(h('div',{className:'modal-backdrop'},h('section',{className:'modal',role:'dialog','aria-modal':'true','aria-label':title,tabindex:'-1'},h('h2',{},title),...children,errorBox())));overlay.querySelector('[role=dialog]').focus();}
+function closeModal(){document.getElementById('overlay').replaceChildren();app.inert=false;}
 async function request(path,body){
     const response=await fetch('api/'+path,{method:body===undefined?'GET':'POST',headers:{'Content-Type':'application/json',...(session?{Authorization:'Bearer '+session.token}:{})},body:body===undefined?undefined:JSON.stringify(body)});
     const data=await response.json();
@@ -82,7 +82,15 @@ function renderClient(c){
         if(c.fatca==='NONE'){modal('Обратите внимание',h('p',{},'Операция недоступна: у клиента не определён FATCA-статус. Заполните форму самосертификации.'),h('div',{className:'actions'},button('Отмена',closeModal),button('Заполнить форму',()=>fatca(c),'primary')));}
         else navigate('#/open/'+c.id);
     },'primary')));
-    right.append(deposits,h('section',{className:'panel'},h('h2',{},'История операций'),c.history.length?h('ul',{className:'history'},c.history.map(t=>h('li',{},t))):h('p',{className:'muted'},'Записей нет')));
+    right.append(deposits);
+    const history=h('section',{className:'panel',role:'tabpanel',hidden:true},h('h2',{},'История операций'),c.history.length?h('ul',{className:'history'},c.history.map(t=>h('li',{},t))):h('p',{className:'muted'},'Записей нет'));
+    const products=Array.from(right.children);
+    const tabs=h('div',{role:'tablist','aria-label':'Продуктовый профиль',className:'actions'});
+    for(const title of ['Продукты','История операций']){
+        const tab=button(title,()=>{const showHistory=title==='История операций';history.hidden=!showHistory;for(const node of products)node.hidden=showHistory;for(const node of tabs.children)node.setAttribute('aria-selected',String(node===tab));});
+        tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(title==='Продукты'));tabs.append(tab);
+    }
+    right.prepend(tabs);right.append(history);
     app.replaceChildren(h('h1',{},'Продуктовый профиль клиента'),errorBox(),h('div',{className:'layout'},h('aside',{className:'panel'},meta),right));
 }
 function shiftYears(date,years){const [y,m,d]=date.split('-');return (Number(y)+years)+'-'+m+'-'+d;}
@@ -94,11 +102,12 @@ function detail(p,c){
     const canClose=p.status==='Открыт'&&(session.role==='OPER'||session.role==='FK'&&p.type==='deposit')&&(p.type==='deposit'||p.kind==='Текущий');
     const content=h('div',{},h('p',{},p.kind+' · '+p.number),h('p',{},'Остаток: '+money(p.amount)+' · '+p.currency),h('p',{},'Статус: '+p.status));
     if(p.type==='deposit')content.append(h('p',{},'Дата открытия: '+p.opened),h('p',{},'Срок: '+(p.term?p.term+' дней':'без срока')));
-    if(canClose)content.append(h('details',{},h('summary',{},'Операции'),button(p.type==='deposit'?'Закрыть вклад':'Закрыть счёт',async()=>{
+    content.append(h('details',{},h('summary',{},'Операции'),canClose?button(p.type==='deposit'?'Закрыть вклад':'Закрыть счёт',async()=>{
         try{const op=await api('begin-close',{productId:p.id});navigate('#/operation/'+op.id);}catch(error){
             closeModal();modal('Обратите внимание',h('p',{},error.message),h('div',{className:'actions'},error.message.startsWith('У клиента нет открытого')?button('Открыть счёт',()=>navigate('#/data')):null,button('Отмена',()=>detail(p,c))));
         }
-    })));
+    }):h('p',{className:'muted'},'Нет доступных операций')));
+    if(p.type==='account')content.append(h('h3',{},'История операций'),(p.history||[]).length?h('ul',{className:'history'},p.history.map(entry=>h('li',{},entry.date+' · Зачисление с вклада '+entry.sourceNumber+' · '+money(entry.amount)))):h('p',{className:'muted'},'Записей нет'));
     modal('Детальная информация',content,h('div',{className:'actions'},button('Закрыть',closeModal)));
 }
 function fatca(c){
@@ -206,7 +215,7 @@ function renderTask(op){
 }
 function renderCreate(saved={}){
     const defaults={surname:'',name:'',patronymic:'',birthDate:'',gender:'Мужской',passport:'',issued:'',division:'',issuer:'',phone:'',address:'',...saved};
-    const form=h('form',{className:'form',onsubmit:async event=>{event.preventDefault();const op=await api('create-client',values(form));navigate('#/operation/'+op.id);}});
+    const form=h('form',{className:'form',onsubmit:async event=>{event.preventDefault();const data=values(form);const op=await api('create-client',data);sessionStorage.setItem('manual.registration.'+op.id,JSON.stringify(data));navigate('#/operation/'+op.id);}});
     const grid=h('div',{className:'grid'});
     for(const [key,label,type] of [['surname','Фамилия','text'],['name','Имя','text'],['patronymic','Отчество','text'],['birthDate','Дата рождения','date']])grid.append(input(label,key,defaults[key],type,{required:key!=='patronymic'}));
     grid.append(select('Пол','gender',['Мужской','Женский'],defaults.gender),input('Гражданство','citizenship','РФ','text',{readonly:true}),input('Паспорт РФ — серия и номер','passport',defaults.passport,'text',{required:true}),input('Дата выдачи','issued',defaults.issued,'date',{required:true}),input('Код подразделения','division',defaults.division,'text',{placeholder:'770-001',required:true}),input('Кем выдан','issuer',defaults.issuer,'text',{required:true}),input('Мобильный телефон','phone',defaults.phone,'tel',{required:true}),input('Адрес регистрации','address',defaults.address,'text',{required:true}));
@@ -214,10 +223,12 @@ function renderCreate(saved={}){
     app.replaceChildren(panel('Создание клиента',form));
 }
 function renderRegistration(op){
+    closeModal();
+    let saved=op.fields;try{saved=JSON.parse(sessionStorage.getItem('manual.registration.'+op.id))||saved;}catch{}
     const buttons=h('div',{className:'actions'}),content=h('div',{},h('p',{className:'message'},op.message),status(op.status));
     if(op.stage==='DUPLICATE'){
         buttons.append(button('Ввести данные предыдущего паспорта',()=>{
-            const form=h('form',{onsubmit:async event=>{event.preventDefault();const p=values(form);const next=await api('continue-client',{id:op.id,choice:'previous',passport:p.series+p.number});closeModal();renderRegistration(next);}},h('div',{className:'grid'},input('Серия','series','','text',{pattern:'[0-9]{4}',required:true,maxlength:4}),input('Номер','number','','text',{pattern:'[0-9]{6}',required:true,maxlength:6})),h('div',{className:'actions'},h('button',{type:'submit',className:'primary'},'Проверить'),button('Отмена',closeModal)));
+            const form=h('form',{onsubmit:async event=>{event.preventDefault();const p=values(form);const next=await api('continue-client',{id:op.id,choice:'previous',passport:p.series+p.number});closeModal();renderRegistration(next);}},h('div',{className:'grid'},input('Серия','series','','text',{pattern:'[0-9]{4}',required:true,maxlength:4}),input('Номер','number','','text',{pattern:'[0-9]{6}',required:true,maxlength:6})),h('div',{className:'actions'},h('button',{type:'submit',className:'primary'},'Проверить'),button('Отмена',()=>renderRegistration(op))));
             modal('Предыдущий паспорт РФ',form);
         }),button('Нет предыдущего паспорта',async()=>renderRegistration(await api('continue-client',{id:op.id,choice:'noPrevious'}))));
     }else if(op.stage==='FINMON')buttons.append(button('Продолжить',async()=>renderRegistration(await api('continue-client',{id:op.id,choice:'continue'})),'primary'));
@@ -226,7 +237,11 @@ function renderRegistration(op){
     else if(op.status==='На подтверждении')buttons.append(h('p',{className:'muted'},'Карточка в статусе «Черновик» и не находится в поиске. Решение доступно контролёру.'));
     if(op.status==='Черновик')buttons.append(button('Отмена',async()=>{await api('cancel',{id:op.id});navigate('#/search');}));
     else buttons.append(button('К поиску',()=>navigate('#/search')));
-    app.replaceChildren(panel(op.stage==='DUPLICATE'||op.stage==='FINMON'?'Обратите внимание':'Создание клиента',content,errorBox(),buttons));
+    if(['DUPLICATE','FINMON','EXISTING'].includes(op.stage)){
+        renderCreate(saved);
+        if(op.stage==='EXISTING')buttons.append(button('Закрыть',closeModal));
+        modal('Обратите внимание',content,buttons);
+    }else app.replaceChildren(panel('Создание клиента',content,errorBox(),buttons));
 }
 async function renderSms(){
     const messages=(await api('sms')).messages;

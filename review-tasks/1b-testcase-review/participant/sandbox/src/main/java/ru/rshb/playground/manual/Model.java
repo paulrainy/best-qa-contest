@@ -26,6 +26,7 @@ public final class Model {
         BigDecimal amount;
         LocalDate opened;
         int term;
+        List<Map<String,Object>> history = new ArrayList<>();
     }
     static class Operation {
         String id, type, owner, branch, clientId, productId = "", status = "Черновик", stage = "PARAMETERS";

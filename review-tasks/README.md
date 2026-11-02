@@ -55,7 +55,6 @@
 - `1b-testcase-review/jury/answer-key.md` — ключ, только жюри. Строки ключа сгруппированы по кейсам;
 - `1b-testcase-review/jury/scoring-sheet.xlsx` — лист подсчёта: 100 строк дефектов и 10 строк ловушек;
 - `1b-testcase-review/jury/fixed/testcases.xlsx` — исправленные кейсы;
-- `1b-testcase-review/jury/verify/sandbox_check.py` — приёмка правильных веток всех 20 кейсов через API запущенной песочницы; сбрасывает её данные. Запуск: `python3 review-tasks/1b-testcase-review/jury/verify/sandbox_check.py`;
 - `1b-testcase-review/jury/source/` — текстовые исходники обеих выгрузок. Кейсы правим только здесь, xlsx собираются скриптами:
 
   ```bash

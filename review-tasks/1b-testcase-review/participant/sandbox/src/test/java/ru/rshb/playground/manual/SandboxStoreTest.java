@@ -128,6 +128,12 @@ class SandboxStoreTest {
         store.dispatch(controller,"take",map("id",op.get("id")));
         store.dispatch(controller,"decide",map("id",op.get("id"),"approve",true));
         assertEquals("105000.82",store.product(a).amount.toPlainString());
+        var accountView=(Map<?,?>)((List<?>)call("client","id",c).get("accounts")).get(0);
+        var history=(List<?>)accountView.get("history");
+        assertNotNull(history, "У счёта должна быть история зачислений");
+        assertEquals(1,history.size());
+        assertEquals(store.product(d).number,((Map<?,?>)history.get(0)).get("sourceNumber"));
+        assertEquals("100000.82",((Map<?,?>)history.get(0)).get("amount"));
         assertThrows(Model.Problem.class,()->store.dispatch(controller,"decide",map("id",op.get("id"),"approve",true)));
         String second=deposit(c,"50000","2026-08-24","Пополняемый");
         assertEquals("50001.00",((Map<?,?>)call("begin-close","productId",second).get("fields")).get("payout"));

@@ -259,14 +259,14 @@ public class SandboxStore {
         if(op.type.startsWith("CLOSE")) {
             readyToSign(op);
             Product p=product(op.productId);
-            if(op.type.equals("CLOSE_DEPOSIT")) { Product target=eligibleSource(c,text(op.fields,"targetId"),true); target.amount=target.amount.add(amount(text(op.fields,"payout"))); }
+            if(op.type.equals("CLOSE_DEPOSIT")) { Product target=eligibleSource(c,text(op.fields,"targetId"),true); target.amount=target.amount.add(amount(text(op.fields,"payout"))); target.history.add(out("date",today.toString(),"sourceNumber",p.number,"amount",text(op.fields,"payout"),"operationId",op.id)); }
             p.status="Закрыт"; op.status="Исполнена"; op.message=""; return;
         }
         Product p=new Product(); p.id=next("p"); p.clientId=c.id; p.type="deposit"; p.kind=text(op.fields,"kind"); p.number=String.format(Locale.ROOT,"423%017d",sequence); p.amount=amount(text(op.fields,"amount")); p.opened=today; p.term=Integer.parseInt(text(op.fields,"term"));
         products.put(p.id,p); op.productId=p.id; op.status="Исполнена"; op.message="";
     }
     Map<String,Object> userView(User u) { return out("login",u.login(),"fullName",u.fullName(),"role",u.role().name(),"branch",u.branch()); }
-    Map<String,Object> productView(Product p) { return out("id",p.id,"clientId",p.clientId,"type",p.type,"kind",p.kind,"number",p.number,"currency",p.currency,"status",p.status,"amount",p.amount.toPlainString(),"opened",p.opened.toString(),"term",p.term); }
+    Map<String,Object> productView(Product p) { return out("id",p.id,"clientId",p.clientId,"type",p.type,"kind",p.kind,"number",p.number,"currency",p.currency,"status",p.status,"amount",p.amount.toPlainString(),"opened",p.opened.toString(),"term",p.term,"history",List.copyOf(p.history)); }
     Map<String,Object> clientView(Client c) {
         return out("id",c.id,"surname",c.surname,"name",c.name,"patronymic",c.patronymic,"fullName",c.fullName(),"passport",c.passport,"birthDate",c.birthDate.toString(),"status",c.status,"fatca",c.fatca,"dbo",c.dbo,"fields",new LinkedHashMap<>(c.fields),"previousPassports",List.copyOf(c.previousPassports),"history",List.copyOf(c.history),
             "accounts",products.values().stream().filter(p->p.clientId.equals(c.id) && p.type.equals("account")).map(this::productView).toList(),"deposits",products.values().stream().filter(p->p.clientId.equals(c.id) && p.type.equals("deposit")).map(this::productView).toList());
