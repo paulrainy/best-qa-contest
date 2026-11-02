@@ -10,7 +10,7 @@ This repository develops materials for the 2026–2027 “Best Tester” contest
 - `final-task/`: transfer-service case; participant specifications, stand launchers, and Java/Python starters; jury stand sources and verification scripts.
 - `base-docs/`, `previous-year/`, and `docs/superpowers/`: reference materials, historical examples, and design plans.
 
-Consult the relevant task README before editing. `CLAUDE.md` contains early planning assumptions; current task READMEs describe the implemented tooling.
+Consult the relevant task README before editing. `CLAUDE.md` is the fuller guide (map, invariants of the exercises, commands); task READMEs describe the implemented tooling in detail.
 
 ## Build, Test, and Development Commands
 
