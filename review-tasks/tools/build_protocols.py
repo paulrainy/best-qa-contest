@@ -1,7 +1,7 @@
 """Протоколы НТ задания 1c: Markdown-исходник → .docx.
 
 Запуск: python build_protocols.py ../1c-load-review
-Читает jury/source/protocols/NN-*.md, пишет participant/protocols/NN-*.docx.
+Читает jury/source/protocols/NN-*.md, пишет participant/2-protocols/NN-*.docx.
 
 Исходник:
 - строки «> …» до названия — шапка (выравнивается вправо), «# …» — название;
@@ -218,7 +218,7 @@ def write(protocol: Protocol, md_path: Path, out: Path) -> None:
 def build(task: Path) -> list:
     built = []
     for md in sorted((task / 'jury' / 'source' / 'protocols').glob('[0-9][0-9]-*.md')):
-        out = task / 'participant' / 'protocols' / f'{md.stem}.docx'
+        out = task / 'participant' / '2-protocols' / f'{md.stem}.docx'
         protocol = parse(md)
         if out.exists() and Document(out).core_properties.identifier == source_hash(md):
             continue  # документ актуален: не пересобираем, чтобы не менять файл без причины

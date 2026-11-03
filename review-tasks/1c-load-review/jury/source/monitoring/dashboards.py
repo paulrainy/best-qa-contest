@@ -1,7 +1,7 @@
 """Дашборды Grafana 16–18 задания 1c. Запуск из папки tools:
 .venv/bin/python ../1c-load-review/jury/source/monitoring/dashboards.py
 
-Пишет participant/monitoring/NN-*.json (с дефектами) и jury/fixed/monitoring/NN-*.json (исправленные).
+Пишет participant/3-monitoring/NN-*.json (с дефектами) и jury/fixed/monitoring/NN-*.json (исправленные).
 Дефекты помечены номерами из ключа. JSON сокращён до полей, которые влияют на вид и запросы.
 """
 import json
@@ -180,7 +180,7 @@ BOARDS = {'16-jmeter-influxdb': jmeter, '17-efr-api-prometheus': app, '18-server
 
 if __name__ == '__main__':
     for name, build in BOARDS.items():
-        for fixed, folder in ((False, TASK / 'participant' / 'monitoring'), (True, TASK / 'jury' / 'fixed' / 'monitoring')):
+        for fixed, folder in ((False, TASK / 'participant' / '3-monitoring'), (True, TASK / 'jury' / 'fixed' / 'monitoring')):
             folder.mkdir(parents=True, exist_ok=True)
             text = json.dumps(build(fixed), ensure_ascii=False, indent=2) + '\n'
             (folder / f'{name}.json').write_text(text, encoding='utf-8')

@@ -2,7 +2,7 @@
 
 Запуск: python build_jmx.py ../1c-load-review [--tree NN]
 Исходники — jury/source/scripts/NN_<операция>.py. В каждом FILE = 'NN-<операция>' и plan(fixed) -> jmx.El.
-Пишет participant/scripts/<FILE>.jmx (plan(False), с дефектами) и jury/fixed/scripts/<FILE>.jmx (plan(True)).
+Пишет participant/1-scripts/<FILE>.jmx (plan(False), с дефектами) и jury/fixed/scripts/<FILE>.jmx (plan(True)).
 --tree NN печатает все пути плана с классом элемента — по ним пишется место в ключе.
 --check загружает все собранные .jmx (участника и исправленные) в JMeter 5.6.3 через check_jmx.groovy.
 Нужны JMETER_HOME и Java 17+ (JAVA или /opt/homebrew/opt/openjdk@21/bin/java).
@@ -36,7 +36,7 @@ def load_sources(task: Path) -> dict:
 
 
 def outputs(task: Path, module) -> dict:
-    return {False: task / 'participant' / 'scripts' / f'{module.FILE}.jmx',
+    return {False: task / 'participant' / '1-scripts' / f'{module.FILE}.jmx',
             True: task / 'jury' / 'fixed' / 'scripts' / f'{module.FILE}.jmx'}
 
 
