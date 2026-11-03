@@ -102,7 +102,7 @@ def make_task(tmp_path):
 def test_build_writes_both_versions(tmp_path):
     task = make_task(tmp_path)
     build_jmx.build(task)
-    broken = (task / 'participant' / 'scripts' / '01-login.jmx').read_text(encoding='utf-8')
+    broken = (task / 'participant' / '1-scripts' / '01-login.jmx').read_text(encoding='utf-8')
     fixed = (task / 'jury' / 'fixed' / 'scripts' / '01-login.jmx').read_text(encoding='utf-8')
     assert 'use_keepalive">false' in broken
     assert 'use_keepalive">true' in fixed
@@ -112,7 +112,7 @@ def test_stale_detects_edited_file(tmp_path):
     task = make_task(tmp_path)
     build_jmx.build(task)
     assert build_jmx.stale(task) == []
-    path = task / 'participant' / 'scripts' / '01-login.jmx'
+    path = task / 'participant' / '1-scripts' / '01-login.jmx'
     path.write_text(path.read_text(encoding='utf-8') + ' ', encoding='utf-8')
     assert build_jmx.stale(task) == ['01']
 

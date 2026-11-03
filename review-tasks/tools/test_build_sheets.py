@@ -188,13 +188,13 @@ def write_protocol(task: Path, unit: str):
     source = task / 'jury' / 'source' / 'protocols' / f'{unit}-p.md'
     source.parent.mkdir(parents=True, exist_ok=True)
     source.write_text(PROTOCOL, encoding='utf-8')
-    build_protocols.write(build_protocols.parse(source), source, task / 'participant' / 'protocols' / f'{unit}-p.docx')
+    build_protocols.write(build_protocols.parse(source), source, task / 'participant' / '2-protocols' / f'{unit}-p.docx')
 
 
 def make_load_task(tmp_path: Path, monkeypatch, place=None, category=None, number=None, defects_of_first=5,
                    trap_place=None, units=range(1, 21), traps=10) -> Path:
     (tmp_path / 'jury').mkdir()
-    for folder in ('scripts', 'monitoring'):
+    for folder in ('1-scripts', '3-monitoring'):
         (tmp_path / 'participant' / folder).mkdir(parents=True)
     lines = ['| № | Единица | Место | Категория | Суть | Засчитываем, если… |', '| --- | --- | --- | --- | --- | --- |']
     categories = ['М', '1', '2', '3', '4']
@@ -202,13 +202,13 @@ def make_load_task(tmp_path: Path, monkeypatch, place=None, category=None, numbe
         unit = f'{u:02d}'
         kind = load_places.KINDS[unit]
         if kind == 'jmx':
-            write_jmx(tmp_path / 'participant' / 'scripts' / f'{unit}-s.jmx')
+            write_jmx(tmp_path / 'participant' / '1-scripts' / f'{unit}-s.jmx')
         elif kind == 'protocol':
             write_protocol(tmp_path, unit)
         elif kind == 'json':
-            write_dashboard(tmp_path / 'participant' / 'monitoring' / f'{unit}-d.json')
+            write_dashboard(tmp_path / 'participant' / '3-monitoring' / f'{unit}-d.json')
         else:
-            (tmp_path / 'participant' / 'monitoring' / f'{unit}-q.sql').write_text(
+            (tmp_path / 'participant' / '3-monitoring' / f'{unit}-q.sql').write_text(
                 ''.join(f'SELECT {n};\n' for n in range(1, 9)), encoding='utf-8')
         for d in range(1, (defects_of_first if u == 1 else 5) + 1):
             first = u == 1 and d == 1
@@ -286,7 +286,7 @@ def test_rejects_stale_jmx(tmp_path, monkeypatch):
     (task / 'jury' / 'source' / 'scripts' / '01_s.py').write_text(SCENARIO, encoding='utf-8')
     build_jmx.build(task)
     build_sheets.build(task)
-    path = task / 'participant' / 'scripts' / '01-s.jmx'
+    path = task / 'participant' / '1-scripts' / '01-s.jmx'
     path.write_text(path.read_text(encoding='utf-8').replace('/s1<', '/s1x<'), encoding='utf-8')
     with pytest.raises(SystemExit, match='сценарий 01 старше исходника — запустите build_jmx.py'):
         build_sheets.build(task)

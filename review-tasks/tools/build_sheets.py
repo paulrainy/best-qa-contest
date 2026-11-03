@@ -135,7 +135,7 @@ def check_cases(defects, traps, elements) -> list:
 def protocol_stale(unit: str, source: Path, task: Path) -> bool:
     import build_protocols
     from docx import Document
-    docx = task / 'participant' / 'protocols' / f'{source.stem}.docx'
+    docx = task / 'participant' / '2-protocols' / f'{source.stem}.docx'
     return not docx.exists() or Document(docx).core_properties.identifier != build_protocols.source_hash(source)
 
 

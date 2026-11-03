@@ -4,10 +4,10 @@
 
 Задание — методика НТ ЕФР (`participant/methodology.md`) и 20 единиц, подготовленных по ней:
 
-- 01–10 — сценарии JMeter 5.6.3, по одному на операцию профиля ОП-01–ОП-10 (`participant/scripts/`);
-- 11–15 — протоколы НТ (`participant/protocols/`);
-- 16–18 — дашборды Grafana (`participant/monitoring/*.json`);
-- 19–20 — SQL-скрипты подготовки стенда и сбора артефактов (`participant/monitoring/*.sql`).
+- 01–10 — сценарии JMeter 5.6.3, по одному на операцию профиля ОП-01–ОП-10 (`participant/1-scripts/`);
+- 11–15 — протоколы НТ (`participant/2-protocols/`);
+- 16–18 — дашборды Grafana (`participant/3-monitoring/*.json`);
+- 19–20 — SQL-скрипты подготовки стенда и сбора артефактов (`participant/3-monitoring/*.sql`).
 
 Все единицы равноправны. В каждой ровно 5 дефектов, всего 100. Ловушек 10. В методике дефектов нет.
 
@@ -230,23 +230,23 @@
 
 | Ед. | Файл | Операция или тема |
 | --- | --- | --- |
-| 01 | `scripts/01-client-search.jmx` | ОП-01 Поиск клиента по паспорту |
-| 02 | `scripts/02-client-card.jmx` | ОП-02 Просмотр карточки клиента |
-| 03 | `scripts/03-client-create.jmx` | ОП-03 Создание клиента, одноразовые данные |
-| 04 | `scripts/04-deposit-open.jmx` | ОП-04 Открытие вклада, три шага, корреляция |
-| 05 | `scripts/05-task-approve.jmx` | ОП-05 Подтверждение контролёром |
-| 06 | `scripts/06-deposit-close.jmx` | ОП-06 Закрытие вклада, одноразовые данные |
-| 07 | `scripts/07-statement.jmx` | ОП-07 Выписка за 12 месяцев, большой ответ |
-| 08 | `scripts/08-cft-balance.jmx` | ОП-08 Остаток в АБС, SOAP, открытая модель |
-| 09 | `scripts/09-branch-report.jmx` | ОП-09 Отчёт отделения, JDBC |
-| 10 | `scripts/10-fm-check.jmx` | ОП-10 Проверка по спискам, подпись в JSR223 на Groovy |
-| 11 | `protocols/11-max-search.docx` | Поиск максимума |
-| 12 | `protocols/12-stability.docx` | Стабильность |
-| 13 | `protocols/13-baseline.docx` | Сравнение с эталоном (релиз 2026.11 против 2026.08) |
-| 14 | `protocols/14-control-run.docx` | Контрольный прогон после исправления пула соединений |
-| 15 | `protocols/15-cft-stub.docx` | Hotfix адаптера АБС, сравнение с эталоном на заглушке АБС |
-| 16 | `monitoring/16-jmeter-influxdb.json` | Метрики JMeter в InfluxDB |
-| 17 | `monitoring/17-efr-api-prometheus.json` | Метрики `efr-api` в Prometheus: HTTP, JVM, HikariCP |
-| 18 | `monitoring/18-servers-zabbix.json` | Утилизация серверов из Zabbix |
-| 19 | `monitoring/19-stand-prepare.sql` | Подготовка стенда перед тестом |
-| 20 | `monitoring/20-artifacts-and-data.sql` | PWR и логи после теста, выборка клиентов в CSV |
+| 01 | `1-scripts/01-client-search.jmx` | ОП-01 Поиск клиента по паспорту |
+| 02 | `1-scripts/02-client-card.jmx` | ОП-02 Просмотр карточки клиента |
+| 03 | `1-scripts/03-client-create.jmx` | ОП-03 Создание клиента, одноразовые данные |
+| 04 | `1-scripts/04-deposit-open.jmx` | ОП-04 Открытие вклада, три шага, корреляция |
+| 05 | `1-scripts/05-task-approve.jmx` | ОП-05 Подтверждение контролёром |
+| 06 | `1-scripts/06-deposit-close.jmx` | ОП-06 Закрытие вклада, одноразовые данные |
+| 07 | `1-scripts/07-statement.jmx` | ОП-07 Выписка за 12 месяцев, большой ответ |
+| 08 | `1-scripts/08-cft-balance.jmx` | ОП-08 Остаток в АБС, SOAP, открытая модель |
+| 09 | `1-scripts/09-branch-report.jmx` | ОП-09 Отчёт отделения, JDBC |
+| 10 | `1-scripts/10-fm-check.jmx` | ОП-10 Проверка по спискам, подпись в JSR223 на Groovy |
+| 11 | `2-protocols/11-max-search.docx` | Поиск максимума |
+| 12 | `2-protocols/12-stability.docx` | Стабильность |
+| 13 | `2-protocols/13-baseline.docx` | Сравнение с эталоном (релиз 2026.11 против 2026.08) |
+| 14 | `2-protocols/14-control-run.docx` | Контрольный прогон после исправления пула соединений |
+| 15 | `2-protocols/15-cft-stub.docx` | Hotfix адаптера АБС, сравнение с эталоном на заглушке АБС |
+| 16 | `3-monitoring/16-jmeter-influxdb.json` | Метрики JMeter в InfluxDB |
+| 17 | `3-monitoring/17-efr-api-prometheus.json` | Метрики `efr-api` в Prometheus: HTTP, JVM, HikariCP |
+| 18 | `3-monitoring/18-servers-zabbix.json` | Утилизация серверов из Zabbix |
+| 19 | `3-monitoring/19-stand-prepare.sql` | Подготовка стенда перед тестом |
+| 20 | `3-monitoring/20-artifacts-and-data.sql` | PWR и логи после теста, выборка клиентов в CSV |

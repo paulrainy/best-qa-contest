@@ -1,6 +1,6 @@
 """CSV для сценариев 1c. Запуск из папки tools: .venv/bin/python ../1c-load-review/jury/source/scripts/make_data.py
 
-Пишет participant/scripts/data/ и, где данные исправленной версии отличаются, jury/fixed/scripts/data/.
+Пишет participant/1-scripts/data/ и, где данные исправленной версии отличаются, jury/fixed/scripts/data/.
 Данные вымышленные, генерация детерминирована (seed).
 """
 import csv
@@ -9,7 +9,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 TASK = Path(__file__).resolve().parents[3]
-OUT = TASK / 'participant' / 'scripts' / 'data'
+OUT = TASK / 'participant' / '1-scripts' / 'data'
 FIXED = TASK / 'jury' / 'fixed' / 'scripts' / 'data'
 
 # Учётки менеджеров: у каждого сценария свой диапазон, вдвое больше потоков (методика 5.1)

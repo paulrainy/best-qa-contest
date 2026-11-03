@@ -14,8 +14,8 @@ KINDS = {f'{n:02d}': kind for kind, numbers in [('jmx', range(1, 11)), ('protoco
                                                 ('json', range(16, 19)), ('sql', range(19, 21))]
          for n in numbers}
 
-FILES = {'jmx': 'participant/scripts/{unit}-*.jmx', 'json': 'participant/monitoring/{unit}-*.json',
-         'sql': 'participant/monitoring/{unit}-*.sql', 'protocol': 'jury/source/protocols/{unit}-*.md'}
+FILES = {'jmx': 'participant/1-scripts/{unit}-*.jmx', 'json': 'participant/3-monitoring/{unit}-*.json',
+         'sql': 'participant/3-monitoring/{unit}-*.sql', 'protocol': 'jury/source/protocols/{unit}-*.md'}
 
 JMX = re.compile(r'`([^`]+)`')
 PANEL = re.compile(r'[Пп]анель «([^»]+)»')
