@@ -80,7 +80,10 @@
 Файлы:
 
 - `1c-load-review/participant/` — всё, что отдаём участнику: `task.md`, `methodology.md`, `1-scripts/`, `2-protocols/`, `3-monitoring/`, `answer-template.xlsx`. Папку отправляем целиком, архивом;
+- `1c-load-review/participant/1-scripts/tools/` — Apache JMeter 5.6.3 и Java 17 Temurin JRE для Windows x64 и macOS Apple Silicon; бинарники хранятся через Git LFS, лицензии — рядом в Git. Запуск — `open-jmeter.bat` или `open-jmeter.command` из `1-scripts/`, без установки и скачиваний. Mac на Intel не поддерживается этим комплектом;
+- `1c-load-review/jury/runtime-downloads.json` — версии, официальные ссылки и контрольные суммы исходных архивов дистрибутивов;
 - `1c-load-review/jury/answer-key.md` — ключ, только жюри: дефекты, правильные выводы протоколов, самопроверка чисел, ловушки;
+- `1c-load-review/jury/jmeter-viewing-guide.md` — короткая памятка жюри по просмотру сценариев в JMeter; в архив участника не включается;
 - `1c-load-review/jury/scoring-sheet.xlsx` — лист подсчёта: 100 строк дефектов и 10 строк ловушек;
 - `1c-load-review/jury/fixed/` — исправленные сценарии, данные, дашборды и SQL;
 - `1c-load-review/jury/source/` — исходники. Материал правим только здесь, файлы участника собираются скриптами:
@@ -98,7 +101,7 @@
 
   SQL-скрипты исправленной версии лежат в `jury/fixed/monitoring/` и правятся вручную.
 
-  Проверка сценариев в настоящем JMeter: скачать `apache-jmeter-5.6.3.tgz` с `archive.apache.org`, указать `JMETER_HOME` и запустить `.venv/bin/python build_jmx.py ../1c-load-review --check`. Скрипт загружает каждый `.jmx` и прогоняет каждый элемент через его окно настроек: так видно, что GUI покажет ровно то, что записано. Нужна Java 17+. Проверка ловит неверное имя или формат свойства, записанного в файле. Не ловит булево свойство со значением false под неверным именем (GUI и так покажет false) и не проверяет, что обязательные свойства заданы.
+  Проверка сценариев в настоящем JMeter: указать `JMETER_HOME` на `participant/1-scripts/tools/apache-jmeter-5.6.3`, `JAVA` на исполняемый файл Java 17+ и запустить `.venv/bin/python build_jmx.py ../1c-load-review --check`. На Mac с Apple Silicon можно использовать комплектную `participant/1-scripts/tools/java/macos-aarch64/Contents/Home/bin/java` (пути в переменных — абсолютные). Скрипт загружает каждый `.jmx` и прогоняет каждый элемент через его окно настроек: так видно, что GUI покажет ровно то, что записано. Проверка ловит неверное имя или формат свойства, записанного в файле. Не ловит булево свойство со значением false под неверным именем (GUI и так покажет false) и не проверяет, что обязательные свойства заданы.
 
   `build_sheets.py` для 1c ещё сверяет таблицы протоколов с данными графиков (`charts.py --check`) и проверяет JSON исправленных дашбордов.
 
@@ -131,11 +134,13 @@
 
 Архив для отправки собирается из папки задания так, чтобы в него не попали служебные файлы macOS и результаты сборки:
 
+Перед упаковкой 1c сопровождающему нужен [Git LFS](https://git-lfs.com/): после установки выполнить в репозитории `git lfs install --local`, `git lfs pull` и `git lfs fsck`. Это восстанавливает реальные JMeter и Java вместо указателей LFS и проверяет их целостность. Участникам Git и Git LFS не нужны: они получают готовый архив. Исходный ZIP всего репозитория с GitHub участникам не выдаём — он содержит материалы жюри.
+
 ```bash
 cd review-tasks/1a-autotest-review/participant && zip -r ../autotest-review.zip . -x '*.DS_Store' '*/target/*' '*/.idea/*' '*/.m2/*' '*/.selenium/*' '*/.allure/*'
 cd review-tasks/1d-python-review/participant && zip -r ../python-autotest-review.zip . -x '*.DS_Store' '*/.venv/*' '*/build/*' '*/__pycache__/*' '*/.pytest_cache/*' '*/.idea/*'
 cd review-tasks/1b-testcase-review/participant && zip -r ../testcase-review.zip . -x '*.DS_Store'
-cd review-tasks/1c-load-review/participant && zip -r ../load-review.zip . -x '*.DS_Store'
+cd review-tasks/1c-load-review/participant && zip -r ../load-review.zip . -x '*.DS_Store' '*/.jmeter/*'
 ```
 
 ## Риски

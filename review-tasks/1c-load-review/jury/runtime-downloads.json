@@ -1,0 +1,33 @@
+{
+  "distributions": [
+    {
+      "name": "Apache JMeter",
+      "version": "5.6.3",
+      "platform": "all",
+      "url": "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz",
+      "checksum_url": "https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz.sha512",
+      "sha512": "5978a1a35edb5a7d428e270564ff49d2b1b257a65e17a759d259a9283fc17093e522fe46f474a043864aea6910683486340706d745fcdf3db1505fd71e689083",
+      "directory": "participant/1-scripts/tools/apache-jmeter-5.6.3"
+    },
+    {
+      "name": "Eclipse Temurin JRE",
+      "version": "17.0.21+9",
+      "platform": "windows-x64",
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.21%2B9/OpenJDK17U-jre_x64_windows_hotspot_17.0.21_9.zip",
+      "checksum_url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.21%2B9/OpenJDK17U-jre_x64_windows_hotspot_17.0.21_9.zip.sha256.txt",
+      "sha256": "fe4656bd78fb09812dc38c49da777f79cc33e7ee435a254be82f9e7f40d9d117",
+      "archive_size": 43860024,
+      "directory": "participant/1-scripts/tools/java/windows-x64"
+    },
+    {
+      "name": "Eclipse Temurin JRE",
+      "version": "17.0.21+9",
+      "platform": "macos-aarch64",
+      "url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.21%2B9/OpenJDK17U-jre_aarch64_mac_hotspot_17.0.21_9.tar.gz",
+      "checksum_url": "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.21%2B9/OpenJDK17U-jre_aarch64_mac_hotspot_17.0.21_9.tar.gz.sha256.txt",
+      "sha256": "a5ab5bacd6e719d5a5570580ed14dceb2ed532208a39af927906b9742da1745e",
+      "archive_size": 42822064,
+      "directory": "participant/1-scripts/tools/java/macos-aarch64"
+    }
+  ]
+}

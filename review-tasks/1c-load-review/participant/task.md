@@ -23,7 +23,7 @@
 
 ## Чем открывать
 
-- `.jmx` — Apache JMeter 5.6.3 (File → Open) или любой текстовый редактор. Дефекты видны в окнах элементов JMeter.
+- `.jmx` — Apache JMeter 5.6.3 (File → Open) или любой текстовый редактор. JMeter и Java включены в комплект: в папке `1-scripts/` запустите `open-jmeter.bat` на Windows x64 или `open-jmeter.command` на macOS с Apple Silicon. Установка и интернет не требуются. Дефекты видны в окнах элементов JMeter.
 - `.docx` — Word или любой редактор документов.
 - `.json` и `.sql` — текстовый редактор. Дашборды можно импортировать в Grafana 10, но это не обязательно.
 - `.csv` в `1-scripts/data/` — текстовый редактор или Excel.
