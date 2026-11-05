@@ -1,0 +1,7 @@
+review-tasks/1c-load-review/participant/1-scripts/tools/** -text
+review-tasks/1c-load-review/participant/1-scripts/tools/**/*.jar filter=lfs diff=lfs merge=lfs -text
+review-tasks/1c-load-review/participant/1-scripts/tools/java/**/bin/** filter=lfs diff=lfs merge=lfs -text
+review-tasks/1c-load-review/participant/1-scripts/tools/java/**/lib/** filter=lfs diff=lfs merge=lfs -text
+review-tasks/1c-load-review/participant/1-scripts/tools/java/**/MacOS/** filter=lfs diff=lfs merge=lfs -text
+review-tasks/1c-load-review/participant/1-scripts/open-jmeter.bat text eol=crlf
+review-tasks/1c-load-review/participant/1-scripts/open-jmeter.command text eol=lf

@@ -22,3 +22,5 @@ final-task/participant/stand/transfer-stand.jar
 final-task/participant/stand/test-data/
 ~$scoring-sheet.xlsx
 ~$testcases.xlsx
+# Журнал локального просмотра JMeter (дистрибутивы в tools хранятся в Git).
+review-tasks/1c-load-review/participant/1-scripts/.jmeter/
