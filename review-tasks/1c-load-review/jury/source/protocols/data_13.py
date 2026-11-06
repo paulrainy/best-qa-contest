@@ -34,6 +34,8 @@ UTIL = [  # показатель, эталон, тест
     ('Диск БД, утилизация %', 20, 21),
     ('CPU efr-nt-gen01, %', 46, 47),
     ('CPU efr-nt-gen02, %', 44, 45),
+    ('Память efr-nt-gen01, %', 57, 58),
+    ('Память efr-nt-gen02, %', 55, 56),
     ('Heap JMeter на генераторах, % от 6 ГБ', 45, 46),
 ]
 
@@ -65,6 +67,8 @@ def tables() -> str:
     rows = [[n, a, b, change(a, b)] for n, a, b in UTIL]
     out += ['', 'Таблица 4. Утилизация против эталона, среднее за тест', pf.table(
         ['Показатель', 'Эталон', 'Тест', 'Изменение, %'], rows)]
+    out += ['', 'Таблица 5. CPU и память ОС по серверам, среднее за тест', pf.table(
+        ['Сервер', 'Метрика', 'Эталон, %', 'Тест, %', 'Изменение, %'], charts.server_comparison(UTIL))]
     return '\n'.join(out)
 
 
@@ -83,11 +87,14 @@ def draw(img: Path) -> list:
             'оп/с', None, None, None, 'Grafana · JMeter'),
         '13-op08-codes.png': ('Рисунок 2. ОП-08: ответы по кодам', {'200': ok08, '503': e503}, 'ответов/с', None,
                               None, ['#56A64B', '#FF780A'], 'Grafana · JMeter'),
-        '13-p95.png': ('Рисунок 3. 95-й перцентиль по окнам: ОП-04 и ОП-07', {
-            'ОП-04': charts.noisy(rng, pf.P95_100['ОП-04'] * 0.97, 0.05, t.size),
-            'ОП-07': charts.noisy(rng, pf.P95_100['ОП-07'] * 0.97, 0.05, t.size)}, 'мс', None, None, None,
+        '13-p95.png': ('Рисунок 3. 95-й перцентиль по окнам', {
+            c: charts.noisy(rng, pf.P95_100[c] * 0.97, 0.05, t.size) for c in CODES}, 'мс', None, None, None,
             'Grafana · JMeter'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
-        charts.panel(img / name, title, when, data, unit, threshold, label, None, colors, source)
-    return list(files)
+        charts.panel(img / name, title, when, data, unit, threshold, label, None, colors, source, summarize=unit != 'мс')
+    errors = {c: np.full(t.size, ERRORS[c]) for c in CODES}
+    errors['ОП-08'] = e503 / (ok08 + e503) * 100
+    charts.panel(img / '13-errors.png', 'Рисунок 4. Доля ошибок по операциям', when, errors, '%')
+    metrics = charts.util_series(UTIL, t.size, column=2)
+    return [*files, '13-errors.png', *charts.server_panels(img, 13, when, metrics, 5)]

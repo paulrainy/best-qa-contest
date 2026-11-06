@@ -47,6 +47,68 @@ def noisy(rng, value, rel=0.03, size=None):
     return np.asarray(value) * (1 + rng.normal(0, rel, size))
 
 
+def util_series(rows, size, column=1, maximum_column=None):
+    """Процентные ряды с заданным средним из таблицы, без выхода за 0–100 %."""
+    rng = np.random.default_rng(261105)
+    result = {}
+    for row in rows:
+        mean = row[column]
+        noise = rng.normal(size=size)
+        noise -= noise.mean()
+        upper = row[maximum_column] if maximum_column is not None else min(100, mean * 1.08)
+        scale = min((upper - mean) / noise.max(), mean / -noise.min())
+        result[row[0]] = mean + noise * scale
+    return result
+
+
+def _server_metrics(metrics):
+    """Разрез по серверам с сохранением среднего приложений и адаптера."""
+    cpu, memory = {}, {}
+    for kind, destination in [('CPU', cpu), ('Память', memory)]:
+        app = metrics[f'{kind} efr-api, среднее по 4 серверам, %']
+        adapter = metrics[f'{kind} efr-cft-adapter, %']
+        for n, factor in enumerate([0.97, 0.99, 1.01, 1.03], 1):
+            destination[f'efr-nt-app{n:02d}'] = np.clip(app * factor, 0, 100)
+        for n, factor in enumerate([0.98, 1.02], 1):
+            destination[f'efr-nt-int{n:02d}'] = np.clip(adapter * factor, 0, 100)
+        destination['efr-nt-db01'] = metrics[f'{kind} БД, %']
+        for n in [1, 2]:
+            destination[f'efr-nt-gen{n:02d}'] = metrics[f'{kind} efr-nt-gen{n:02d}, %']
+    return cpu, memory
+
+
+def server_comparison(rows):
+    """Средние CPU и памяти каждого сервера для сравнения по п. 4.4."""
+    baseline = _server_metrics({row[0]: row[1] for row in rows})
+    current = _server_metrics({row[0]: row[2] for row in rows})
+    result = []
+    for metric, old, new in zip(['CPU', 'Память ОС'], baseline, current):
+        for host in old:
+            values = [old[host], new[host], (new[host] / old[host] - 1) * 100]
+            result.append([host, metric, *[f'{value:.2f}'.replace('.', ',') for value in values]])
+    return result
+
+
+def server_panels(img, unit, when, metrics, first):
+    """CPU, память ОС, диск БД и heap генераторов; агрегаты совпадают с таблицами."""
+    cpu, memory = _server_metrics(metrics)
+    plots = [
+        ('server-cpu', 'CPU серверов', cpu),
+        ('memory', 'Память ОС серверов', memory),
+        ('disk', 'Утилизация диска БД', {'efr-nt-db01': metrics['Диск БД, утилизация %']}),
+        ('generator-heap', 'Heap JMeter, % от 6 ГБ', {
+            'Генераторы': metrics['Heap JMeter на генераторах, % от 6 ГБ']}),
+    ]
+    files = []
+    for offset, (suffix, title, values) in enumerate(plots):
+        name = f'{unit}-{suffix}.png'
+        threshold = 80 if suffix == 'generator-heap' else None
+        panel(img / name, f'Рисунок {first + offset}. {title}', when, values, '%', threshold,
+              'порог heap 80 %' if threshold else None, (0, 100), source='Grafana · Zabbix / JVM')
+        files.append(name)
+    return files
+
+
 def fmt(value: float, unit: str) -> str:
     if np.isnan(value):
         return '—'
@@ -79,14 +141,18 @@ def timeseries(ax, t, series: dict, unit: str, threshold=None, threshold_label=N
     return used
 
 
-def legend_table(ax, series: dict, colors, unit: str):
-    """Легенда как в Grafana: имя ряда, среднее и максимум."""
+def legend_table(ax, series: dict, colors, unit: str, summarize=True):
+    """Для оконных перцентилей — только имена рядов, без агрегирования за интервал."""
     ax.axis('off')
-    rows = [['', 'Сред.', 'Макс.']]
+    rows = [['', 'Сред.', 'Макс.']] if summarize else [['']]
     for name, values in series.items():
-        values = np.asarray(values, dtype=float)
-        rows.append([f'— {name}', fmt(np.nanmean(values), unit), fmt(np.nanmax(values), unit)])
-    table = ax.table(cellText=rows, bbox=[0, 0, 1, 1], cellLoc='left', colWidths=[0.66, 0.17, 0.17], edges='open')
+        row = [f'— {name}']
+        if summarize:
+            values = np.asarray(values, dtype=float)
+            row += [fmt(np.nanmean(values), unit), fmt(np.nanmax(values), unit)]
+        rows.append(row)
+    widths = [0.66, 0.17, 0.17] if summarize else [1.0]
+    table = ax.table(cellText=rows, bbox=[0, 0, 1, 1], cellLoc='left', colWidths=widths, edges='open')
     table.auto_set_font_size(False)
     table.set_fontsize(8)
     for (r, c), cell in table.get_celld().items():
@@ -101,7 +167,7 @@ def legend_table(ax, series: dict, colors, unit: str):
 
 
 def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, threshold_label=None, ylim=None,
-          colors=None, source='Grafana'):
+          colors=None, source='Grafana', summarize=True):
     """Один график-панель с заголовком, линиями и легендой-таблицей. Сохраняет PNG."""
     style()
     legend_rows = len(series) + 1
@@ -111,7 +177,7 @@ def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, th
     used = timeseries(ax, t, series, unit, threshold, threshold_label, ylim, colors)
     fig.text(0.01, 0.985, title, ha='left', va='top', fontsize=10, weight='bold', color=TEXT)
     fig.text(0.99, 0.985, source, ha='right', va='top', fontsize=8, color='#8E8E8E')
-    legend_table(fig.add_subplot(grid[1]), series, used, unit)
+    legend_table(fig.add_subplot(grid[1]), series, used, unit, summarize=summarize)
     fig.subplots_adjust(left=0.08, right=0.98, top=0.9, bottom=0.04)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)

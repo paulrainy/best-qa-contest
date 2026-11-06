@@ -31,6 +31,8 @@ UTIL = [
     ('Диск БД, утилизация %', 21, 27),
     ('CPU efr-nt-gen01, %', 46, 51),
     ('CPU efr-nt-gen02, %', 45, 49),
+    ('Память efr-nt-gen01, %', 58, 64),
+    ('Память efr-nt-gen02, %', 56, 62),
     ('Heap JMeter на генераторах, % от 6 ГБ', 45, 52),
     ('HikariCP: активных на экземпляр (из 40)', 18, 24),
     ('HikariCP: ожидающих, всего', 0, 0),
@@ -69,8 +71,7 @@ def draw(img: Path) -> list:
     when = charts.minutes(f'{DAY} {CHART_START}', t)
     active = charts.noisy(rng, 18.0, 0.08, t.size)
     pending = np.zeros(t.size)
-    errors = {c: np.clip(charts.noisy(rng, ERRORS[c], 0.35, t.size), 0, None) for c in ('ОП-04', 'ОП-06', 'ОП-08')}
-    errors['Остальные, среднее'] = np.clip(charts.noisy(rng, 0.03, 0.4, t.size), 0, None)
+    errors = {c: np.clip(charts.noisy(rng, ERRORS[c], 0.35, t.size), 0, None) for c in pf.CODES}
     live = 2.1 + rng.normal(0, 0.01, t.size)
     used = live + (t * 60 % 40) / 40 * 2.6 + rng.normal(0, 0.03, t.size)
     files = {
@@ -84,5 +85,13 @@ def draw(img: Path) -> list:
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 9) if unit == 'ГБ' else ((0, 4) if unit == '%' else None)
-        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source)
-    return list(files)
+        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
+    target = sum(pf.target(c, 100) for c in pf.CODES) / 3600
+    charts.panel(img / '14-throughput.png', 'Рисунок 4. Интенсивность операций', when, {
+        'Заданная': np.full(t.size, target),
+        'Фактическая': charts.noisy(rng, target * 0.996, 0.02, t.size)}, 'оп/с')
+    charts.panel(img / '14-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', when,
+                 {c: charts.noisy(rng, P95[c], 0.03, t.size) for c in pf.CODES}, 'мс', summarize=False)
+    metrics = charts.util_series(UTIL, t.size, maximum_column=2)
+    return [*files, '14-throughput.png', '14-p95.png',
+            *charts.server_panels(img, 14, when, metrics, 6)]

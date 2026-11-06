@@ -28,6 +28,7 @@ MEM_APP = [54, 58, 60, 62, 63, 63]  # память серверов efr-api, % (
 MEM_DB = [71, 72, 72, 73, 73, 73]  # shared_buffers и кэш ОС
 MEM_ADAPTER = [44, 47, 49, 50, 51, 51]
 MEM_GEN = [38, 46, 51, 57, 61, 64]  # heap JMeter на генераторах, % от 6 ГБ
+MEM_GEN_OS = [[42, 55, 62, 68, 72, 75], [40, 53, 60, 66, 70, 73]]
 WARMUP = '21:00'
 STEP_MIN = 10
 # p95 на 100 %, мс
@@ -78,8 +79,8 @@ def tables() -> str:
     out = ['Таблица 1. Ступени теста', pf.table(
         ['Ступень', 'Измерение, МСК', 'Потоков', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'Подано, %'], rows)]
     head = ['Операция'] + [f'{s[0]} %' for s in STEPS]
-    rng = np.random.default_rng(511)
-    rows = [[c] + [pf.num(min(100.0, s[2] * 100 + rng.normal(0, 0.6)), 1) for s in STEPS] for c in pf.CODES]
+    # Общая и пооперационная интенсивности описывают один и тот же профиль.
+    rows = [[c] + [pf.num(s[2] * 100, 1) for s in STEPS] for c in pf.CODES]
     out += ['', 'Таблица 2. Фактическая интенсивность по операциям, % от заданной', pf.table(head, rows)]
     head = ['Операция', 'Порог, мс'] + [f'{s[0]} %' for s in STEPS]
     rows = [[c, pf.num(pf.THRESHOLD[c])] + [pf.num(p95(c, s[5])) for s in STEPS] for c in pf.CODES]
@@ -95,6 +96,7 @@ def tables() -> str:
     rows.insert(3, ['Память efr-cft-adapter, %'] + [m for m in MEM_ADAPTER])
     rows.insert(5, ['Память БД, %'] + [m for m in MEM_DB])
     rows.insert(10, ['Heap JMeter на генераторах, % от 6 ГБ'] + [m for m in MEM_GEN])
+    rows.extend([[f'Память efr-nt-gen{n + 1:02d}, %', *values] for n, values in enumerate(MEM_GEN_OS)])
     out += ['', 'Таблица 5. Утилизация по ступеням', pf.table(['Показатель'] + [f'{s[0]} %' for s in STEPS], rows)]
     return '\n'.join(out)
 
@@ -116,14 +118,17 @@ def series(rng):
             target = step_target(pct) / 3600
             delivered = target * share * ramp
             requests = sum(pf.target(c, pct) * REQUESTS[c] for c in pf.CODES) / 3600 * share * ramp
-            rows.append([target, *charts.noisy(rng, [delivered], 0.02), charts.noisy(rng, requests * (1 - e503 / 100), 0.02),
-                         max(0.0, charts.noisy(rng, requests * e503 / 100, 0.15)) if e503 else 0.0,
-                         max(0.0, charts.noisy(rng, requests * e500 / 100, 0.6)),
-                         *charts.noisy(rng, [cpu_app, cpu_db, g1, g2], 0.04),
-                         min(40.0, charts.noisy(rng, act, 0.04)), max(0.0, charts.noisy(rng, pend, 0.12)) if pend else 0.0])
+            http503 = max(0.0, charts.noisy(rng, requests * e503 / 100, 0.15)) if e503 else 0.0
+            http500 = max(0.0, charts.noisy(rng, requests * e500 / 100, 0.6))
+            step = STEPS.index(s)
+            rows.append([target, delivered, requests - http503 - http500, http503, http500,
+                         *np.clip(charts.noisy(rng, [cpu_app, cpu_db, g1, g2], 0.04), 0, 100),
+                         min(40.0, charts.noisy(rng, act, 0.04)), max(0.0, charts.noisy(rng, pend, 0.12)) if pend else 0.0,
+                         MEM_APP[step], MEM_ADAPTER[step], MEM_DB[step], disk, cpu_ad,
+                         MEM_GEN_OS[0][step], MEM_GEN_OS[1][step], MEM_GEN[step], mult, e503, e500])
         if not rising:
             t.append(start + length)
-            rows.append([np.nan] * 11)
+            rows.append([np.nan] * 22)
     return charts.minutes(f'{DAY} {WARMUP}', t), np.array(rows, dtype=float)
 
 
@@ -144,5 +149,19 @@ def draw(img: Path) -> list:
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 105) if unit == '%' else None
-        charts.panel(img / name, title, t, data, unit, threshold, label, ylim, colors, source)
-    return list(files)
+        charts.panel(img / name, title, t, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
+    charts.panel(img / '11-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', t,
+                 {c: P95[c] * a[:, 19] for c in pf.CODES}, 'мс', summarize=False)
+    charts.panel(img / '11-errors.png', 'Рисунок 6. Доля ошибок по операциям', t,
+                 {c: a[:, 20] + a[:, 21] * ERR_WEIGHT[c] for c in pf.CODES}, '%')
+    columns = {
+        'CPU efr-api, среднее по 4 серверам, %': 5, 'CPU БД, %': 6,
+        'CPU efr-nt-gen01, %': 7, 'CPU efr-nt-gen02, %': 8,
+        'Память efr-api, среднее по 4 серверам, %': 11,
+        'Память efr-cft-adapter, %': 12, 'Память БД, %': 13,
+        'Диск БД, утилизация %': 14, 'CPU efr-cft-adapter, %': 15,
+        'Память efr-nt-gen01, %': 16, 'Память efr-nt-gen02, %': 17,
+        'Heap JMeter на генераторах, % от 6 ГБ': 18,
+    }
+    return [*files, '11-p95.png', '11-errors.png',
+            *charts.server_panels(img, 11, t, {name: a[:, col] for name, col in columns.items()}, 7)]

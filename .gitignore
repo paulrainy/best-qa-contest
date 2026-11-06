@@ -24,3 +24,8 @@ final-task/participant/stand/test-data/
 ~$testcases.xlsx
 # Журнал локального просмотра JMeter (дистрибутивы в tools хранятся в Git).
 review-tasks/1c-load-review/participant/1-scripts/.jmeter/
+~$-stability.docx
+~$-max-search.docx
+~$-control-run.docx
+~$-cft-stub.docx
+~$-baseline.docx
