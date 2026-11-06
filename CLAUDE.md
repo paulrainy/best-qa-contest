@@ -24,7 +24,7 @@ All prose, identifiers in task material, commit messages and comments are in **R
 | `final-task/` | Final case «Сервис переводов»: participant spec + black-box stand, jury key, scoring, stand sources |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Dated design specs and implementation plans written before each piece of work; `2026-10-30-review-materials-followups.md` lists deferred proposals (1c part still pending) |
 | `previous-year/` | Digests of last year's case, criteria and example artifacts; reference only |
-| `base-docs/` | Original chat export and organiser presentations; superseded by `rating-tasks.md` where they disagree |
+| `docs/base-docs/` | Original chat export and organiser presentations; superseded by `rating-tasks.md` where they disagree |
 
 Exercise numbering is Latin `1a`–`1d`; older specs/plans and commits still say `1а`/`1б`/`1г` (Cyrillic) — `1г` is today's `1c`.
 
