@@ -27,18 +27,19 @@ TIMEOUTS = {'ОП-08': 38}
 FACT_08 = 6400
 UTIL = [
     ('CPU efr-api, среднее по 4 серверам, %', 41, 40),
-    ('Память efr-api, среднее по 4 серверам, %', 59, 59),
+    ('Память efr-api, среднее по 4 серверам, %', 59, 60),
     ('CPU efr-cft-adapter, %', 15, 12),
-    ('Память efr-cft-adapter, %', 52, 51),
-    ('CPU БД, %', 31, 31),
+    ('Память efr-cft-adapter, %', 47, 46),
+    ('CPU БД, %', 31, 30),
     ('Память БД, %', 72, 72),
-    ('Диск БД, утилизация %', 21, 21),
-    ('CPU efr-nt-gen01, %', 47, 47),
+    ('Диск БД, утилизация %', 21, 22),
+    ('CPU efr-nt-gen01, %', 47, 46),
     ('CPU efr-nt-gen02, %', 45, 45),
-    ('Память efr-nt-gen01, %', 58, 58),
+    ('Память efr-nt-gen01, %', 58, 57),
     ('Память efr-nt-gen02, %', 56, 56),
-    ('Heap JMeter на генераторах, % от 6 ГБ', 46, 46),
+    ('Heap JMeter на генераторах, % от 6 ГБ', 46, 47),
 ]
+DELIVERED = pf.delivered(0.996, 1519)
 THRESHOLD = dict(pf.THRESHOLD, **{'ОП-08': 800})  # дефект Д15.5
 
 
@@ -61,7 +62,7 @@ def tables() -> str:
     rows = []
     for c in pf.CODES:
         tgt = pf.target(c, 100)
-        fact = FACT_08 if c == 'ОП-08' else tgt * 0.996
+        fact = FACT_08 if c == 'ОП-08' else tgt * DELIVERED[c]
         rows.append([c, pf.num(tgt), pf.num(fact), pf.num(TEST[c]), pf.num(THRESHOLD[c]), pf.num(ERRORS[c], 2),
                      TIMEOUTS.get(c, 0)])
     out += ['', 'Таблица 3. Бизнес-метрики теста, 22:10–23:10', pf.table(
@@ -97,10 +98,10 @@ def draw(img: Path) -> list:
     fact = (sum(pf.target(c, 100) * 0.996 for c in pf.CODES if c != 'ОП-08') + FACT_08) / 3600
     charts.panel(img / '15-throughput.png', 'Рисунок 3. Интенсивность всех операций', when, {
         'Заданная': np.full(t.size, target),
-        'Фактическая': charts.noisy(rng, fact, 0.02, t.size)}, 'оп/с')
+        'Фактическая': charts.noisy(rng, fact, 0.02, t.size)}, 'оп/с', source='Grafana · JMeter')
     # Намеренно не учтены таймауты, как в таблице: Д15.3.
     charts.panel(img / '15-errors.png', 'Рисунок 4. Доля ошибок по операциям', when,
-                 {c: np.full(t.size, ERRORS[c]) for c in pf.CODES}, '%')
-    metrics = charts.util_series(UTIL, t.size, column=2)
+                 {c: charts.error_series(rng, ERRORS[c], t.size) for c in pf.CODES}, '%', source='Grafana · JMeter')
+    metrics = charts.util_series(UTIL, t.size, seed=1519, column=2)
     return [*files, '15-throughput.png', '15-errors.png',
             *charts.server_panels(img, 15, when, metrics, 5)]

@@ -19,6 +19,8 @@ DAY = '2026-11-07'
 START = '22:10'
 TOTAL_MIN = 60
 CODES = [c for c in pf.CODES if c != 'ОП-09']
+PALETTE = [charts.COLORS[pf.CODES.index(c)] for c in CODES]  # цвет операции тот же, что в других протоколах
+DELIVERED = pf.delivered(0.995, 1307, CODES)
 BASELINE = {'ОП-01': 412, 'ОП-02': 598, 'ОП-03': 1160, 'ОП-04': 1710, 'ОП-05': 805, 'ОП-06': 1380, 'ОП-07': 5185,
             'ОП-08': 305, 'ОП-10': 515}
 ERRORS = {'ОП-01': 0.01, 'ОП-02': 0.01, 'ОП-03': 0.03, 'ОП-04': 0.05, 'ОП-05': 0.02, 'ОП-06': 0.04, 'ОП-07': 0.02,
@@ -57,8 +59,8 @@ def tables() -> str:
     rows = []
     for code in CODES:
         tgt = pf.target(code, 100)
-        rows.append([code, pf.num(tgt), pf.num(tgt * 0.995), pf.num(pf.P95_100[code]), pf.num(pf.THRESHOLD[code]),
-                     pf.num(ERRORS[code], 2)])
+        rows.append([code, pf.num(tgt), pf.num(tgt * DELIVERED[code]), pf.num(pf.P95_100[code]),
+                     pf.num(pf.THRESHOLD[code]), pf.num(ERRORS[code], 2)])
     out += ['', 'Таблица 2. Бизнес-метрики теста, 22:10–23:10', pf.table(
         ['Операция', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'p95, мс', 'Порог, мс', 'Ошибки, %'], rows)]
     rows = [[c, pf.num(BASELINE[c]), pf.num(pf.P95_100[c]), change(BASELINE[c], pf.P95_100[c])] for c in CODES]
@@ -88,13 +90,14 @@ def draw(img: Path) -> list:
         '13-op08-codes.png': ('Рисунок 2. ОП-08: ответы по кодам', {'200': ok08, '503': e503}, 'ответов/с', None,
                               None, ['#56A64B', '#FF780A'], 'Grafana · JMeter'),
         '13-p95.png': ('Рисунок 3. 95-й перцентиль по окнам', {
-            c: charts.noisy(rng, pf.P95_100[c] * 0.97, 0.05, t.size) for c in CODES}, 'мс', None, None, None,
+            c: charts.noisy(rng, pf.P95_100[c] * 0.97, 0.05, t.size) for c in CODES}, 'мс', None, None, PALETTE,
             'Grafana · JMeter'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         charts.panel(img / name, title, when, data, unit, threshold, label, None, colors, source, summarize=unit != 'мс')
-    errors = {c: np.full(t.size, ERRORS[c]) for c in CODES}
+    errors = {c: charts.error_series(rng, ERRORS[c], t.size) for c in CODES}
     errors['ОП-08'] = e503 / (ok08 + e503) * 100
-    charts.panel(img / '13-errors.png', 'Рисунок 4. Доля ошибок по операциям', when, errors, '%')
-    metrics = charts.util_series(UTIL, t.size, column=2)
+    charts.panel(img / '13-errors.png', 'Рисунок 4. Доля ошибок по операциям', when, errors, '%',
+                 colors=PALETTE, source='Grafana · JMeter')
+    metrics = charts.util_series(UTIL, t.size, seed=1307, column=2)
     return [*files, '13-errors.png', *charts.server_panels(img, 13, when, metrics, 5)]

@@ -6,7 +6,7 @@
 - АБС была на заглушке (CFTNT занят), исходный тест — на CFTNT, в «Ограничениях» «Нет»;
 - ошибки показаны только суммарно 0,14 %, а у ОП-06 — 2,4 % (рисунок 2);
 - журнал 22:00–23:00, графики — 21:00–22:00 (другой запуск);
-- рекомендация «увеличить heap» не следует из данных: heap не выше 4,8 из 8 ГБ, нижняя граница ровная.
+- рекомендация «увеличить heap» не следует из данных: heap не выше 4,4 из 8 ГБ, нижняя граница ровная.
 """
 from pathlib import Path
 
@@ -16,6 +16,8 @@ import charts
 import nt_profile as pf
 
 DAY = '2026-11-14'
+HEAP_PEAK = 4.4  # ГБ: в выводе протокола «занятый heap доходит до 4,4 ГБ»
+DELIVERED = pf.delivered(0.996, 1414)
 CHART_START = '21:00'  # графики выгружены за другой интервал
 ERRORS = {'ОП-01': 0.02, 'ОП-02': 0.02, 'ОП-03': 0.05, 'ОП-04': 0.06, 'ОП-05': 0.04, 'ОП-06': 2.4, 'ОП-07': 0.03,
           'ОП-08': 0.01, 'ОП-09': 0.03, 'ОП-10': 0.02}
@@ -23,16 +25,16 @@ P95 = {'ОП-01': 415, 'ОП-02': 600, 'ОП-03': 1170, 'ОП-04': 1570, 'ОП-0
        'ОП-08': 205, 'ОП-09': 2280, 'ОП-10': 515}
 UTIL = [
     ('CPU efr-api, среднее по 4 серверам, %', 40, 46),
-    ('Память efr-api, среднее по 4 серверам, %', 58, 63),
+    ('Память efr-api, среднее по 4 серверам, %', 58, 60),
     ('CPU efr-cft-adapter, %', 13, 16),
-    ('Память efr-cft-adapter, %', 46, 48),
+    ('Память efr-cft-adapter, %', 46, 47),
     ('CPU БД, %', 30, 36),
     ('Память БД, %', 72, 73),
     ('Диск БД, утилизация %', 21, 27),
     ('CPU efr-nt-gen01, %', 46, 51),
     ('CPU efr-nt-gen02, %', 45, 49),
-    ('Память efr-nt-gen01, %', 58, 64),
-    ('Память efr-nt-gen02, %', 56, 62),
+    ('Память efr-nt-gen01, %', 58, 60),
+    ('Память efr-nt-gen02, %', 56, 58),
     ('Heap JMeter на генераторах, % от 6 ГБ', 45, 52),
     ('HikariCP: активных на экземпляр (из 40)', 18, 24),
     ('HikariCP: ожидающих, всего', 0, 0),
@@ -55,11 +57,12 @@ def tables() -> str:
     ]
     out = ['Таблица 1. Условия исходного теста и контрольного прогона',
            pf.table(['Параметр', 'Стабильность 12.11.2026', 'Контрольный прогон 14.11.2026'], conditions)]
-    rows = [[c, pf.num(pf.target(c, 100)), pf.num(pf.target(c, 100) * 0.996), pf.num(P95[c]), pf.num(pf.THRESHOLD[c])]
-            for c in pf.CODES]
-    rows.append(['Ошибки, всего', '', '', '', pf.num(total_errors(), 2) + ' %'])
+    rows = [[c, pf.num(pf.target(c, 100)), pf.num(pf.target(c, 100) * DELIVERED[c]), pf.num(P95[c]),
+             pf.num(pf.THRESHOLD[c])] for c in pf.CODES]
     out += ['', 'Таблица 2. Бизнес-метрики контрольного прогона', pf.table(
         ['Операция', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'p95, мс', 'Порог, мс'], rows)]
+    # Доля ошибок — одной строкой под таблицей, без разбивки по операциям: это дефект Д14.4.
+    out += ['', f'Доля ошибок за прогон, все операции — {pf.num(total_errors(), 2)} %.']
     out += ['', 'Таблица 3. Утилизация за контрольный прогон',
             pf.table(['Показатель', 'Среднее', 'Максимум'], [[n, a, m] for n, a, m in UTIL])]
     return '\n'.join(out)
@@ -69,11 +72,13 @@ def draw(img: Path) -> list:
     rng = np.random.default_rng(1414)
     t = np.arange(0, 60, 0.25)
     when = charts.minutes(f'{DAY} {CHART_START}', t)
-    active = charts.noisy(rng, 18.0, 0.08, t.size)
+    metrics = charts.util_series(UTIL, t.size, seed=1414, maximum_column=2)
+    active = metrics['HikariCP: активных на экземпляр (из 40)']
     pending = np.zeros(t.size)
-    errors = {c: np.clip(charts.noisy(rng, ERRORS[c], 0.35, t.size), 0, None) for c in pf.CODES}
+    errors = {c: charts.error_series(rng, ERRORS[c], t.size) for c in pf.CODES}
     live = 2.1 + rng.normal(0, 0.01, t.size)
     used = live + (t * 60 % 40) / 40 * 2.6 + rng.normal(0, 0.03, t.size)
+    used = live + (used - live) * (HEAP_PEAK - 2.1) / (used.max() - 2.1)  # пик — как в тексте вывода
     files = {
         '14-hikari.png': ('Рисунок 1. Пул соединений HikariCP', {'Активные, среднее на экземпляр': active,
                                                                   'Ожидающие, всего': pending},
@@ -84,14 +89,14 @@ def draw(img: Path) -> list:
                         'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
-        ylim = (0, 9) if unit == 'ГБ' else ((0, 4) if unit == '%' else None)
+        ylim = (0, 9) if unit == 'ГБ' else None
         charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
     target = sum(pf.target(c, 100) for c in pf.CODES) / 3600
     charts.panel(img / '14-throughput.png', 'Рисунок 4. Интенсивность операций', when, {
         'Заданная': np.full(t.size, target),
-        'Фактическая': charts.noisy(rng, target * 0.996, 0.02, t.size)}, 'оп/с')
+        'Фактическая': charts.noisy(rng, target * 0.996, 0.02, t.size)}, 'оп/с', source='Grafana · JMeter')
     charts.panel(img / '14-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', when,
-                 {c: charts.noisy(rng, P95[c], 0.03, t.size) for c in pf.CODES}, 'мс', summarize=False)
-    metrics = charts.util_series(UTIL, t.size, maximum_column=2)
+                 {c: charts.noisy(rng, P95[c], 0.03, t.size) for c in pf.CODES}, 'мс', source='Grafana · JMeter',
+                 summarize=False)
     return [*files, '14-throughput.png', '14-p95.png',
             *charts.server_panels(img, 14, when, metrics, 6)]

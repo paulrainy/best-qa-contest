@@ -28,7 +28,7 @@ def table_rows(text, caption):
 
 
 def number(value):
-    return float(value.replace(' ', '').replace(',', '.'))
+    return float(value.replace(' ', '').replace(',', '.').replace('−', '-'))
 
 
 def capture(data, unit, monkeypatch, tmp_path):
@@ -112,6 +112,197 @@ def test_comparison_exposes_cpu_and_memory_baselines_for_each_server(data, unit)
     for row in rows:
         old, new, change = map(number, row[2:])
         assert abs((new / old - 1) * 100 - change) < 0.1
+
+
+def test_maximum_operation_shares_differ_and_keep_step_verdict(data):
+    """Таблица 2: у операций свой процент поданной интенсивности, но вывод по ступени (3.5) один."""
+    rows = table_rows(data[11].tables(), 'Таблица 2.')
+    for col, percent in enumerate([50, 100, 125, 150, 175, 200], start=1):
+        values = [number(row[col]) for row in rows]
+        assert len(set(values)) > 3, percent
+        assert max(values) - min(values) <= 1.6, percent
+        assert all(value <= 100 for value in values)
+        assert all(value >= 95 for value in values) if percent <= 125 else all(value < 95 for value in values)
+
+
+def test_maximum_503_only_for_operations_served_by_efr_api(data, monkeypatch, tmp_path):
+    """ОП-08 идёт в адаптер, ОП-09 — в БД: ответов 503 от efr-api у них быть не может."""
+    errors = capture(data, 11, monkeypatch, tmp_path)['11-errors.png'][2]
+    for code, values in errors.items():
+        if code in ('ОП-08', 'ОП-09'):
+            assert np.nanmax(values) < 1, code
+        else:
+            assert np.nanmax(values) > 5, code
+
+
+def test_maximum_step_series_are_not_flat(data):
+    _, series = data[11].series(np.random.default_rng(1105))
+    step = series[np.isfinite(series[:, 0])][:40]  # прогрев: одна ступень, 10 минут
+    for column in [11, 12, 13, 14, 15, 16, 17, 18]:
+        assert np.std(step[:, column]) > 0, column
+
+
+@pytest.mark.parametrize('unit', [12, 13, 15])
+def test_error_windows_vary_and_average_to_table(data, unit, monkeypatch, tmp_path):
+    plots = capture(data, unit, monkeypatch, tmp_path)
+    errors = next(value[2] for name, value in plots.items() if 'errors' in name)
+    for code, values in errors.items():
+        if unit == 13 and code == 'ОП-08':
+            continue  # 503 в 22:40–22:47, в таблице 0 % — дефект Д13.4
+        assert np.std(values) > 0, code
+        assert np.mean(values) == pytest.approx(data[unit].ERRORS[code], rel=1e-6), code
+
+
+@pytest.mark.parametrize('first, second', [(13, 15), (13, 14), (14, 15)])
+def test_utilisation_curves_are_not_copied_between_protocols(data, first, second, monkeypatch, tmp_path):
+    """Одинаковые кривые в двух протоколах — это «график другого запуска», незаложенный дефект."""
+    one = capture(data, first, monkeypatch, tmp_path)
+    other = capture(data, second, monkeypatch, tmp_path)
+    for kind in ['server-cpu', 'memory', 'disk', 'generator-heap']:
+        a, b = one[f'{first}-{kind}.png'][2], other[f'{second}-{kind}.png'][2]
+        for host in a:
+            assert abs(np.corrcoef(a[host], b[host])[0, 1]) < 0.9, (kind, host)
+
+
+@pytest.mark.parametrize('unit', range(11, 16))
+def test_servers_of_one_group_have_own_curves(data, unit, monkeypatch, tmp_path):
+    plots = capture(data, unit, monkeypatch, tmp_path)
+    cpu = next(value[2] for name, value in plots.items() if 'server-cpu' in name)
+    seen = np.isfinite(cpu['efr-nt-app01'])
+    for a, b in [('efr-nt-app01', 'efr-nt-app02'), ('efr-nt-app03', 'efr-nt-app04'), ('efr-nt-int01', 'efr-nt-int02')]:
+        ratio = cpu[a][seen] / cpu[b][seen]
+        assert np.std(ratio) > 0.005, (a, b)
+
+
+@pytest.mark.parametrize('unit', [13, 15])
+def test_server_means_on_graph_match_comparison_table(data, unit, monkeypatch, tmp_path):
+    rows = table_rows(data[unit].tables(), 'Таблица 5.' if unit == 13 else 'Таблица 6.')
+    plots = capture(data, unit, monkeypatch, tmp_path)
+    for metric, kind in [('CPU', 'server-cpu'), ('Память ОС', 'memory')]:
+        series = plots[f'{unit}-{kind}.png'][2]
+        for row in rows:
+            if row[1] == metric:
+                assert float(np.mean(series[row[0]])) == pytest.approx(number(row[3]), abs=0.06), row
+    changes = {number(row[4]) for row in rows if row[0].startswith('efr-nt-app') and row[1] == 'CPU'}
+    assert len(changes) > 1  # у серверов приложений изменение не одинаковое до сотых
+
+
+def test_os_memory_changes_slowly(data, monkeypatch, tmp_path):
+    for unit in [13, 15]:
+        memory = capture(data, unit, monkeypatch, tmp_path)[f'{unit}-memory.png'][2]
+        for host, values in memory.items():
+            assert np.max(np.abs(np.diff(values))) < 1.0, (unit, host)
+            assert np.max(values) - np.min(values) < 4.0, (unit, host)
+
+
+def test_control_run_error_graph_is_not_clipped_and_total_is_below_table(data, monkeypatch, tmp_path):
+    limits = {}
+
+    def record(path, title, when, series, unit, threshold=None, label=None, ylim=None, *args, **kwargs):
+        limits[path.name] = (series, ylim)
+
+    monkeypatch.setattr(data[14].charts, 'panel', record)
+    data[14].draw(tmp_path)
+    series, ylim = limits['14-errors.png']
+    assert ylim is None or max(np.max(values) for values in series.values()) <= ylim[1]
+    assert np.mean(series['ОП-06']) == pytest.approx(2.4)
+    tables = data[14].tables()
+    assert 'Ошибки, всего' not in tables
+    assert 'Доля ошибок за прогон, все операции — 0,14 %.' in tables.split('\n\n')
+    assert all(len(row) == 5 and row[4] for row in table_rows(tables, 'Таблица 2.'))
+
+
+def test_small_error_shares_keep_two_decimals_in_legend(data):
+    fmt = data[11].charts.fmt
+    assert fmt(0.05, '%') == '0,05 %'
+    assert fmt(0.6, '%') == '0,60 %'
+    assert fmt(1.4, '%') == '1,4 %'
+    assert fmt(0.0, '%') == '0 %'
+    assert fmt(46.0, '%') == '46,0 %'  # тот же формат, что у соседнего 39,8 %
+    assert fmt(10.0, 'оп/с') == '10,0 оп/с'
+    assert fmt(5600.0, 'мс') == '5 600 мс'
+
+
+@pytest.mark.parametrize('unit, caption', [(12, 'Таблица 1.'), (13, 'Таблица 2.'), (14, 'Таблица 2.'),
+                                           (15, 'Таблица 3.')])
+def test_delivered_intensity_differs_by_operation(data, unit, caption):
+    rows = table_rows(data[unit].tables(), caption)
+    ratios = [number(row[2]) / number(row[1]) for row in rows if not (unit == 15 and row[0] == 'ОП-08')]
+    assert len({round(ratio, 3) for ratio in ratios}) > 3
+    assert min(ratios) >= 0.95  # 3.5: нагрузка подана
+
+
+def test_control_and_hotfix_runs_do_not_share_delivered_numbers(data):
+    one = [row[2] for row in table_rows(data[14].tables(), 'Таблица 2.')]
+    other = [row[2] for row in table_rows(data[15].tables(), 'Таблица 3.')]
+    assert sum(a == b for a, b in zip(one, other)) <= 2
+
+
+def test_maximum_and_baseline_runs_do_not_share_p95(data):
+    step = [row[3] for row in table_rows(data[11].tables(), 'Таблица 3.') if row[0] != 'ОП-09']
+    baseline = [row[3] for row in table_rows(data[13].tables(), 'Таблица 2.')]
+    assert sum(a == b for a, b in zip(step, baseline)) <= 1
+
+
+def test_maximum_operations_outside_pool_slow_down_less(data):
+    rows = {row[0]: [number(value) for value in row[1:]] for row in table_rows(data[11].tables(), 'Таблица 3.')}
+    for code, (limit, *steps) in rows.items():
+        growth = steps[5] / steps[1]  # 200 % к 100 %
+        assert (growth < 1.5) == (code in ('ОП-08', 'ОП-09')), code
+        assert all(value <= limit for value in steps[:4]), code  # до 150 % все в порогах
+    over = [code for code, (limit, *steps) in rows.items() if steps[4] > limit]
+    assert over == ['ОП-02', 'ОП-03', 'ОП-04', 'ОП-05', 'ОП-06', 'ОП-07']  # как в выводе протокола
+
+
+def test_stability_total_p95_lies_within_window_values(data):
+    for code, total in data[12].TOTAL_P95.items():
+        windows = data[12].p95(code)[data[12].T >= data[12].WARMUP_MIN]
+        assert np.percentile(windows, 50) < total < np.percentile(windows, 99.5), code
+
+
+def test_stability_load_ramps_after_warmup(data):
+    load = data[12].LOAD
+    steps = np.diff(load)
+    assert steps.max() < 0.2  # не мгновенная ступень 50 → 100 %
+    assert load[data[12].T >= data[12].WARMUP_MIN + data[12].RAMP_MIN].min() == 1.0
+
+
+def test_graph_maximum_is_not_fixed_share_of_mean(data, monkeypatch, tmp_path):
+    for unit in [13, 15]:
+        cpu = capture(data, unit, monkeypatch, tmp_path)[f'{unit}-server-cpu.png'][2]
+        ratios = {round(float(np.max(cpu[host]) / np.mean(cpu[host])), 3)
+                  for host in ['efr-nt-db01', 'efr-nt-gen01', 'efr-nt-gen02']}
+        assert len(ratios) == 3, unit
+
+
+def test_control_run_heap_peak_matches_conclusion(data, monkeypatch, tmp_path):
+    heap = capture(data, 14, monkeypatch, tmp_path)['14-heap.png'][2]
+    assert 4.35 <= np.max(heap['Занято']) < 4.45
+    assert np.max(heap['После сборки (live data)']) < 2.2
+
+
+def test_baseline_graphs_keep_operation_colours(data, monkeypatch, tmp_path):
+    palettes = {}
+
+    def record(path, title, when, series, unit, threshold=None, label=None, ylim=None, colors=None, *a, **k):
+        palettes[path.name] = colors
+
+    monkeypatch.setattr(data[13].charts, 'panel', record)
+    data[13].draw(tmp_path)
+    full = data[13].charts.COLORS
+    assert palettes['13-p95.png'][-1] == full[9] and palettes['13-errors.png'][-1] == full[9]  # ОП-10
+
+
+def test_utilisation_table_groups_pool_metrics(data):
+    names = [row[0] for row in table_rows(data[11].tables(), 'Таблица 5.')]
+    assert names[-3:] == ['Heap JMeter на генераторах, % от 6 ГБ', 'HikariCP: активных на экземпляр (из 40)',
+                          'HikariCP: ожидающих, всего']
+
+
+def test_comparison_tables_use_one_minus_sign(data):
+    for unit in [13, 15]:
+        rows = table_rows(data[unit].tables(), 'Таблица 5.' if unit == 13 else 'Таблица 6.')
+        assert not any(cell.startswith('-') for row in rows for cell in row)
 
 
 def test_window_p95_legend_has_no_interval_aggregates(data):

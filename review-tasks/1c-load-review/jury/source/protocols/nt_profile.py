@@ -1,5 +1,6 @@
 """Профиль нагрузки из методики (2.2, 3.2, 4.1) — общий для всех протоколов."""
 import math
+import random
 
 # код, название, потоков на 100 %, пейсинг с (None — открытая модель), интенсивность на 100 % оп/ч, порог p95 мс
 OPS = [
@@ -34,6 +35,20 @@ def target(code: str, percent: float) -> float:
     if op[3] is None:
         return op[4] * percent / 100
     return threads(code, percent) * 3600 / op[3]
+
+
+def delivered(share: float, seed: int, codes=None, spread=0.003) -> dict:
+    """Доля поданной интенсивности по операциям: у каждой свой небольшой разброс вокруг общей доли.
+
+    Среднее, взвешенное по заданной интенсивности, равно общей доле. seed у протокола свой: одинаковые
+    до единицы фактические интенсивности в двух разных прогонах неправдоподобны.
+    """
+    codes = codes or CODES
+    rng = random.Random(seed)
+    weights = [target(code, 100) for code in codes]
+    shifts = [rng.uniform(-spread, spread) for _ in codes]
+    mean = sum(shift * weight for shift, weight in zip(shifts, weights)) / sum(weights)
+    return {code: min(1.0, share + shift - mean) for code, shift in zip(codes, shifts)}
 
 
 def num(value, digits=0) -> str:
