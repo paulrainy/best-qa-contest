@@ -27,17 +27,20 @@ TIMEOUTS = {'ОП-08': 38}
 FACT_08 = 6400
 UTIL = [
     ('CPU efr-api, среднее по 4 серверам, %', 41, 40),
-    ('Память efr-api, среднее по 4 серверам, %', 59, 59),
+    ('Память efr-api, среднее по 4 серверам, %', 59, 60),
     ('CPU efr-cft-adapter, %', 15, 12),
-    ('Память efr-cft-adapter, %', 52, 51),
-    ('CPU БД, %', 31, 31),
+    ('Память efr-cft-adapter, %', 47, 46),
+    ('CPU БД, %', 31, 30),
     ('Память БД, %', 72, 72),
-    ('Диск БД, утилизация %', 21, 21),
-    ('CPU efr-nt-gen01, %', 47, 47),
+    ('Диск БД, утилизация %', 21, 22),
+    ('CPU efr-nt-gen01, %', 47, 46),
     ('CPU efr-nt-gen02, %', 45, 45),
-    ('Heap JMeter на генераторах, % от 6 ГБ', 46, 46),
+    ('Память efr-nt-gen01, %', 58, 57),
+    ('Память efr-nt-gen02, %', 56, 56),
+    ('Heap JMeter на генераторах, % от 6 ГБ', 46, 47),
 ]
-THRESHOLD = dict(pf.THRESHOLD, **{'ОП-08': 800})  # дефект 15.4
+DELIVERED = pf.delivered(0.996, 1519)
+THRESHOLD = dict(pf.THRESHOLD, **{'ОП-08': 800})  # дефект Д15.5
 
 
 def change(old, new):
@@ -59,7 +62,7 @@ def tables() -> str:
     rows = []
     for c in pf.CODES:
         tgt = pf.target(c, 100)
-        fact = FACT_08 if c == 'ОП-08' else tgt * 0.996
+        fact = FACT_08 if c == 'ОП-08' else tgt * DELIVERED[c]
         rows.append([c, pf.num(tgt), pf.num(fact), pf.num(TEST[c]), pf.num(THRESHOLD[c]), pf.num(ERRORS[c], 2),
                      TIMEOUTS.get(c, 0)])
     out += ['', 'Таблица 3. Бизнес-метрики теста, 22:10–23:10', pf.table(
@@ -71,6 +74,8 @@ def tables() -> str:
     rows = [[n, a, b, change(a, b)] for n, a, b in UTIL]
     out += ['', 'Таблица 5. Утилизация против эталона, среднее за тест', pf.table(
         ['Показатель', 'Эталон', 'Тест', 'Изменение, %'], rows)]
+    out += ['', 'Таблица 6. CPU и память ОС по серверам, среднее за тест', pf.table(
+        ['Сервер', 'Метрика', 'Эталон, %', 'Тест, %', 'Изменение, %'], charts.server_comparison(UTIL))]
     return '\n'.join(out)
 
 
@@ -82,11 +87,21 @@ def draw(img: Path) -> list:
         '15-op08-throughput.png': ('Рисунок 1. ОП-08: интенсивность', {
             'Заданная': np.full(t.size, 2.0), 'Фактическая': charts.noisy(rng, FACT_08 / 3600, 0.04, t.size)},
             'оп/с', None, None, None, 'Grafana · JMeter'),
-        '15-p95.png': ('Рисунок 2. 95-й перцентиль по окнам: операции через АБС', {
-            c: charts.noisy(rng, TEST[c] * 0.97, 0.05, t.size) for c in ('ОП-04', 'ОП-06', 'ОП-08')},
+        '15-p95.png': ('Рисунок 2. 95-й перцентиль по окнам', {
+            c: charts.noisy(rng, TEST[c] * 0.97, 0.05, t.size) for c in pf.CODES},
             'мс', None, None, None, 'Grafana · JMeter'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 2.5) if unit == 'оп/с' else None
-        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source)
-    return list(files)
+        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
+    target = sum(pf.target(c, 100) for c in pf.CODES) / 3600
+    fact = (sum(pf.target(c, 100) * 0.996 for c in pf.CODES if c != 'ОП-08') + FACT_08) / 3600
+    charts.panel(img / '15-throughput.png', 'Рисунок 3. Интенсивность всех операций', when, {
+        'Заданная': np.full(t.size, target),
+        'Фактическая': charts.noisy(rng, fact, 0.02, t.size)}, 'оп/с', source='Grafana · JMeter')
+    # Намеренно не учтены таймауты, как в таблице: Д15.3.
+    charts.panel(img / '15-errors.png', 'Рисунок 4. Доля ошибок по операциям', when,
+                 {c: charts.error_series(rng, ERRORS[c], t.size) for c in pf.CODES}, '%', source='Grafana · JMeter')
+    metrics = charts.util_series(UTIL, t.size, seed=1519, column=2)
+    return [*files, '15-throughput.png', '15-errors.png',
+            *charts.server_panels(img, 15, when, metrics, 5)]

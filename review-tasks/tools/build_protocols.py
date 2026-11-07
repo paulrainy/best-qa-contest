@@ -11,6 +11,9 @@
 - «- …» — пункт списка, «**…**» — жирный текст, остальное — абзацы.
 Падает, если номера идут не подряд, нет картинки, у таблицы нет подписи или в строке не то число колонок.
 В свойствах документа (identifier) — хэш исходника и картинок: по нему build_sheets видит устаревший документ.
+Хэш считается по тексту с переводами строк LF: на Windows с core.autocrlf исходник лежит с CRLF, а документ тот же.
+Страница — A4, поля 2,5 и 1,5 см: рисунок шириной 16 см помещается в текст. Ширина колонок таблиц задаётся явно,
+по самому длинному слову колонки: иначе в LibreOffice колонки равные и заголовки рвутся посреди слова.
 """
 import hashlib
 import re
@@ -24,6 +27,12 @@ from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
 FONT = 'Times New Roman'
+PAGE = (Cm(21.0), Cm(29.7))  # A4
+MARGINS = {'left': Cm(2.5), 'right': Cm(1.5), 'top': Cm(2.0), 'bottom': Cm(2.0)}
+TEXT_WIDTH = 17.0  # см: 21 − 2,5 − 1,5
+PICTURE_WIDTH = 16.0  # см
+CHAR, DIGIT, PADDING = 0.28, 0.22, 0.45  # см: знак полужирного Times New Roman 12 pt, цифра, поля ячейки
+NUMERIC = re.compile(r'[\d\s,.:%–−-]+')  # число, проценты, интервал времени — не переносится по пробелу
 IMAGE = re.compile(r'^!\[(Рисунок (\d+)\.[^\]]*)\]\(([^)]+)\)\s*$')
 CAPTION = re.compile(r'^Таблица (\d+)\.')
 SECTION = re.compile(r'^## (\d+)\. ')
@@ -148,8 +157,9 @@ def places(protocol: Protocol) -> dict:
 
 
 def source_hash(path: Path) -> str:
-    digest = hashlib.sha256(path.read_bytes())
-    for line in path.read_text(encoding='utf-8').splitlines():
+    text = path.read_bytes().replace(b'\r\n', b'\n')
+    digest = hashlib.sha256(text)
+    for line in text.decode('utf-8').splitlines():
         match = IMAGE.match(line.rstrip())
         if match and (path.parent / match.group(3)).exists():
             digest.update((path.parent / match.group(3)).read_bytes())
@@ -175,9 +185,36 @@ def style_fonts(doc):
         doc.styles[name].font.size = Pt(size)
 
 
+def token_width(token: str) -> float:
+    if NUMERIC.fullmatch(token):
+        return len(token) * DIGIT + (0.25 if '%' in token else 0)  # знак процента вдвое шире цифры
+    return len(token) * CHAR
+
+
+def column_widths(rows: list) -> list:
+    """Ширина колонок, см: не меньше самого длинного слова; остаток — колонке с длинным текстом или поровну."""
+    plain = [[BOLD.sub(r'\1', value) for value in row] for row in rows]
+    need, spare = [], []
+    for column in zip(*plain):
+        tokens = [token for value in column for token in ([value] if NUMERIC.fullmatch(value) else value.split())]
+        word = max((token_width(token) for token in tokens), default=CHAR)
+        need.append(word + PADDING)
+        spare.append(max(token_width(value) for value in column) - word)
+    if sum(need) >= TEXT_WIDTH:
+        return [width * TEXT_WIDTH / sum(need) for width in need]
+    if max(spare) < 2.0:  # длинных текстов нет — остаток делим поровну
+        spare = [1.0] * len(need)
+    rest = TEXT_WIDTH - sum(need)
+    return [width + rest * share / sum(spare) for width, share in zip(need, spare)]
+
+
 def write(protocol: Protocol, md_path: Path, out: Path) -> None:
     doc = Document()
     style_fonts(doc)
+    section = doc.sections[0]
+    section.page_width, section.page_height = PAGE
+    section.left_margin, section.right_margin = MARGINS['left'], MARGINS['right']
+    section.top_margin, section.bottom_margin = MARGINS['top'], MARGINS['bottom']
     for line in protocol.header:
         paragraph = doc.add_paragraph()
         paragraph.alignment = WD_ALIGN_PARAGRAPH.RIGHT
@@ -193,18 +230,26 @@ def write(protocol: Protocol, md_path: Path, out: Path) -> None:
         elif block.kind == 'list':
             runs(doc.add_paragraph(style='List Bullet'), block.text)
         elif block.kind == 'table':
-            runs(doc.add_paragraph(), block.text, italic=True)
+            caption = doc.add_paragraph()
+            caption.paragraph_format.keep_with_next = True  # подпись не остаётся одна внизу страницы
+            runs(caption, block.text, italic=True)
             head, *rows = block.rows
             table = doc.add_table(rows=1 + len(rows), cols=len(head))
             table.style = 'Table Grid'
+            table.autofit = False
+            widths = [Cm(width) for width in column_widths(block.rows)]
+            for c, width in enumerate(widths):
+                table.columns[c].width = width
             for r, row in enumerate([head, *rows]):
                 for c, value in enumerate(row):
+                    table.cell(r, c).width = widths[c]
                     cell = table.cell(r, c).paragraphs[0]
                     runs(cell, value, bold=r == 0)
             doc.add_paragraph()
         elif block.kind == 'figure':
-            doc.add_picture(str(block.image), width=Cm(16))
+            doc.add_picture(str(block.image), width=Cm(PICTURE_WIDTH))
             doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+            doc.paragraphs[-1].paragraph_format.keep_with_next = True  # рисунок и подпись — на одной странице
             caption = doc.add_paragraph()
             caption.alignment = WD_ALIGN_PARAGRAPH.CENTER
             runs(caption, block.text, italic=True)

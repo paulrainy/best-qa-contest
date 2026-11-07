@@ -6,8 +6,8 @@
 - в 00:35 вручную запущен VACUUM (ANALYZE) operations под нагрузкой — ОП-09 и CPU БД до 00:52 заметно выше;
 - таблицы результатов посчитаны за 22:00–02:10, то есть вместе с прогревом.
 
-Таблицы считаются из тех же рядов, что и графики: p95 — 95-й перцентиль значений по окнам, утилизация — среднее
-и максимум ряда.
+Итоговые p95 заданы отдельно как синтетические измерения отчёта JMeter по операциям.
+Оконные p95 нужны только для графиков; утилизация в таблице — среднее и максимум ряда.
 """
 from pathlib import Path
 
@@ -19,10 +19,15 @@ import nt_profile as pf
 DAY = '2026-11-06'
 START = '22:00'
 WARMUP_MIN, TOTAL_MIN = 10, 250
+RAMP_MIN = 1.5  # после прогрева потоки добавляются по одному в секунду (методика 3.4): 74 потока
 VACUUM = (155, 172)  # 00:35–00:52 от 22:00
 LIVE = (2.10, 2.48)  # ГБ, нижняя граница heap в начале и в конце
 ERRORS = {'ОП-01': 0.01, 'ОП-02': 0.01, 'ОП-03': 0.04, 'ОП-04': 0.05, 'ОП-05': 0.03, 'ОП-06': 0.04, 'ОП-07': 0.02,
           'ОП-08': 0.01, 'ОП-09': 0.03, 'ОП-10': 0.01}
+# Итоги отчёта по исходным операциям, не агрегат оконных перцентилей.
+# На 4–5 % выше уровня 100 %: к концу теста время чуть растёт. ОП-09 — выше из-за 17 минут вакуума.
+TOTAL_P95 = dict(zip(pf.CODES, [439, 637, 1233, 2038, 857, 1463, 5852, 324, 3300, 543]))
+DELIVERED = pf.delivered(0.996, 1206)
 # показатель, уровень на 100 %, разброс; на прогреве — половина
 UTIL = [
     ('CPU efr-api, среднее по 4 серверам, %', 41, 0.05),
@@ -34,10 +39,12 @@ UTIL = [
     ('Диск БД, утилизация %', 22, 0.08),
     ('CPU efr-nt-gen01, %', 47, 0.04),
     ('CPU efr-nt-gen02, %', 45, 0.04),
+    ('Память efr-nt-gen01, %', 58, 0.02),
+    ('Память efr-nt-gen02, %', 56, 0.02),
     ('Heap JMeter на генераторах, % от 6 ГБ', 46, 0.05),
 ]
 T = np.arange(0, TOTAL_MIN, 0.25)
-LOAD = np.where(T < WARMUP_MIN, 0.5, 1.0)
+LOAD = np.where(T < WARMUP_MIN, 0.5, np.minimum(1.0, 0.5 + 0.5 * (T - WARMUP_MIN + 0.25) / RAMP_MIN))
 VAC = (T >= VACUUM[0]) & (T < VACUUM[1])
 
 
@@ -68,8 +75,8 @@ def tables() -> str:
     rows = []
     for code in pf.CODES:
         tgt = pf.target(code, 100)
-        fact = tgt * (TOTAL_MIN - WARMUP_MIN * 0.5) / TOTAL_MIN * 0.996
-        rows.append([code, pf.num(tgt), pf.num(fact), pf.num(int(round(np.percentile(p95(code), 95), -1))),
+        fact = tgt * (TOTAL_MIN - WARMUP_MIN * 0.5) / TOTAL_MIN * DELIVERED[code]
+        rows.append([code, pf.num(tgt), pf.num(fact), pf.num(TOTAL_P95[code]),
                      pf.num(pf.THRESHOLD[code]), pf.num(ERRORS[code], 2)])
     out = ['Таблица 1. Бизнес-метрики за интервал 22:00–02:10', pf.table(
         ['Операция', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'p95, мс', 'Порог, мс', 'Ошибки, %'], rows)]
@@ -89,7 +96,7 @@ def draw(img: Path) -> list:
     files = {
         '12-throughput.png': ('Рисунок 1. Интенсивность операций', {'Заданная': target, 'Фактическая': fact},
                               'оп/с', None, None, None, 'Grafana · JMeter'),
-        '12-p95.png': ('Рисунок 2. 95-й перцентиль по окнам', {c: p95(c) for c in ('ОП-01', 'ОП-04', 'ОП-09')},
+        '12-p95.png': ('Рисунок 2. 95-й перцентиль по окнам', {c: p95(c) for c in pf.CODES},
                        'мс', None, None, None, 'Grafana · JMeter'),
         '12-heap.png': ('Рисунок 3. Heap efr-api, среднее по экземплярам', {
             'Занято': used, 'После сборки (live data)': live}, 'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
@@ -98,5 +105,8 @@ def draw(img: Path) -> list:
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 100) if unit == '%' else ((0, 9) if unit == 'ГБ' else None)
-        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source)
-    return list(files)
+        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
+    charts.panel(img / '12-errors.png', 'Рисунок 5. Доля ошибок по операциям', when,
+                 {c: charts.error_series(rng, ERRORS[c], T.size) for c in pf.CODES}, '%', source='Grafana · JMeter')
+    metrics = {name: util(n) for n, (name, _, _) in enumerate(UTIL)}
+    return [*files, '12-errors.png', *charts.server_panels(img, 12, when, metrics, 6)]

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; img-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Мониторинг · Ревью материалов НТ</title>
+<style>@@STYLE@@</style>
+</head>
+<body>
+<a class="skip-link" href="#content">Перейти к заданию</a>
+<aside class="sidebar">
+  <div class="brand"><span class="brand-mark">НТ</span><div>Ревью материалов<small>Нагрузочное тестирование</small></div></div>
+  <p class="eyebrow">03 / Мониторинг</p>
+  <nav aria-label="Задания мониторинга">@@NAVIGATION@@</nav>
+  <div class="sidebar-note"><strong>Как пользоваться</strong><p>Сверяйте материалы с методикой. В ответе указывайте название панели, свойство или строку SQL.</p><p>Страница показывает сохранённую конфигурацию. Запросы не выполняются.</p></div>
+</aside>
+<div class="workspace">
+  <div class="topbar"><span>Материалы для просмотра</span><span class="offline">Автономный просмотр</span></div>
+  <div class="search-area enhanced-only">
+    <form id="search-form" role="search">
+      <label for="search">Поиск по пяти исходникам</label>
+      <div class="search-controls"><input id="search" type="search" placeholder="Название метрики, SQL или настройка…" autocomplete="off"><button type="submit">Найти</button><button type="button" id="clear-search">Сбросить</button></div>
+    </form>
+    <p id="search-status" role="status"></p>
+    <div id="search-results" hidden></div>
+  </div>
+  <main id="content" tabindex="-1">
+    <noscript><p class="notice">JavaScript отключён: все задания показаны последовательно. Поиск — Ctrl+F или ⌘F; текст можно выделить и скопировать.</p></noscript>
+    @@SECTIONS@@
+  </main>
+  <footer>Снимок исходных JSON и SQL из комплекта задания. После изменения исходников страницу нужно пересобрать.</footer>
+</div>
+<div id="copy-status" role="status" class="toast" hidden></div>
+<div id="copy-fallback" class="copy-fallback" hidden>
+  <label for="copy-text">Автоматическое копирование недоступно. Текст выделен — нажмите Ctrl+C или ⌘C.</label>
+  <textarea id="copy-text" readonly rows="8"></textarea>
+  <button id="close-copy" type="button">Закрыть</button>
+</div>
+<script id="sources" type="application/json">@@SOURCES@@</script>
+<script>@@SCRIPT@@</script>
+</body>
+</html>

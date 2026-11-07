@@ -24,7 +24,7 @@ All prose, identifiers in task material, commit messages and comments are in **R
 | `final-task/` | Final case «Сервис переводов»: participant spec + black-box stand, jury key, scoring, stand sources |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Dated design specs and implementation plans written before each piece of work; `2026-10-30-review-materials-followups.md` lists deferred proposals (1c part still pending) |
 | `previous-year/` | Digests of last year's case, criteria and example artifacts; reference only |
-| `base-docs/` | Original chat export and organiser presentations; superseded by `rating-tasks.md` where they disagree |
+| `docs/base-docs/` | Original chat export and organiser presentations; superseded by `rating-tasks.md` where they disagree |
 
 Exercise numbering is Latin `1a`–`1d`; older specs/plans and commits still say `1а`/`1б`/`1г` (Cyrillic) — `1г` is today's `1c`.
 
@@ -61,6 +61,8 @@ python build_sheets.py ../1b-testcase-review --show # print the text the key poi
 python build_testcases.py ../1b-testcase-review     # 1b xlsx exports from Markdown sources (run before build_sheets)
 python build_jmx.py ../1c-load-review               # 1c JMeter scripts; add --check with JMETER_HOME set to load each .jmx in real JMeter 5.6.3
 python build_protocols.py ../1c-load-review         # 1c protocols .docx (run charts.py first if chart data changed)
+python build_monitoring_viewer.py ../1c-load-review # 1c offline review.html; rebuild after participant JSON/SQL changes
+python build_monitoring_viewer.py ../1c-load-review --check # read-only freshness check before packaging
 python build_wiki_html.py <path/to/task.md>         # HTML copy of a task statement for EvaWiki (output is not committed)
 ```
 
