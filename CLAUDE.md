@@ -61,6 +61,8 @@ python build_sheets.py ../1b-testcase-review --show # print the text the key poi
 python build_testcases.py ../1b-testcase-review     # 1b xlsx exports from Markdown sources (run before build_sheets)
 python build_jmx.py ../1c-load-review               # 1c JMeter scripts; add --check with JMETER_HOME set to load each .jmx in real JMeter 5.6.3
 python build_protocols.py ../1c-load-review         # 1c protocols .docx (run charts.py first if chart data changed)
+python build_monitoring_viewer.py ../1c-load-review # 1c offline review.html; rebuild after participant JSON/SQL changes
+python build_monitoring_viewer.py ../1c-load-review --check # read-only freshness check before packaging
 python build_wiki_html.py <path/to/task.md>         # HTML copy of a task statement for EvaWiki (output is not committed)
 ```
 

@@ -81,6 +81,7 @@
 
 - `1c-load-review/participant/` — всё, что отдаём участнику: `task.md`, `methodology.md`, `1-scripts/`, `2-protocols/`, `3-monitoring/`, `answer-template.xlsx`. Папку отправляем целиком, архивом;
 - `1c-load-review/participant/1-scripts/tools/` — Apache JMeter 5.6.3 и Java 17 Temurin JRE для Windows x64 и macOS Apple Silicon; бинарники хранятся через Git LFS, лицензии — рядом в Git. Запуск — `open-jmeter.bat` или `open-jmeter.command` из `1-scripts/`, без установки и скачиваний. Mac на Intel не поддерживается этим комплектом;
+- `1c-load-review/participant/3-monitoring/review.html` — автономный просмотр пяти заданий мониторинга в браузере: конфигурация дашбордов и SQL с номерами строк. Работает после распаковки архива, без Grafana, сервера и интернета. Исходные JSON/SQL остаются рядом. HTML — производный снимок, вручную не редактируется;
 - `1c-load-review/jury/runtime-downloads.json` — версии, официальные ссылки и контрольные суммы исходных архивов дистрибутивов;
 - `1c-load-review/jury/answer-key.md` — ключ, только жюри: дефекты, правильные выводы протоколов, самопроверка чисел, ловушки;
 - `1c-load-review/jury/jmeter-viewing-guide.md` — короткая памятка жюри по просмотру сценариев в JMeter; в архив участника не включается;
@@ -93,6 +94,7 @@
   .venv/bin/python build_jmx.py ../1c-load-review                                  # сценарии участника и исправленные
   .venv/bin/python ../1c-load-review/jury/source/scripts/make_data.py               # CSV к сценариям
   .venv/bin/python ../1c-load-review/jury/source/monitoring/dashboards.py           # дашборды обеих версий
+  .venv/bin/python build_monitoring_viewer.py ../1c-load-review                    # автономный просмотр JSON и SQL участника
   .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py 11 12 13 14 15 # графики протоколов
   .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 13 14 15  # таблицы = числа графиков
   .venv/bin/python build_protocols.py ../1c-load-review                            # протоколы в .docx
@@ -100,6 +102,8 @@
   ```
 
   SQL-скрипты исправленной версии лежат в `jury/fixed/monitoring/` и правятся вручную.
+
+  После изменения JSON или SQL участника пересобрать `review.html`. Генератор использует только стандартную библиотеку Python; его HTML/CSS/JS-шаблоны находятся в `1c-load-review/jury/source/monitoring/viewer/`. Он читает только пять заданий участника, не включает ключ или исправления и не интерпретирует настройки через предполагаемые умолчания Grafana. Полные исходники встроены в страницу. Поиск работает по всем пяти файлам; при запрете доступа к буферу обмена доступно ручное копирование. Никаких дополнительных файлов или библиотек для участника не требуется.
 
   Проверка сценариев в настоящем JMeter: указать `JMETER_HOME` на `participant/1-scripts/tools/apache-jmeter-5.6.3`, `JAVA` на исполняемый файл Java 17+ и запустить `.venv/bin/python build_jmx.py ../1c-load-review --check`. На Mac с Apple Silicon можно использовать комплектную `participant/1-scripts/tools/java/macos-aarch64/Contents/Home/bin/java` (пути в переменных — абсолютные). Скрипт загружает каждый `.jmx` и прогоняет каждый элемент через его окно настроек: так видно, что GUI покажет ровно то, что записано. Проверка ловит неверное имя или формат свойства, записанного в файле. Не ловит булево свойство со значением false под неверным именем (GUI и так покажет false) и не проверяет, что обязательные свойства заданы.
 
@@ -137,6 +141,8 @@
 Архив для отправки собирается из папки задания так, чтобы в него не попали служебные файлы macOS и результаты сборки:
 
 Перед упаковкой 1c сопровождающему нужен [Git LFS](https://git-lfs.com/): после установки выполнить в репозитории `git lfs install --local`, `git lfs pull` и `git lfs fsck`. Это восстанавливает реальные JMeter и Java вместо указателей LFS и проверяет их целостность. Участникам Git и Git LFS не нужны: они получают готовый архив. Исходный ZIP всего репозитория с GitHub участникам не выдаём — он содержит материалы жюри.
+
+Также из корня репозитория выполнить `python review-tasks/tools/build_monitoring_viewer.py review-tasks/1c-load-review --check`: код возврата 0 подтверждает актуальность `review.html`. Если файл отсутствует или устарел, собрать его той же командой без `--check`. Эта проверка ничего не записывает и учитывает изменения исходников и шаблонов просмотрщика.
 
 ```bash
 cd review-tasks/1a-autotest-review/participant && zip -r ../autotest-review.zip . -x '*.DS_Store' '*/target/*' '*/.idea/*' '*/.m2/*' '*/.selenium/*' '*/.allure/*'
