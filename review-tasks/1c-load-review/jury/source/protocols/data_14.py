@@ -93,8 +93,8 @@ def draw(img: Path) -> list:
                           'соединений', 40, 'maximumPoolSize = 40', None, 'Grafana · Prometheus'),
         '14-errors.png': ('Рисунок 2. Доля ошибок по операциям', errors, '%', None, None, None, 'Grafana · JMeter'),
         '14-heap.png': ('Рисунок 3. Heap efr-api, среднее по экземплярам', {'Занято': used,
-                                                                            'После сборки (live data)': live},
-                        'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
+                                                                            'После полной сборки, весь heap': live},
+                        'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus / GC'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 9) if unit == 'ГБ' else None

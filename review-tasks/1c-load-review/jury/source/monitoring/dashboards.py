@@ -22,7 +22,7 @@ class Board:
         self.panels, self.y = [], 0
 
     def add(self, title, kind, datasource, targets, unit='short', width=12, height=8, custom=None, thresholds=None,
-            options=None):
+            options=None, legend_calcs=None, description=None):
         last = self.panels[-1]['gridPos'] if self.panels else None
         x = last['x'] + last['w'] if last else 0
         if last and x + width > 24:
@@ -37,9 +37,12 @@ class Board:
                  'gridPos': {'x': x, 'y': self.y, 'w': width, 'h': height}, 'datasource': datasource,
                  'fieldConfig': {'defaults': defaults, 'overrides': []},
                  'options': options or ({'legend': {'displayMode': 'table', 'placement': 'bottom',
-                                                    'calcs': ['mean', 'max']}, 'tooltip': {'mode': 'multi'}}
+                                                    'calcs': ['mean', 'max'] if legend_calcs is None else legend_calcs},
+                                         'tooltip': {'mode': 'multi'}}
                                         if kind == 'timeseries' else {}),
                  'targets': [{'refId': chr(ord('A') + n), 'datasource': datasource, **t} for n, t in enumerate(targets)]}
+        if description:
+            panel['description'] = description
         self.panels.append(panel)
 
 
@@ -72,7 +75,9 @@ def jmeter(fixed):
     b.add('Среднее время отклика', 'timeseries', INFLUX, [influx(mean)], unit='ms')
     b.add('95-й перцентиль по окнам', 'timeseries', INFLUX, [influx(
         f'SELECT max("pct95.0") FROM "jmeter" WHERE {APP} AND "statut" = \'ok\' AND {OPS} AND $timeFilter '
-        'GROUP BY time($__interval), "transaction" fill(null)')], unit='ms')
+        'GROUP BY time($__interval), "transaction" fill(null)')], unit='ms', legend_calcs=[],
+        description='Худший p95 исходного окна Backend Listener внутри каждого интервала отображения. '
+                    'Это максимум оконных p95, а не p95 объединённых операций или всего теста.')
     if not fixed:  # 16.2
         b.add('95-й перцентиль за тест', 'stat', INFLUX, [influx(
             f'SELECT mean("pct95.0") FROM "jmeter" WHERE {APP} AND "statut" = \'ok\' AND {OPS} AND $timeFilter '
@@ -82,7 +87,8 @@ def jmeter(fixed):
     b.add('95-й перцентиль ОП-01', 'timeseries', INFLUX, [influx(
         f'SELECT max("pct95.0") FROM "jmeter" WHERE {APP} AND "statut" = \'ok\' AND "transaction" = \'{OP01}\' '
         'AND $timeFilter GROUP BY time($__interval) fill(null)', alias='p95 ОП-01')], unit='ms',
-        custom={'thresholdsStyle': {'mode': 'line'}}, thresholds=800 if fixed else 1000)  # 16.5
+        custom={'thresholdsStyle': {'mode': 'line'}}, thresholds=800 if fixed else 1000, legend_calcs=[],
+        description='Худший p95 исходного окна ОП-01 внутри интервала отображения; не итоговый p95 теста.')  # 16.5
     status = 'ko' if fixed else 'ok'  # 16.3
     b.add('Ошибки по операциям', 'timeseries', INFLUX, [influx(
         f'SELECT sum("count") FROM "jmeter" WHERE {APP} AND "statut" = \'{status}\' AND {OPS} AND $timeFilter '
@@ -121,7 +127,7 @@ def app(fixed):
     inner = f'rate(http_server_requests_seconds_bucket{{{sel}, outcome="SUCCESS"}}[5m])'
     quantile = f'histogram_quantile(0.95, sum by (le, uri) ({inner}))' if fixed else \
         f'histogram_quantile(0.95, {inner})'  # 17.2
-    b.add('p95 по API, все экземпляры', 'timeseries', PROM, [prom(quantile, '{{uri}}')], unit='s')
+    b.add('p95 по API, все экземпляры', 'timeseries', PROM, [prom(quantile, '{{uri}}')], unit='s', legend_calcs=[])
     b.add('Ошибки 4xx и 5xx', 'timeseries', PROM, [prom(
         f'sum by (uri, status) (increase(http_server_requests_seconds_count{{{sel}, status=~"[45].."}}[$__interval]))',
         '{{uri}} {{status}}')], unit='short')
@@ -129,8 +135,11 @@ def app(fixed):
     b.add('Heap по экземплярам', 'timeseries', PROM, [prom(
         f'sum by (instance) (jvm_memory_used_bytes{{{sel}, area="heap"}})', '{{instance}}')], unit='bytes',
         custom={'stacking': stacking, 'thresholdsStyle': {'mode': 'line'}}, thresholds=8589934592)
-    b.add('Нижняя граница heap', 'timeseries', PROM, [prom(
-        f'max by (instance) (jvm_gc_live_data_size_bytes{{{sel}}})', '{{instance}}')], unit='bytes')
+    b.add('Live data после GC, по экземплярам', 'timeseries', PROM, [prom(
+        f'max by (instance) (jvm_gc_live_data_size_bytes{{{sel}}})', '{{instance}}')], unit='bytes',
+        description='Приближённый индикатор объёма долгоживущих объектов после освобождения памяти. '
+                    'Не измеряет весь heap после полной сборки. Для критерия методики 4.5 нужны данные GC '
+                    'по всему heap; текущий jvm_memory_used_bytes сам по себе их не заменяет.')
     b.add('HikariCP: активные соединения', 'timeseries', PROM, [prom(
         f'sum by (instance) (hikaricp_connections_active{{{sel}}})', '{{instance}}')], unit='short',
         custom={'thresholdsStyle': {'mode': 'line'}}, thresholds=40)

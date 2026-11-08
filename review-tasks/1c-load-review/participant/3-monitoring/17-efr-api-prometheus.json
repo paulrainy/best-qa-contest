@@ -156,10 +156,7 @@
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "max"
-          ]
+          "calcs": []
         },
         "tooltip": {
           "mode": "multi"
@@ -295,7 +292,7 @@
     {
       "id": 6,
       "type": "timeseries",
-      "title": "Нижняя граница heap",
+      "title": "Live data после GC, по экземплярам",
       "gridPos": {
         "x": 12,
         "y": 16,
@@ -336,7 +333,8 @@
           "legendFormat": "{{instance}}",
           "range": true
         }
-      ]
+      ],
+      "description": "Приближённый индикатор объёма долгоживущих объектов после освобождения памяти. Не измеряет весь heap после полной сборки. Для критерия методики 4.5 нужны данные GC по всему heap; текущий jvm_memory_used_bytes сам по себе их не заменяет."
     },
     {
       "id": 7,

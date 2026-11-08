@@ -284,7 +284,7 @@ def test_graph_maximum_is_not_fixed_share_of_mean(data, monkeypatch, tmp_path):
 def test_control_run_heap_peak_matches_conclusion(data, monkeypatch, tmp_path):
     heap = capture(data, 14, monkeypatch, tmp_path)['14-heap.png'][2]
     assert 4.35 <= np.max(heap['Занято']) < 4.45
-    assert np.max(heap['После сборки (live data)']) < 2.2
+    assert np.max(heap['После полной сборки, весь heap']) < 2.2
 
 
 def test_baseline_graphs_keep_operation_colours(data, monkeypatch, tmp_path):

@@ -108,7 +108,7 @@ def draw(img: Path) -> list:
         '12-p95.png': ('Рисунок 2. 95-й перцентиль по окнам', {c: p95(c) for c in pf.CODES},
                        'мс', None, None, None, 'Grafana · JMeter'),
         '12-heap.png': ('Рисунок 3. Heap efr-api, среднее по экземплярам', {
-            'Занято': used, 'После сборки (live data)': live}, 'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
+            'Занято': used, 'После полной сборки, весь heap': live}, 'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus / GC'),
         '12-cpu.png': ('Рисунок 4. Загрузка CPU', {label: util(n) for n, label in names.items()}, '%', None, None,
                        None, 'Grafana · Zabbix'),
     }
