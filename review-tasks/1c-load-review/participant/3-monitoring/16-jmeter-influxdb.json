@@ -168,10 +168,7 @@
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "max"
-          ]
+          "calcs": []
         },
         "tooltip": {
           "mode": "multi"

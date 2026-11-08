@@ -51,3 +51,13 @@ def test_api_dashboard_keeps_exactly_its_five_seeded_differences(fixed):
     wait = panels['Ожидание соединения HikariCP']['fieldConfig']['defaults']['unit']
     assert wait == ('s' if fixed else 'ms')
     assert ('HikariCP: ожидающие соединения' in panels) == fixed
+
+
+@pytest.mark.parametrize('fixed', [False, True])
+@pytest.mark.parametrize('make,title', [(boards.jmeter, 'Среднее время отклика'),
+                                        (boards.app, 'Ожидание соединения HikariCP')])
+def test_window_means_have_no_unweighted_interval_legend(make, title, fixed):
+    # Для окон (1 × 1000 мс) и (99 × 10 мс) правильное среднее 19,9 мс,
+    # Grafana mean по двум значениям окна показал бы 505 мс.
+    panel = next(p for p in make(fixed)['panels'] if p['title'] == title)
+    assert panel['options']['legend']['calcs'] == []

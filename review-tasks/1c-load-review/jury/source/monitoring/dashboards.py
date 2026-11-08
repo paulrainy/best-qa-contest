@@ -72,7 +72,7 @@ def jmeter(fixed):
     else:
         mean = (f'SELECT mean("avg") FROM "jmeter" WHERE {APP} AND "statut" = \'ok\' AND {OPS} AND $timeFilter '
                 'GROUP BY time($__interval), "transaction" fill(null)')  # 16.1
-    b.add('Среднее время отклика', 'timeseries', INFLUX, [influx(mean)], unit='ms')
+    b.add('Среднее время отклика', 'timeseries', INFLUX, [influx(mean)], unit='ms', legend_calcs=[])
     b.add('95-й перцентиль по окнам', 'timeseries', INFLUX, [influx(
         f'SELECT max("pct95.0") FROM "jmeter" WHERE {APP} AND "statut" = \'ok\' AND {OPS} AND $timeFilter '
         'GROUP BY time($__interval), "transaction" fill(null)')], unit='ms', legend_calcs=[],
@@ -149,7 +149,7 @@ def app(fixed):
     b.add('Ожидание соединения HikariCP', 'timeseries', PROM, [prom(
         f'max by (instance) (rate(hikaricp_connections_acquire_seconds_sum{{{sel}}}[5m]) / '
         f'rate(hikaricp_connections_acquire_seconds_count{{{sel}}}[5m]))', '{{instance}}')],
-        unit='s' if fixed else 'ms')  # 17.4
+        unit='s' if fixed else 'ms', legend_calcs=[])  # 17.4
     variables = [{'name': 'instance', 'label': 'Экземпляр', 'type': 'query', 'datasource': PROM,
                   'query': {'query': 'label_values(jvm_memory_used_bytes{job="efr-api"}, instance)', 'refId': 'V'},
                   'refresh': 2, 'multi': True, 'includeAll': True}]
