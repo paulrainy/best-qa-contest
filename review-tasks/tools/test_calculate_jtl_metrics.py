@@ -2,6 +2,7 @@
 import csv
 import importlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -17,8 +18,8 @@ def jtl(tmp_path, rows, name='results.jtl'):
     path = tmp_path / name
     with path.open('w', newline='', encoding='utf-8') as stream:
         writer = csv.writer(stream)
-        writer.writerow(['timeStamp', 'elapsed', 'label', 'success'])
-        writer.writerows(rows)
+        writer.writerow(['timeStamp', 'elapsed', 'label', 'success', 'IdleTime'])
+        writer.writerows([*row, 0] if len(row) == 4 else row for row in rows)
     return path
 
 
@@ -87,6 +88,7 @@ def test_nearest_rank_and_single_sample(tmp_path):
 @pytest.mark.parametrize('row', [
     ('bad', 10, OP, 'true'), (0, -1, OP, 'true'), (0, '1.5', OP, 'true'),
     (0, 10, OP, 'unknown'), (0, 10, OP, ''), (-1, 10, OP, 'true'),
+    (0, 10, OP, 'true', -1),
 ])
 def test_rejects_malformed_sample(tmp_path, row):
     with pytest.raises(ValueError, match='results.jtl:2'):
@@ -119,3 +121,63 @@ def test_cli_outputs_json(tmp_path):
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert json.loads(result.stdout)[OP]['p95_ms'] == 123
+
+
+@pytest.mark.parametrize('idle,total,p95', [(200, 0, None), (90, 1, 10)])
+def test_idle_time_affects_boundary_but_not_p95(tmp_path, idle, total, p95):
+    path = jtl(tmp_path, [(100, 10, OP2, 'true', idle)])
+    result = calculate([path], 0, 200)[OP2]
+    assert result['total'] == total
+    assert result['p95_ms'] == p95
+
+
+def test_idle_time_column_is_required(tmp_path):
+    path = tmp_path / 'missing-idle.jtl'
+    path.write_text('timeStamp,elapsed,label,success\n0,10,test,true\n')
+    with pytest.raises(ValueError, match='IdleTime'):
+        calculate([path])
+
+
+@pytest.mark.skipif(not os.environ.get('JMETER_HOME'), reason='нет JMETER_HOME')
+def test_real_transaction_idle_time_is_used_for_boundary(tmp_path):
+    # Настоящий TransactionSampler исключает паузу из elapsed, но сохраняет IdleTime.
+    runner = tmp_path / 'transaction.groovy'
+    runner.write_text('''
+import groovy.json.JsonOutput
+import org.apache.jmeter.control.TransactionController
+import org.apache.jmeter.control.TransactionSampler
+import org.apache.jmeter.samplers.SampleResult
+import org.apache.jmeter.util.JMeterUtils
+def home = System.getenv('JMETER_HOME')
+JMeterUtils.setJMeterHome(home)
+JMeterUtils.loadJMeterProperties("$home/bin/jmeter.properties")
+def controller = new TransactionController()
+controller.setIncludeTimers(false)
+def sampler = new TransactionSampler(controller, 'ОП-02 Просмотр карточки клиента')
+Thread.sleep(200)
+def child = new SampleResult()
+child.sampleStart()
+Thread.sleep(25)
+child.sampleEnd()
+child.setSuccessful(true)
+sampler.addSubSamplerResult(child)
+sampler.setTransactionDone()
+def result = sampler.getTransactionResult()
+println('RESULT=' + JsonOutput.toJson([start:result.startTime, end:result.endTime,
+                                     elapsed:result.time, idle:result.idleTime]))
+''', encoding='utf-8')
+    home = os.environ['JMETER_HOME']
+    java = os.environ.get('JAVA', '/opt/homebrew/opt/openjdk@21/bin/java')
+    process = subprocess.run([java, '-Djava.awt.headless=true', '-cp', f'{home}/lib/*:{home}/lib/ext/*',
+                              'groovy.ui.GroovyMain', str(runner)], cwd=tmp_path,
+                             capture_output=True, text=True, timeout=60)
+    assert process.returncode == 0, process.stdout + process.stderr
+    line = next(line for line in process.stdout.splitlines() if line.startswith('RESULT='))
+    result = json.loads(line.partition('=')[2])
+    assert result['idle'] >= 200
+    assert result['end'] - result['start'] == result['elapsed'] + result['idle']
+    path = jtl(tmp_path, [(result['start'], result['elapsed'], OP2, 'true', result['idle'])])
+    assert calculate([path], result['start'], result['end'] - 1)[OP2]['total'] == 0
+    included = calculate([path], result['start'], result['end'])[OP2]
+    assert included['total'] == 1
+    assert included['p95_ms'] == result['elapsed']

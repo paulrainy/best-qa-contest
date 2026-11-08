@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 OPERATION = re.compile(r'^ОП-(?:0[1-9]|10)(?:\s|$)')
-FIELDS = {'timeStamp', 'elapsed', 'label', 'success'}
+FIELDS = {'timeStamp', 'elapsed', 'label', 'success', 'IdleTime'}
 
 
 def calculate(paths: list[Path], start_ms: int, end_ms: int) -> dict[str, dict]:
@@ -32,9 +32,9 @@ def calculate(paths: list[Path], start_ms: int, end_ms: int) -> dict[str, dict]:
                 raise ValueError(f'{path}: нет полей {", ".join(sorted(missing))}')
             for row in reader:
                 try:
-                    stamp, elapsed = int(row['timeStamp']), int(row['elapsed'])
+                    stamp, elapsed, idle = int(row['timeStamp']), int(row['elapsed']), int(row['IdleTime'])
                     success = row['success'].lower()
-                    if stamp < 0 or elapsed < 0 or success not in ('true', 'false') or None in row:
+                    if stamp < 0 or elapsed < 0 or idle < 0 or success not in ('true', 'false') or None in row:
                         raise ValueError('некорректное значение')
                     label = row['label']
                     if label is None:
@@ -44,7 +44,7 @@ def calculate(paths: list[Path], start_ms: int, end_ms: int) -> dict[str, dict]:
                 if not OPERATION.match(label):
                     continue
                 state = samples.setdefault(label, {'total': 0, 'failed': 0, 'elapsed': []})
-                if stamp < start_ms or stamp + elapsed > end_ms:
+                if stamp < start_ms or stamp + elapsed + idle > end_ms:
                     continue
                 state['total'] += 1
                 if success == 'true':

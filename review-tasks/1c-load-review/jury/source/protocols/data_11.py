@@ -233,7 +233,9 @@ def draw(img: Path) -> list:
         charts.panel(img / name, title, t, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
     rows = len(a)
     charts.panel(img / '11-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', t,
-                 {c: charts.noisy(rng, P95[c] * growth(c, a[:, 19]), 0.04, rows) for c in pf.CODES}, 'мс',
+                 {c: np.where([row.successful > 0 for row in counts[c]],
+                              charts.noisy(rng, P95[c] * growth(c, a[:, 19]), 0.04, rows), np.nan)
+                  for c in pf.CODES}, 'мс',
                  source='Grafana · JMeter', summarize=False)
     errors = {c: oc.error_values(counts[c]) for c in pf.CODES}
     charts.panel(img / '11-errors.png', 'Рисунок 6. Доля ошибок по операциям', t, errors, '%',

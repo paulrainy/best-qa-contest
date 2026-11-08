@@ -401,3 +401,13 @@ def test_response_codes_partition_request_count(data):
         assert np.nansum(rows[:, 2:5]) * 15 == pytest.approx(expected)
         assert np.allclose(rows[np.isfinite(rows[:, 2]), 2:5] * 15,
                            np.round(rows[np.isfinite(rows[:, 2]), 2:5] * 15))
+
+
+@pytest.mark.parametrize('unit', range(11, 16))
+def test_window_p95_exists_only_with_successful_operations(data, unit, monkeypatch, tmp_path):
+    plots = capture(data, unit, monkeypatch, tmp_path)
+    values = plots[f'{unit}-p95.png'][2]
+    counts = (data[11].series(np.random.default_rng(1105), with_counts=True)[2] if unit == 11
+              else data[unit].operation_counts())
+    for code, series in values.items():
+        assert np.array_equal(np.isfinite(series), [row.successful > 0 for row in counts[code]]), code
