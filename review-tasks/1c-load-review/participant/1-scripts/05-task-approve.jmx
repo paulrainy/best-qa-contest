@@ -194,7 +194,7 @@
             <RegexExtractor guiclass="RegexExtractorGui" testclass="RegexExtractor" testname="Regex taskId">
               <stringProp name="RegexExtractor.useHeaders">false</stringProp>
               <stringProp name="RegexExtractor.refname">taskId</stringProp>
-              <stringProp name="RegexExtractor.regex">"id":"(.+?)"</stringProp>
+              <stringProp name="RegexExtractor.regex">"id"\s*:\s*"(.+?)"</stringProp>
               <stringProp name="RegexExtractor.template">$1$</stringProp>
               <stringProp name="RegexExtractor.default"></stringProp>
               <boolProp name="RegexExtractor.default_empty_value">false</boolProp>
