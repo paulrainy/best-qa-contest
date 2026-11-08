@@ -96,7 +96,9 @@ def test_protocol_contains_business_and_server_graphs(data, unit, monkeypatch, t
 def test_intended_profile_and_timeout_defects_remain(data):
     assert 'ОП-09' not in data[13].CODES
     assert data[15].FACT_08 == 6400
-    assert data[15].ERRORS['ОП-08'] == 0.6
+    counts = importlib.import_module('operation_counts').combine(data[15].operation_counts()['ОП-08'])
+    assert counts.other_errors == counts.timeouts == 38
+    assert counts.failed / counts.total > 0.01
     assert data[15].TIMEOUTS['ОП-08'] == 38
     assert data[15].THRESHOLD['ОП-08'] == 800
     assert data[12].TOTAL_MIN - data[12].WARMUP_MIN == 240
@@ -127,12 +129,13 @@ def test_maximum_operation_shares_differ_and_keep_step_verdict(data):
 
 def test_maximum_503_only_for_operations_served_by_efr_api(data, monkeypatch, tmp_path):
     """ОП-08 идёт в адаптер, ОП-09 — в БД: ответов 503 от efr-api у них быть не может."""
-    errors = capture(data, 11, monkeypatch, tmp_path)['11-errors.png'][2]
-    for code, values in errors.items():
-        if code in ('ОП-08', 'ОП-09'):
-            assert np.nanmax(values) < 1, code
-        else:
-            assert np.nanmax(values) > 5, code
+    for percent, operations in data[11].operation_counts().items():
+        for code, windows in operations.items():
+            total = importlib.import_module('operation_counts').combine(windows)
+            if code in ('ОП-08', 'ОП-09'):
+                assert total.http503 == 0
+            elif percent >= 150:
+                assert total.http503 / total.total > 0.01
 
 
 def test_maximum_step_series_are_not_flat(data):
@@ -143,14 +146,15 @@ def test_maximum_step_series_are_not_flat(data):
 
 
 @pytest.mark.parametrize('unit', [12, 13, 15])
-def test_error_windows_vary_and_average_to_table(data, unit, monkeypatch, tmp_path):
+def test_error_windows_are_count_weighted(data, unit, monkeypatch, tmp_path):
     plots = capture(data, unit, monkeypatch, tmp_path)
     errors = next(value[2] for name, value in plots.items() if 'errors' in name)
     for code, values in errors.items():
-        if unit == 13 and code == 'ОП-08':
-            continue  # 503 в 22:40–22:47, в таблице 0 % — дефект Д13.4
-        assert np.std(values) > 0, code
-        assert np.mean(values) == pytest.approx(data[unit].ERRORS[code], rel=1e-6), code
+        windows = data[unit].operation_counts()[code]
+        total = sum(row.total for row in windows)
+        failed = sum(row.other_errors + row.http503 + (row.timeouts if unit != 15 else 0) for row in windows)
+        weighted = sum(value * row.total for value, row in zip(values, windows) if row.total) / total
+        assert weighted == pytest.approx(100 * failed / total)
 
 
 @pytest.mark.parametrize('first, second', [(13, 15), (13, 14), (14, 15)])
@@ -205,7 +209,9 @@ def test_control_run_error_graph_is_not_clipped_and_total_is_below_table(data, m
     data[14].draw(tmp_path)
     series, ylim = limits['14-errors.png']
     assert ylim is None or max(np.max(values) for values in series.values()) <= ylim[1]
-    assert np.mean(series['ОП-06']) == pytest.approx(2.4)
+    windows = data[14].operation_counts()['ОП-06']
+    weighted = sum(value * row.total for value, row in zip(series['ОП-06'], windows)) / sum(row.total for row in windows)
+    assert 2.39 < weighted < 2.41
     tables = data[14].tables()
     assert 'Ошибки, всего' not in tables
     assert 'Доля ошибок за прогон, все операции — 0,14 %.' in tables.split('\n\n')
@@ -329,3 +335,69 @@ def test_window_p95_panels_disable_aggregate_legend(data, unit, monkeypatch, tmp
     monkeypatch.setattr(data[unit].charts, 'panel', record)
     data[unit].draw(tmp_path)
     assert options == [False]
+
+
+def test_window_counts_sum_to_interval(data):
+    counts = importlib.import_module('operation_counts')
+    windows = counts.split_counts(counts.Counts(714, 1, 2, 3), [1, 0, 2, 3], seed=7)
+    assert [sum(getattr(row, field) for row in windows) for field in
+            ('total', 'other_errors', 'http503', 'timeouts')] == [714, 1, 2, 3]
+    assert windows[1].total == 0
+    assert all(row.failed <= row.total for row in windows)
+    assert windows == counts.split_counts(counts.Counts(714, 1, 2, 3), [1, 0, 2, 3], seed=7)
+
+
+@pytest.mark.parametrize('args', [(-1,), (1, 2), (1, 0, 1, 1), (1.5,), (True,)])
+def test_error_categories_do_not_overlap(data, args):
+    with pytest.raises(ValueError):
+        importlib.import_module('operation_counts').Counts(*args)
+
+
+def test_aggregate_error_share_is_count_weighted(data):
+    counts = importlib.import_module('operation_counts')
+    windows = [counts.Counts(1, 1), counts.Counts(99)]
+    assert counts.error_values(windows).tolist() == [100.0, 0.0]
+    assert counts.error_summary(windows) == (1.0, 100.0)
+
+
+def test_empty_window_is_not_zero_percent(data):
+    counts = importlib.import_module('operation_counts')
+    assert np.isnan(counts.error_values([counts.Counts(0)])[0])
+
+
+@pytest.mark.parametrize('unit,caption', [(12, 'Таблица 1.'), (13, 'Таблица 2.'), (15, 'Таблица 3.')])
+def test_error_percentages_are_realizable(data, unit, caption):
+    counts = importlib.import_module('operation_counts')
+    operations = data[unit].operation_counts()
+    for row in table_rows(data[unit].tables(), caption):
+        total = counts.combine(operations[row[0]])
+        shown_errors = total.other_errors  # 13 скрывает 503, 15 скрывает таймауты
+        assert number(row[5]) == round(shown_errors / total.total * 100, 2)
+        minutes = 250 if unit == 12 else 60
+        assert abs(number(row[2]) - total.total * 60 / minutes) <= 0.5
+    if unit == 13:
+        assert counts.combine(operations['ОП-07']).total == 714
+        assert table_rows(data[unit].tables(), caption)[6][5] == '0,00'
+
+
+@pytest.mark.parametrize('unit', [12, 13, 14, 15])
+def test_throughput_counts_match_tables_and_graph(data, unit, monkeypatch, tmp_path):
+    operations = data[unit].operation_counts()
+    plots = capture(data, unit, monkeypatch, tmp_path)
+    actual = plots[f'{unit}-throughput.png'][2]['Фактическая']
+    assert sum(actual) * 15 == pytest.approx(sum(row.total for rows in operations.values() for row in rows))
+
+
+def test_response_codes_partition_request_count(data):
+    from datetime import datetime, timedelta
+
+    when, values = data[11].series(np.random.default_rng(1105))
+    for pct, clock, *_ in data[11].STEPS:
+        start = datetime.fromisoformat(f'{data[11].DAY} {clock}')
+        mask = np.array([start <= time < start + timedelta(minutes=10) for time in when])
+        rows = values[mask]
+        expected = sum(data[11].REQUESTS[code] * sample.total
+                       for code, windows in data[11].operation_counts()[pct].items() for sample in windows)
+        assert np.nansum(rows[:, 2:5]) * 15 == pytest.approx(expected)
+        assert np.allclose(rows[np.isfinite(rows[:, 2]), 2:5] * 15,
+                           np.round(rows[np.isfinite(rows[:, 2]), 2:5] * 15))

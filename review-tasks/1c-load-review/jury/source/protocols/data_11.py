@@ -12,6 +12,7 @@ import numpy as np
 
 import charts
 import nt_profile as pf
+import operation_counts as oc
 
 # Ступени: процент, начало измерения (МСК), доля поданной интенсивности, 503 %, 500 %, множитель p95,
 # CPU efr-api, CPU адаптера, CPU БД, диск БД, CPU gen01, CPU gen02, HikariCP активных на экземпляр, ожидающих всего
@@ -108,24 +109,35 @@ def op_shares():
     return result
 
 
+def operation_counts():
+    shares = op_shares()
+    return {pct: {code: oc.make_counts(pf.target(code, pct) * shares[i][code] / 100, STEP_MIN,
+                                       err500(code, step[4]), 1105 + i * 10 + j,
+                                       http503_percent=0 if code in NOT_API else step[3])
+                  for j, code in enumerate(pf.CODES)}
+            for i, step in enumerate(STEPS) for pct in [step[0]]}
+
+
 def tables() -> str:
+    counts = operation_counts()
     rows = []
     for pct, start, share, *_ in STEPS:
         tgt = step_target(pct)
-        rows.append([f'{pct} %', f'{start}–{end_clock(start)}', step_threads(pct), pf.num(tgt), pf.num(tgt * share),
-                     pf.num(share * 100, 1)])
+        fact = sum(oc.combine(windows).total for windows in counts[pct].values()) * 60 / STEP_MIN
+        rows.append([f'{pct} %', f'{start}–{end_clock(start)}', step_threads(pct), pf.num(tgt), pf.num(fact),
+                     pf.num(fact / tgt * 100, 1)])
     out = ['Таблица 1. Ступени теста', pf.table(
         ['Ступень', 'Измерение, МСК', 'Потоков', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'Подано, %'], rows)]
     head = ['Операция'] + [f'{s[0]} %' for s in STEPS]
     # Общая и пооперационная интенсивности описывают один и тот же профиль.
-    shares = op_shares()
-    rows = [[c] + [pf.num(step[c], 1) for step in shares] for c in pf.CODES]
+    rows = [[c] + [pf.num(oc.combine(counts[step[0]][c]).total * 60 / STEP_MIN / pf.target(c, step[0]) * 100, 1)
+                   for step in STEPS] for c in pf.CODES]
     out += ['', 'Таблица 2. Фактическая интенсивность по операциям, % от заданной', pf.table(head, rows)]
     head = ['Операция', 'Порог, мс'] + [f'{s[0]} %' for s in STEPS]
     rows = [[c, pf.num(pf.THRESHOLD[c])] + [pf.num(p95(c, s[5])) for s in STEPS] for c in pf.CODES]
     out += ['', 'Таблица 3. 95-й перцентиль времени операции по ступеням, мс', pf.table(head, rows)]
     head = ['Операция'] + [f'{s[0]} %' for s in STEPS]
-    rows = [[c] + [pf.num(err500(c, s[4]), 2) for s in STEPS] for c in pf.CODES]
+    rows = [[c] + [pf.num(oc.error_summary(counts[s[0]][c], include503=False)[0], 2) for s in STEPS] for c in pf.CODES]
     out += ['', 'Таблица 4. Доля ошибок по операциям, %', pf.table(head, rows)]
     def column(n):
         return [s[n] for s in STEPS]
@@ -151,7 +163,7 @@ def tables() -> str:
     return '\n'.join(out)
 
 
-def series(rng):
+def series(rng, with_counts=False):
     """Ряды по 15 с: прогрев 10 мин на 50 %; каждая ступень — разгон 1 поток/с, затем 10 мин измерения."""
     blocks = [(0, STEP_MIN, STEPS[0], 0.0)]
     for s in STEPS:
@@ -159,18 +171,30 @@ def series(rng):
         blocks.append((minute_of(s[1]) - ramp_min, ramp_min, s, 1.0))
         blocks.append((minute_of(s[1]), STEP_MIN, s, 0.0))
     t, rows = [], []
+    counts = operation_counts()
+    all_counts = {c: [] for c in pf.CODES}
     for start, length, s, rising in blocks:
         n = max(1, int(length * 4))
+        pct, _, share, e503, e500, *_ = s
+        if not rising and start == minute_of(s[1]):
+            block_counts = counts[pct]
+        else:
+            weights = [(i + 1) / n if rising else 1.0 for i in range(n)]
+            block_counts = {c: oc.make_counts(pf.target(c, pct) * share * np.mean(weights), n / 4,
+                                             err500(c, e500), 1100 + int(start * 4) + j, weights=weights,
+                                             http503_percent=0 if c in NOT_API else e503)
+                            for j, c in enumerate(pf.CODES)}
         for i in range(n):
             t.append(start + i / 4)
             pct, _, share, e503, e500, mult, cpu_app, cpu_ad, cpu_db, disk, g1, g2, act, pend = s
-            ramp = (i + 1) / n if rising else 1.0
             target = step_target(pct) / 3600
-            delivered = target * share * ramp
-            requests = sum(pf.target(c, pct) * REQUESTS[c] for c in pf.CODES) / 3600 * share * ramp
-            api = sum(pf.target(c, pct) * REQUESTS[c] for c in pf.CODES if c not in NOT_API) / 3600 * share * ramp
-            http503 = max(0.0, charts.noisy(rng, api * e503 / 100, 0.15)) if e503 else 0.0
-            http500 = max(0.0, charts.noisy(rng, requests * e500 / 100, 0.6))
+            window = {c: block_counts[c][i] for c in pf.CODES}
+            for code, count in window.items():
+                all_counts[code].append(count)
+            delivered = sum(row.total for row in window.values()) / 15
+            requests = sum(window[c].total * REQUESTS[c] for c in pf.CODES) / 15
+            http503 = sum(row.http503 for row in window.values()) / 15
+            http500 = sum(row.other_errors for row in window.values()) / 15
             step = STEPS.index(s)
             rows.append([target, delivered, requests - http503 - http500, http503, http500,
                          *np.clip(charts.noisy(rng, [cpu_app, cpu_db, g1, g2], 0.04), 0, 100),
@@ -183,12 +207,15 @@ def series(rng):
         if not rising:
             t.append(start + length)
             rows.append([np.nan] * 22)
-    return charts.minutes(f'{DAY} {WARMUP}', t), np.array(rows, dtype=float)
+            for code in pf.CODES:
+                all_counts[code].append(oc.Counts(0))
+    result = charts.minutes(f'{DAY} {WARMUP}', t), np.array(rows, dtype=float)
+    return (*result, all_counts) if with_counts else result
 
 
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1105)
-    t, a = series(rng)
+    t, a, counts = series(rng, with_counts=True)
     files = {
         '11-throughput.png': ('Рисунок 1. Интенсивность операций', {'Заданная': a[:, 0], 'Фактическая': a[:, 1]},
                               'оп/с', None, None, None, 'Grafana · JMeter'),
@@ -208,12 +235,9 @@ def draw(img: Path) -> list:
     charts.panel(img / '11-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', t,
                  {c: charts.noisy(rng, P95[c] * growth(c, a[:, 19]), 0.04, rows) for c in pf.CODES}, 'мс',
                  source='Grafana · JMeter', summarize=False)
-    errors = {}
-    for c in pf.CODES:
-        http503 = 0.0 if c in NOT_API else charts.noisy(rng, a[:, 20], 0.12, rows)
-        errors[c] = np.clip(http503 + charts.noisy(rng, a[:, 21] * ERR_WEIGHT[c], 0.35, rows), 0, None)
+    errors = {c: oc.error_values(counts[c]) for c in pf.CODES}
     charts.panel(img / '11-errors.png', 'Рисунок 6. Доля ошибок по операциям', t, errors, '%',
-                 source='Grafana · JMeter')
+                 source='Grafana · JMeter', summary_values={c: oc.error_summary(counts[c]) for c in pf.CODES})
     columns = {
         'CPU efr-api, среднее по 4 серверам, %': 5, 'CPU БД, %': 6,
         'CPU efr-nt-gen01, %': 7, 'CPU efr-nt-gen02, %': 8,

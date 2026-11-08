@@ -57,14 +57,6 @@ def smooth(values, window):
     return np.convolve(values, np.ones(window) / window, mode='same')
 
 
-def error_series(rng, level, size, rel=0.35):
-    """Оконная доля ошибок вокруг уровня из таблицы. Среднее ряда равно уровню, как итог в отчёте JMeter."""
-    if not level:
-        return np.zeros(size)
-    values = np.clip(noisy(rng, level, rel, size), 0, None)
-    return values * (level / values.mean())
-
-
 def util_series(rows, size, seed, column=1, maximum_column=None):
     """Процентные ряды с заданным средним из таблицы, без выхода за 0–100 %.
 
@@ -193,15 +185,16 @@ def timeseries(ax, t, series: dict, unit: str, threshold=None, threshold_label=N
     return used
 
 
-def legend_table(ax, series: dict, colors, unit: str, summarize=True):
+def legend_table(ax, series: dict, colors, unit: str, summarize=True, summary_values=None):
     """Для оконных перцентилей — только имена рядов, без агрегирования за интервал."""
     ax.axis('off')
-    rows = [['', 'Сред.', 'Макс.']] if summarize else [['']]
+    rows = [['', 'За интервал' if summary_values is not None else 'Сред.', 'Макс.']] if summarize else [['']]
     for name, values in series.items():
         row = [f'— {name}']
         if summarize:
             values = np.asarray(values, dtype=float)
-            row += [fmt(np.nanmean(values), unit), fmt(np.nanmax(values), unit)]
+            mean, maximum = summary_values[name] if summary_values is not None else (np.nanmean(values), np.nanmax(values))
+            row += [fmt(mean, unit), fmt(maximum, unit)]
         rows.append(row)
     widths = [0.66, 0.17, 0.17] if summarize else [1.0]
     table = ax.table(cellText=rows, bbox=[0, 0, 1, 1], cellLoc='left', colWidths=widths, edges='open')
@@ -219,7 +212,7 @@ def legend_table(ax, series: dict, colors, unit: str, summarize=True):
 
 
 def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, threshold_label=None, ylim=None,
-          colors=None, source='Grafana', summarize=True):
+          colors=None, source='Grafana', summarize=True, summary_values=None):
     """Один график-панель с заголовком, линиями и легендой-таблицей. Сохраняет PNG."""
     style()
     legend_rows = len(series) + 1
@@ -229,7 +222,7 @@ def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, th
     used = timeseries(ax, t, series, unit, threshold, threshold_label, ylim, colors)
     fig.text(0.01, 0.985, title, ha='left', va='top', fontsize=11, weight='bold', color=TEXT)
     fig.text(0.99, 0.985, source, ha='right', va='top', fontsize=9, color='#8E8E8E')
-    legend_table(fig.add_subplot(grid[1]), series, used, unit, summarize=summarize)
+    legend_table(fig.add_subplot(grid[1]), series, used, unit, summarize=summarize, summary_values=summary_values)
     fig.subplots_adjust(left=0.08, right=0.98, top=0.9, bottom=0.04)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)
