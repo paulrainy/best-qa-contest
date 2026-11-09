@@ -166,11 +166,9 @@ def result = sampler.getTransactionResult()
 println('RESULT=' + JsonOutput.toJson([start:result.startTime, end:result.endTime,
                                      elapsed:result.time, idle:result.idleTime]))
 ''', encoding='utf-8')
-    home = os.environ['JMETER_HOME']
-    java = os.environ.get('JAVA', '/opt/homebrew/opt/openjdk@21/bin/java')
-    process = subprocess.run([java, '-Djava.awt.headless=true', '-cp', f'{home}/lib/*:{home}/lib/ext/*',
-                              'groovy.ui.GroovyMain', str(runner)], cwd=tmp_path,
-                             capture_output=True, text=True, timeout=60)
+    import build_jmx
+    process = subprocess.run(build_jmx.groovy(runner), cwd=tmp_path,
+                             capture_output=True, text=True, encoding='utf-8', timeout=60)
     assert process.returncode == 0, process.stdout + process.stderr
     line = next(line for line in process.stdout.splitlines() if line.startswith('RESULT='))
     result = json.loads(line.partition('=')[2])

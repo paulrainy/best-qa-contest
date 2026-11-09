@@ -75,6 +75,19 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    util = {name: (mean, peak) for name, mean, peak in UTIL}
+    active = util['HikariCP: активных на экземпляр (из 40)'][0]
+    pending = util['HikariCP: ожидающих, всего'][1]
+    return [
+        f'Доля ошибок — {pf.num(total_errors(), 2)} %, в пределах критерия 1 %',
+        f'Активных соединений HikariCP в среднем {active} из 40 на экземпляр'
+        + (', ожидающих нет' if pending == 0 else ''),
+        f'heap efr-api доходит до {pf.num(HEAP_PEAK, 1)} ГБ',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1414)
     t = np.arange(0, 60, 0.25)

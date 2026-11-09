@@ -88,6 +88,21 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    # Как в таблице 2: 503 у ОП-08 не учтены (Д13.4).
+    max_error = pf.num(max(oc.error_summary(windows, include503=False)[0]
+                           for windows in operation_counts().values()), 2)
+    growth = {c: (pf.P95_100[c] - BASELINE[c]) / BASELINE[c] * 100 for c in CODES}
+    top = max(growth, key=growth.get)
+    return [
+        f'наибольший рост p95 — у {top}, {pf.num(growth[top])} %, при пороге {pf.num(pf.THRESHOLD[top])} мс '
+        f'{top} выполняется за {pf.num(pf.P95_100[top])} мс. Доля ошибок не выше {max_error} %',
+        f'доля ошибок не выше {max_error} %. Время операций выросло против эталона на '
+        f'{pf.num(min(growth.values()))}–{pf.num(growth[top])} %',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1307)
     t = np.arange(0, TOTAL_MIN, 0.25)

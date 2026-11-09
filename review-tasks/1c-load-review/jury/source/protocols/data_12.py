@@ -93,6 +93,25 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def clock(minutes: float) -> str:
+    h, m = map(int, START.split(':'))
+    total = (h * 60 + m + int(minutes)) % (24 * 60)
+    return f'{total // 60:02d}:{total % 60:02d}'
+
+
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    max_error = max(oc.error_summary(windows)[0] for windows in operation_counts().values())
+    vacuum = f'{clock(VACUUM[0])}–{clock(VACUUM[1])}'
+    return [
+        f'{pf.num((TOTAL_MIN - WARMUP_MIN) / 60)} часа на 100 % профиля',
+        f'доля ошибок не выше {pf.num(max_error, 2)} %',
+        f'{vacuum} — выполнен VACUUM (ANALYZE) operations',
+        f'возвращается к {pf.num(LIVE[0])}–{pf.num(LIVE[1], 1)} ГБ',
+        f'ОП-09 и CPU БД в {vacuum}',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1206)
     when = charts.minutes(f'{DAY} {START}', T)

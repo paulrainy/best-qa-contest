@@ -1,4 +1,4 @@
-"""ОП-10 Проверка клиента по спискам финмониторинга, подпись в JSR223. Дефекты: 10.1–10.5."""
+"""ОП-10 Проверка клиента по спискам финмониторинга, подпись в JSR223. Дефекты: Д10.1–Д10.5, номера из ключа."""
 import common
 import jmx
 
@@ -29,17 +29,17 @@ def plan(fixed):
     if fixed:
         check = jmx.json_assertion('Решение получено', '$.decision', 'CLEAR|MATCH', regex=True)
     else:
-        check = jmx.response_assertion('Код 200', ['200'], field=jmx.RESPONSE_CODE, test_type=jmx.EQUALS)  # 10.3
+        check = jmx.response_assertion('Код 200', ['200'], field=jmx.RESPONSE_CODE, test_type=jmx.EQUALS)  # Д10.5
     request = jmx.http_request('POST /api/v1/fm/check', 'POST', '/api/v1/fm/check', body=BODY,
-                               keep_alive=fixed, children=[  # 10.5
+                               keep_alive=fixed, children=[  # Д10.2
                                    jmx.jsr223('pre', 'Подпись', SIGN_FIXED if fixed else SIGN_BROKEN,
-                                              cache=fixed),  # 10.1, 10.2
+                                              cache=fixed),  # Д10.3, Д10.4
                                    jmx.header_manager('Подпись запроса', [('X-Signature', '${signature}')]),
                                    check,
                                ])
     props = common.thread_props(5)
     if not fixed:
-        props['rampup'] = '${__P(rampup,1)}'  # 10.4
+        props['rampup'] = '${__P(rampup,1)}'  # Д10.1
     return jmx.test_plan('ОП-10 Проверка клиента по спискам финмониторинга', variables={'pacing': '10000'}, children=[
         common.defaults(),
         common.headers(),

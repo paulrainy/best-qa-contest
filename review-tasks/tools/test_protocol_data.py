@@ -411,3 +411,14 @@ def test_window_p95_exists_only_with_successful_operations(data, unit, monkeypat
               else data[unit].operation_counts())
     for code, series in values.items():
         assert np.array_equal(np.isfinite(series), [row.successful > 0 for row in counts[code]]), code
+
+
+@pytest.mark.parametrize('unit', range(11, 16))
+def test_protocol_tables_and_text_numbers_match_data(data, unit):
+    assert data[unit].charts.check(str(unit)) == []
+
+
+def test_text_check_reports_stale_conclusion_number(data, monkeypatch):
+    stale = 'доля ошибок не выше 0,14 %'  # прежний вывод протокола 11 при 0,16 % в таблице 4
+    monkeypatch.setattr(data[11], 'prose', lambda: [stale])
+    assert data[11].charts.check('11') == [f'текст «{stale}»']

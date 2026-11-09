@@ -2,7 +2,7 @@
 
 Что на самом деле произошло (правильный вывод — в ключе):
 - до 125 % всё в норме, пул HikariCP заполняется (25 из 40 на экземпляр);
-- на 150 % пул почти исчерпан (38 из 40), растёт очередь ожидающих, efr-api отвечает 503 (1,8 % запросов),
+- на 150 % пул почти исчерпан (38 из 40), растёт очередь ожидающих, efr-api отвечает 503 (1,8 % операций через efr-api),
   генераторы загружены на 76–78 % (порог 70 %), подано только 88 % заданной интенсивности;
 - CPU БД не выше 46 % — не узкое место.
 """
@@ -161,6 +161,28 @@ def tables() -> str:
     ]
     out += ['', 'Таблица 5. Утилизация по ступеням', pf.table(['Показатель'] + [f'{s[0]} %' for s in STEPS], rows)]
     return '\n'.join(out)
+
+
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    counts = operation_counts()
+    claimed = 150  # максимум, заявленный в протоколе (Д11.2)
+    max_error = max(oc.error_summary(counts[s[0]][c], include503=False)[0]
+                    for s in STEPS if s[0] <= claimed for c in pf.CODES)
+    api = [c for c in pf.CODES if c not in NOT_API]
+
+    def share503(pct):
+        total = oc.combine(row for c in api for row in counts[pct][c])
+        return pf.num(100 * total.http503 / total.total, 1)
+
+    return [
+        f'{claimed} % профиля: {step_threads(claimed)} потоков, {pf.num(step_target(claimed))} операций в час',
+        f'{DAY} {WARMUP}–{end_clock(STEPS[-1][1])}',
+        f'На 150 % ответом 503 завершились {share503(150)} % операций через efr-api, '
+        f'на 175 % — {share503(175)} %, на 200 % — {share503(200)} %',
+        f'До {claimed} % профиля включительно все операции укладываются в пороги p95, '
+        f'доля ошибок не выше {pf.num(max_error, 2)} %',
+    ]
 
 
 def series(rng, with_counts=False):

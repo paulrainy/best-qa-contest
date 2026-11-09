@@ -42,7 +42,7 @@ def users():
 
 def controllers():
     rows = [(f'nt_ctl{n:02d}', PASSWORD) for n in range(1, 13)]
-    write(OUT / 'controllers.csv', ['login', 'password'], rows[:6])  # дефект 05.1: учёток на 100 %, не на 200 %
+    write(OUT / 'controllers.csv', ['login', 'password'], rows[:6])  # дефект Д05.2: учёток на 100 %, не на 200 %
     write(FIXED / 'controllers.csv', ['login', 'password'], rows)
 
 
@@ -69,7 +69,7 @@ def new_clients(rng, used):
         rows.append((rng.choice(SURNAMES), rng.choice(NAMES), rng.choice(PATRONYMICS), birth.isoformat(),
                      passport(rng, used), '+7 9' + ''.join(str(rng.randint(0, 9)) for _ in range(9))))
     header = ['lastName', 'firstName', 'middleName', 'birthDate', 'passport', 'phone']
-    write(OUT / 'new_clients.csv', header, rows[:5_000])  # дефект 03.1: нужно не меньше 13 824
+    write(OUT / 'new_clients.csv', header, rows[:5_000])  # дефект Д03.3: нужно не меньше 13 824
     write(FIXED / 'new_clients.csv', header, rows)
 
 

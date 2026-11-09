@@ -67,15 +67,24 @@ def tree(task: Path, unit: str, fixed: bool = False) -> str:
     return '\n'.join(lines)
 
 
+def groovy(script, *args, java=None) -> list:
+    """Команда: Groovy-скрипт на библиотеках JMeter из JMETER_HOME, вывод Java в UTF-8 на любой ОС."""
+    home = os.environ['JMETER_HOME']
+    classpath = os.pathsep.join([f'{home}/lib/*', f'{home}/lib/ext/*'])  # «;» на Windows, «:» на macOS и Linux
+    # Java 17 на Windows читает скрипт и пишет вывод в кодировке ОС (cp1251/cp1252), а не в UTF-8.
+    # Кодировку вывода Java 17 берёт из sun.std*.encoding, Java 19+ — из std*.encoding.
+    encoding = ['-Dfile.encoding=UTF-8'] + [f'-D{prefix}{stream}.encoding=UTF-8'
+                                            for prefix in ('sun.', '') for stream in ('stdout', 'stderr')]
+    return [java or JAVA, '-Djava.awt.headless=true', *encoding, '-cp', classpath, 'groovy.ui.GroovyMain',
+            str(script), *map(str, args)]
+
+
 def check(files) -> tuple:
     """Загружает файлы в JMeter через check_jmx.groovy. Возвращает (код, вывод)."""
-    home = os.environ.get('JMETER_HOME')
-    if not home:
+    if not os.environ.get('JMETER_HOME'):
         sys.exit('нет JMETER_HOME — скачайте JMeter 5.6.3, см. README')
-    classpath = f'{home}/lib/*:{home}/lib/ext/*'
-    result = subprocess.run([JAVA, '-Djava.awt.headless=true', '-cp', classpath, 'groovy.ui.GroovyMain',
-                             str(HERE / 'check_jmx.groovy'), *map(str, files)],
-                            capture_output=True, text=True, encoding='utf-8')
+    result = subprocess.run(groovy(HERE / 'check_jmx.groovy', *files),
+                            capture_output=True, text=True, encoding='utf-8', errors='replace')
     return result.returncode, result.stdout + result.stderr
 
 

@@ -72,9 +72,8 @@ def test_task_id_extractors_match_example(tmp_path, compact):
                             (True, ['TS-20261104-000187'])]:
         plan = tmp_path / f'{fixed}.jmx'
         plan.write_text(jmx.render(source.plan(fixed)), encoding='utf-8')
-        result = subprocess.run([build_jmx.JAVA, '-Djava.awt.headless=true', '-cp', f'{home}/lib/*:{home}/lib/ext/*',
-                                 'groovy.ui.GroovyMain', str(runner), str(plan), str(response)],
-                                cwd=tmp_path, capture_output=True, text=True, timeout=60)
+        result = subprocess.run(build_jmx.groovy(runner, plan, response),
+                                cwd=tmp_path, capture_output=True, text=True, encoding='utf-8', timeout=60)
         assert result.returncode == 0, result.stdout + result.stderr
         line = next(row for row in result.stdout.splitlines() if row.startswith('CANDIDATES='))
         assert json.loads(line.partition('=')[2]) == expected

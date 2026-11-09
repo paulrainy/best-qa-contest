@@ -3,11 +3,13 @@
 Запуск из папки tools:
     .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py 11 12   — нарисовать графики протоколов
     .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --tables 11 — таблицы средних в Markdown
-    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables
+    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables,
+                                                                                 а числа текста — с data_NN.prose()
 
 Числа каждого протокола задаёт его модуль data_NN.py рядом: константы ступеней или интервалов и функция
 series(), которая строит ряды по формулам с шумом и фиксированным seed. Таблицы протокола берутся из --tables,
-поэтому числа в тексте и на графиках одни и те же.
+поэтому числа в таблицах и на графиках одни и те же. Числа в выводах и заключении пишутся вручную; prose()
+пересчитывает фразы с ними из тех же данных, и --check находит фразу, которая разошлась с данными.
 """
 import importlib
 import sys
@@ -235,9 +237,11 @@ def load(unit: str):
 
 
 def check(unit: str) -> list:
-    """Таблицы из data_NN.tables(), которых нет в исходнике протокола слово в слово."""
+    """Таблицы из data_NN.tables() и фразы с числами из data_NN.prose(), которых нет в исходнике слово в слово."""
     source = next(HERE.glob(f'{unit}-*.md')).read_text(encoding='utf-8')
-    return [chunk.splitlines()[0] for chunk in load(unit).tables().split('\n\n') if chunk not in source]
+    data = load(unit)
+    missing = [chunk.splitlines()[0] for chunk in data.tables().split('\n\n') if chunk not in source]
+    return missing + [f'текст «{phrase}»' for phrase in data.prose() if phrase not in source]
 
 
 if __name__ == '__main__':
@@ -247,7 +251,8 @@ if __name__ == '__main__':
     if args[0] == '--check':
         problems = {unit: check(unit) for unit in args[1:]}
         for unit, missing in problems.items():
-            print(f'{unit}: ' + ('таблицы совпадают' if not missing else 'не совпадают: ' + '; '.join(missing)))
+            print(f'{unit}: ' + ('таблицы и числа текста совпадают' if not missing
+                                 else 'не совпадают: ' + '; '.join(missing)))
         sys.exit(1 if any(problems.values()) else 0)
     if args[0] == '--tables':
         for unit in args[1:]:

@@ -88,6 +88,21 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    via_abs = ('ОП-08', 'ОП-06', 'ОП-04')  # идут в АБС: таблица 2 задержек заглушек
+    faster = {c: (BASE[c] - TEST[c]) / BASE[c] * 100 for c in via_abs}
+    cpu = next((old, new) for name, old, new in UTIL if name == 'CPU efr-cft-adapter, %')
+    # Как в таблице 3: таймауты не учтены (Д15.3).
+    error_08 = oc.error_summary(operation_counts()['ОП-08'], include_timeouts=False)[0]
+    return [
+        f'уменьшилось на {pf.num(min(faster.values()))}–{pf.num(max(faster.values()))} %',
+        'ускорил операции через АБС: ' + ', '.join(f'{c} — на {pf.num(faster[c])} %' for c in via_abs),
+        f'CPU efr-cft-adapter снизился на {pf.num((cpu[0] - cpu[1]) / cpu[0] * 100)} %',
+        f'Доля ошибок ОП-08 — {pf.num(error_08, 2)} %',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1519)
     t = np.arange(0, 60, 0.25)

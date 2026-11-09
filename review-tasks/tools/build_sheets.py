@@ -199,7 +199,7 @@ def charts_mismatch(task: Path, files: dict) -> list:
         charts = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(charts)
         units = [u for u in sorted(files) if load_places.KINDS[u] == 'protocol']
-        return [f'протокол {u}: таблицы не совпадают с данными графиков: ' + '; '.join(missing)
+        return [f'протокол {u}: таблицы или числа текста не совпадают с данными графиков: ' + '; '.join(missing)
                 for u in units if (missing := charts.check(u))]
     finally:
         sys.path.remove(str(path.parent))
