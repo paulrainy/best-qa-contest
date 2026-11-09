@@ -168,10 +168,7 @@
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "max"
-          ]
+          "calcs": []
         },
         "tooltip": {
           "mode": "multi"
@@ -215,10 +212,7 @@
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "max"
-          ]
+          "calcs": []
         },
         "tooltip": {
           "mode": "multi"
@@ -236,7 +230,8 @@
           "resultFormat": "time_series",
           "alias": "$tag_transaction"
         }
-      ]
+      ],
+      "description": "Худший p95 исходного окна Backend Listener внутри каждого интервала отображения. Это максимум оконных p95, а не p95 объединённых операций или всего теста."
     },
     {
       "id": 5,
@@ -280,10 +275,7 @@
         "legend": {
           "displayMode": "table",
           "placement": "bottom",
-          "calcs": [
-            "mean",
-            "max"
-          ]
+          "calcs": []
         },
         "tooltip": {
           "mode": "multi"
@@ -301,7 +293,8 @@
           "resultFormat": "time_series",
           "alias": "p95 ОП-01"
         }
-      ]
+      ],
+      "description": "Худший p95 исходного окна ОП-01 внутри интервала отображения; не итоговый p95 теста."
     },
     {
       "id": 6,

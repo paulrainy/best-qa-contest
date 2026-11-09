@@ -3,11 +3,13 @@
 Запуск из папки tools:
     .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py 11 12   — нарисовать графики протоколов
     .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --tables 11 — таблицы средних в Markdown
-    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables
+    .venv/bin/python ../1c-load-review/jury/source/protocols/charts.py --check 11 12 — таблицы в NN-*.md совпадают с --tables,
+                                                                                 а числа текста — с data_NN.prose()
 
 Числа каждого протокола задаёт его модуль data_NN.py рядом: константы ступеней или интервалов и функция
 series(), которая строит ряды по формулам с шумом и фиксированным seed. Таблицы протокола берутся из --tables,
-поэтому числа в тексте и на графиках одни и те же.
+поэтому числа в таблицах и на графиках одни и те же. Числа в выводах и заключении пишутся вручную; prose()
+пересчитывает фразы с ними из тех же данных, и --check находит фразу, которая разошлась с данными.
 """
 import importlib
 import sys
@@ -55,14 +57,6 @@ BASELINE_FACTORS = {'app': [0.975, 0.985, 1.015, 1.025], 'int': [0.985, 1.015]}
 def smooth(values, window):
     """Скользящее среднее: память ОС меняется медленно, а не скачет от окна к окну."""
     return np.convolve(values, np.ones(window) / window, mode='same')
-
-
-def error_series(rng, level, size, rel=0.35):
-    """Оконная доля ошибок вокруг уровня из таблицы. Среднее ряда равно уровню, как итог в отчёте JMeter."""
-    if not level:
-        return np.zeros(size)
-    values = np.clip(noisy(rng, level, rel, size), 0, None)
-    return values * (level / values.mean())
 
 
 def util_series(rows, size, seed, column=1, maximum_column=None):
@@ -193,15 +187,16 @@ def timeseries(ax, t, series: dict, unit: str, threshold=None, threshold_label=N
     return used
 
 
-def legend_table(ax, series: dict, colors, unit: str, summarize=True):
+def legend_table(ax, series: dict, colors, unit: str, summarize=True, summary_values=None):
     """Для оконных перцентилей — только имена рядов, без агрегирования за интервал."""
     ax.axis('off')
-    rows = [['', 'Сред.', 'Макс.']] if summarize else [['']]
+    rows = [['', 'За интервал' if summary_values is not None else 'Сред.', 'Макс.']] if summarize else [['']]
     for name, values in series.items():
         row = [f'— {name}']
         if summarize:
             values = np.asarray(values, dtype=float)
-            row += [fmt(np.nanmean(values), unit), fmt(np.nanmax(values), unit)]
+            mean, maximum = summary_values[name] if summary_values is not None else (np.nanmean(values), np.nanmax(values))
+            row += [fmt(mean, unit), fmt(maximum, unit)]
         rows.append(row)
     widths = [0.66, 0.17, 0.17] if summarize else [1.0]
     table = ax.table(cellText=rows, bbox=[0, 0, 1, 1], cellLoc='left', colWidths=widths, edges='open')
@@ -219,7 +214,7 @@ def legend_table(ax, series: dict, colors, unit: str, summarize=True):
 
 
 def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, threshold_label=None, ylim=None,
-          colors=None, source='Grafana', summarize=True):
+          colors=None, source='Grafana', summarize=True, summary_values=None):
     """Один график-панель с заголовком, линиями и легендой-таблицей. Сохраняет PNG."""
     style()
     legend_rows = len(series) + 1
@@ -229,7 +224,7 @@ def panel(path: Path, title: str, t, series: dict, unit: str, threshold=None, th
     used = timeseries(ax, t, series, unit, threshold, threshold_label, ylim, colors)
     fig.text(0.01, 0.985, title, ha='left', va='top', fontsize=11, weight='bold', color=TEXT)
     fig.text(0.99, 0.985, source, ha='right', va='top', fontsize=9, color='#8E8E8E')
-    legend_table(fig.add_subplot(grid[1]), series, used, unit, summarize=summarize)
+    legend_table(fig.add_subplot(grid[1]), series, used, unit, summarize=summarize, summary_values=summary_values)
     fig.subplots_adjust(left=0.08, right=0.98, top=0.9, bottom=0.04)
     path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(path)
@@ -242,9 +237,11 @@ def load(unit: str):
 
 
 def check(unit: str) -> list:
-    """Таблицы из data_NN.tables(), которых нет в исходнике протокола слово в слово."""
+    """Таблицы из data_NN.tables() и фразы с числами из data_NN.prose(), которых нет в исходнике слово в слово."""
     source = next(HERE.glob(f'{unit}-*.md')).read_text(encoding='utf-8')
-    return [chunk.splitlines()[0] for chunk in load(unit).tables().split('\n\n') if chunk not in source]
+    data = load(unit)
+    missing = [chunk.splitlines()[0] for chunk in data.tables().split('\n\n') if chunk not in source]
+    return missing + [f'текст «{phrase}»' for phrase in data.prose() if phrase not in source]
 
 
 if __name__ == '__main__':
@@ -254,7 +251,8 @@ if __name__ == '__main__':
     if args[0] == '--check':
         problems = {unit: check(unit) for unit in args[1:]}
         for unit, missing in problems.items():
-            print(f'{unit}: ' + ('таблицы совпадают' if not missing else 'не совпадают: ' + '; '.join(missing)))
+            print(f'{unit}: ' + ('таблицы и числа текста совпадают' if not missing
+                                 else 'не совпадают: ' + '; '.join(missing)))
         sys.exit(1 if any(problems.values()) else 0)
     if args[0] == '--tables':
         for unit in args[1:]:

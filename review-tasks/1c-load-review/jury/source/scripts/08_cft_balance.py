@@ -1,4 +1,4 @@
-"""ОП-08 Запрос остатка в АБС, SOAP, открытая модель. Дефекты: 08.1–08.5. Ловушка: Precise Throughput Timer."""
+"""ОП-08 Запрос остатка в АБС, SOAP, открытая модель. Дефекты: Д08.1–Д08.5, номера из ключа. Ловушка: Precise Throughput Timer."""
 import common
 import jmx
 
@@ -18,8 +18,10 @@ ENVELOPE = '''<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/e
 TIME_FIXED = '''// Время запроса для АБС, с часовым поясом
 vars.put('requestTime', java.time.OffsetDateTime.now().toString())'''
 
+# JMeter подставляет функцию в текст до компиляции, Groovy видит готовую строку в двойных кавычках:
+# скрипт компилируется и кэшируется со временем первого вызова (Д08.4, проверено в JMeter 5.6.3).
 TIME_BROKEN = '''// Время запроса для АБС
-vars.put('requestTime', '${__time(yyyy-MM-dd\\'T\\'HH:mm:ss.SSSXXX,)}')'''
+vars.put('requestTime', "${__time(yyyy-MM-dd'T'HH:mm:ss.SSSXXX,)}")'''
 
 
 def plan(fixed):
@@ -27,16 +29,16 @@ def plan(fixed):
         checks = [jmx.response_assertion('ResultCode 0', ['<ResultCode>0</ResultCode>']),
                   jmx.response_assertion('Нет soap:Fault', ['Fault>'], test_type=jmx.SUBSTRING | jmx.NOT)]
     else:
-        checks = [jmx.response_assertion('ResultCode', ['<ResultCode>'])]  # 08.2
+        checks = [jmx.response_assertion('ResultCode', ['<ResultCode>'])]  # Д08.5
     balance = jmx.http_request('POST /cft/AccountService', 'POST', '/cft/AccountService', body=ENVELOPE, children=[
-        jmx.jsr223('pre', 'Время запроса', TIME_FIXED if fixed else TIME_BROKEN),  # 08.5
+        jmx.jsr223('pre', 'Время запроса', TIME_FIXED if fixed else TIME_BROKEN),  # Д08.4
         *checks,
     ])
-    headers = [('Content-Type', 'text/xml; charset=UTF-8' if fixed else 'application/xml')]  # 08.4
+    headers = [('Content-Type', 'text/xml; charset=UTF-8' if fixed else 'application/xml')]  # Д08.1
     if fixed:
-        headers.append(('SOAPAction', 'GetAccountBalance'))  # 08.1
+        headers.append(('SOAPAction', 'GetAccountBalance'))  # Д08.2
     else:
-        headers.append(('Authorization', 'Basic bnRfY2Z0Ok50LUNmdC0yMDI2'))  # 08.3
+        headers.append(('Authorization', 'Basic bnRfY2Z0Ok50LUNmdC0yMDI2'))  # Д08.3
     headers.append(('X-Request-Id', '${__UUID()}'))
     config = [common.defaults(domain='${__P(cft.host)}', port='${__P(cft.port,8443)}'),
               jmx.header_manager('HTTP Header Manager', headers)]

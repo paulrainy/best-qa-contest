@@ -14,12 +14,13 @@ import numpy as np
 
 import charts
 import nt_profile as pf
+import operation_counts as oc
 
 DAY = '2026-11-14'
 HEAP_PEAK = 4.4  # ГБ: в выводе протокола «занятый heap доходит до 4,4 ГБ»
 DELIVERED = pf.delivered(0.996, 1414)
 CHART_START = '21:00'  # графики выгружены за другой интервал
-ERRORS = {'ОП-01': 0.02, 'ОП-02': 0.02, 'ОП-03': 0.05, 'ОП-04': 0.06, 'ОП-05': 0.04, 'ОП-06': 2.4, 'ОП-07': 0.03,
+ERROR_TARGETS = {'ОП-01': 0.02, 'ОП-02': 0.02, 'ОП-03': 0.05, 'ОП-04': 0.06, 'ОП-05': 0.04, 'ОП-06': 2.4, 'ОП-07': 0.03,
           'ОП-08': 0.01, 'ОП-09': 0.03, 'ОП-10': 0.02}
 P95 = {'ОП-01': 415, 'ОП-02': 600, 'ОП-03': 1170, 'ОП-04': 1570, 'ОП-05': 810, 'ОП-06': 1070, 'ОП-07': 5550,
        'ОП-08': 205, 'ОП-09': 2280, 'ОП-10': 515}
@@ -41,12 +42,18 @@ UTIL = [
 ]
 
 
+def operation_counts():
+    return {code: oc.make_counts(pf.target(code, 100) * DELIVERED[code], 60,
+                                ERROR_TARGETS[code], 1414 + i) for i, code in enumerate(pf.CODES)}
+
+
 def total_errors():
-    weights = {c: pf.target(c, 100) for c in pf.CODES}
-    return sum(ERRORS[c] * w for c, w in weights.items()) / sum(weights.values())
+    total = oc.combine(row for windows in operation_counts().values() for row in windows)
+    return total.failed / total.total * 100
 
 
 def tables() -> str:
+    counts = operation_counts()
     conditions = [
         ['Сборка efr-api', '2026.11.0-b412', '2026.11.0-b431 (исправление EFR-NT-418)'],
         ['Вид и длительность', 'Стабильность, 8 ч', 'Контрольный прогон, 1 ч'],
@@ -57,7 +64,7 @@ def tables() -> str:
     ]
     out = ['Таблица 1. Условия исходного теста и контрольного прогона',
            pf.table(['Параметр', 'Стабильность 12.11.2026', 'Контрольный прогон 14.11.2026'], conditions)]
-    rows = [[c, pf.num(pf.target(c, 100)), pf.num(pf.target(c, 100) * DELIVERED[c]), pf.num(P95[c]),
+    rows = [[c, pf.num(pf.target(c, 100)), pf.num(oc.combine(counts[c]).total), pf.num(P95[c]),
              pf.num(pf.THRESHOLD[c])] for c in pf.CODES]
     out += ['', 'Таблица 2. Бизнес-метрики контрольного прогона', pf.table(
         ['Операция', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'p95, мс', 'Порог, мс'], rows)]
@@ -68,6 +75,19 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    util = {name: (mean, peak) for name, mean, peak in UTIL}
+    active = util['HikariCP: активных на экземпляр (из 40)'][0]
+    pending = util['HikariCP: ожидающих, всего'][1]
+    return [
+        f'Доля ошибок — {pf.num(total_errors(), 2)} %, в пределах критерия 1 %',
+        f'Активных соединений HikariCP в среднем {active} из 40 на экземпляр'
+        + (', ожидающих нет' if pending == 0 else ''),
+        f'heap efr-api доходит до {pf.num(HEAP_PEAK, 1)} ГБ',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1414)
     t = np.arange(0, 60, 0.25)
@@ -75,7 +95,8 @@ def draw(img: Path) -> list:
     metrics = charts.util_series(UTIL, t.size, seed=1414, maximum_column=2)
     active = metrics['HikariCP: активных на экземпляр (из 40)']
     pending = np.zeros(t.size)
-    errors = {c: charts.error_series(rng, ERRORS[c], t.size) for c in pf.CODES}
+    counts = operation_counts()
+    errors = {c: oc.error_values(counts[c]) for c in pf.CODES}
     live = 2.1 + rng.normal(0, 0.01, t.size)
     used = live + (t * 60 % 40) / 40 * 2.6 + rng.normal(0, 0.03, t.size)
     used = live + (used - live) * (HEAP_PEAK - 2.1) / (used.max() - 2.1)  # пик — как в тексте вывода
@@ -85,16 +106,17 @@ def draw(img: Path) -> list:
                           'соединений', 40, 'maximumPoolSize = 40', None, 'Grafana · Prometheus'),
         '14-errors.png': ('Рисунок 2. Доля ошибок по операциям', errors, '%', None, None, None, 'Grafana · JMeter'),
         '14-heap.png': ('Рисунок 3. Heap efr-api, среднее по экземплярам', {'Занято': used,
-                                                                            'После сборки (live data)': live},
-                        'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
+                                                                            'После полной сборки, весь heap': live},
+                        'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus / GC'),
     }
     for name, (title, data, unit, threshold, label, colors, source) in files.items():
         ylim = (0, 9) if unit == 'ГБ' else None
-        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
+        charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс',
+                     summary_values={c: oc.error_summary(counts[c]) for c in pf.CODES} if name == '14-errors.png' else None)
     target = sum(pf.target(c, 100) for c in pf.CODES) / 3600
     charts.panel(img / '14-throughput.png', 'Рисунок 4. Интенсивность операций', when, {
         'Заданная': np.full(t.size, target),
-        'Фактическая': charts.noisy(rng, target * 0.996, 0.02, t.size)}, 'оп/с', source='Grafana · JMeter')
+        'Фактическая': oc.throughput(counts)}, 'оп/с', source='Grafana · JMeter')
     charts.panel(img / '14-p95.png', 'Рисунок 5. 95-й перцентиль по окнам', when,
                  {c: charts.noisy(rng, P95[c], 0.03, t.size) for c in pf.CODES}, 'мс', source='Grafana · JMeter',
                  summarize=False)

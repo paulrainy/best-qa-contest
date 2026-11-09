@@ -170,7 +170,7 @@
               <stringProp name="filename"></stringProp>
               <stringProp name="parameters"></stringProp>
               <stringProp name="script">// Время запроса для АБС
-vars.put('requestTime', '${__time(yyyy-MM-dd\'T\'HH:mm:ss.SSSXXX,)}')</stringProp>
+vars.put('requestTime', "${__time(yyyy-MM-dd'T'HH:mm:ss.SSSXXX,)}")</stringProp>
               <stringProp name="scriptLanguage">groovy</stringProp>
             </JSR223PreProcessor>
             <hashTree/>

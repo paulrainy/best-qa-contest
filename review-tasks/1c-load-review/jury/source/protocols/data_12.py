@@ -6,7 +6,7 @@
 - в 00:35 вручную запущен VACUUM (ANALYZE) operations под нагрузкой — ОП-09 и CPU БД до 00:52 заметно выше;
 - таблицы результатов посчитаны за 22:00–02:10, то есть вместе с прогревом.
 
-Итоговые p95 заданы отдельно как синтетические измерения отчёта JMeter по операциям.
+Итоговые p95 заданы отдельно как синтетические итоговые измерения по исходным операциям JTL.
 Оконные p95 нужны только для графиков; утилизация в таблице — среднее и максимум ряда.
 """
 from pathlib import Path
@@ -15,6 +15,7 @@ import numpy as np
 
 import charts
 import nt_profile as pf
+import operation_counts as oc
 
 DAY = '2026-11-06'
 START = '22:00'
@@ -22,7 +23,7 @@ WARMUP_MIN, TOTAL_MIN = 10, 250
 RAMP_MIN = 1.5  # после прогрева потоки добавляются по одному в секунду (методика 3.4): 74 потока
 VACUUM = (155, 172)  # 00:35–00:52 от 22:00
 LIVE = (2.10, 2.48)  # ГБ, нижняя граница heap в начале и в конце
-ERRORS = {'ОП-01': 0.01, 'ОП-02': 0.01, 'ОП-03': 0.04, 'ОП-04': 0.05, 'ОП-05': 0.03, 'ОП-06': 0.04, 'ОП-07': 0.02,
+ERROR_TARGETS = {'ОП-01': 0.01, 'ОП-02': 0.01, 'ОП-03': 0.04, 'ОП-04': 0.05, 'ОП-05': 0.03, 'ОП-06': 0.04, 'ОП-07': 0.02,
           'ОП-08': 0.01, 'ОП-09': 0.03, 'ОП-10': 0.01}
 # Итоги отчёта по исходным операциям, не агрегат оконных перцентилей.
 # На 4–5 % выше уровня 100 %: к концу теста время чуть растёт. ОП-09 — выше из-за 17 минут вакуума.
@@ -71,13 +72,20 @@ def util(n):
     return values
 
 
+def operation_counts():
+    return {code: oc.make_counts(pf.target(code, 100) * float(np.mean(LOAD)) * DELIVERED[code],
+                                TOTAL_MIN, ERROR_TARGETS[code], 1206 + i, weights=LOAD)
+            for i, code in enumerate(pf.CODES)}
+
+
 def tables() -> str:
+    counts = operation_counts()
     rows = []
     for code in pf.CODES:
         tgt = pf.target(code, 100)
-        fact = tgt * (TOTAL_MIN - WARMUP_MIN * 0.5) / TOTAL_MIN * DELIVERED[code]
+        fact = oc.combine(counts[code]).total * 60 / TOTAL_MIN
         rows.append([code, pf.num(tgt), pf.num(fact), pf.num(TOTAL_P95[code]),
-                     pf.num(pf.THRESHOLD[code]), pf.num(ERRORS[code], 2)])
+                     pf.num(pf.THRESHOLD[code]), pf.num(oc.error_summary(counts[code])[0], 2)])
     out = ['Таблица 1. Бизнес-метрики за интервал 22:00–02:10', pf.table(
         ['Операция', 'Заданная, оп/ч', 'Фактическая, оп/ч', 'p95, мс', 'Порог, мс', 'Ошибки, %'], rows)]
     rows = [[name, round(float(np.mean(util(n)))), round(float(np.max(util(n))))] for n, (name, _, _) in enumerate(UTIL)]
@@ -85,11 +93,31 @@ def tables() -> str:
     return '\n'.join(out)
 
 
+def clock(minutes: float) -> str:
+    h, m = map(int, START.split(':'))
+    total = (h * 60 + m + int(minutes)) % (24 * 60)
+    return f'{total // 60:02d}:{total % 60:02d}'
+
+
+def prose() -> list:
+    """Фразы текста протокола с числами из данных: charts.py --check ищет их в исходнике слово в слово."""
+    max_error = max(oc.error_summary(windows)[0] for windows in operation_counts().values())
+    vacuum = f'{clock(VACUUM[0])}–{clock(VACUUM[1])}'
+    return [
+        f'{pf.num((TOTAL_MIN - WARMUP_MIN) / 60)} часа на 100 % профиля',
+        f'доля ошибок не выше {pf.num(max_error, 2)} %',
+        f'{vacuum} — выполнен VACUUM (ANALYZE) operations',
+        f'возвращается к {pf.num(LIVE[0])}–{pf.num(LIVE[1], 1)} ГБ',
+        f'ОП-09 и CPU БД в {vacuum}',
+    ]
+
+
 def draw(img: Path) -> list:
     rng = np.random.default_rng(1206)
     when = charts.minutes(f'{DAY} {START}', T)
     target = 36000 / 3600 * LOAD
-    fact = charts.noisy(rng, target * 0.996, 0.02, T.size)
+    counts = operation_counts()
+    fact = oc.throughput(counts)
     live = LIVE[0] + (LIVE[1] - LIVE[0]) * T / TOTAL_MIN + rng.normal(0, 0.01, T.size)
     used = live + (T * 60 % 40) / 40 * 2.6 + rng.normal(0, 0.03, T.size)
     names = {0: 'efr-api, среднее', 4: 'БД efr-nt-db01', 7: 'efr-nt-gen01', 8: 'efr-nt-gen02'}
@@ -99,7 +127,7 @@ def draw(img: Path) -> list:
         '12-p95.png': ('Рисунок 2. 95-й перцентиль по окнам', {c: p95(c) for c in pf.CODES},
                        'мс', None, None, None, 'Grafana · JMeter'),
         '12-heap.png': ('Рисунок 3. Heap efr-api, среднее по экземплярам', {
-            'Занято': used, 'После сборки (live data)': live}, 'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus'),
+            'Занято': used, 'После полной сборки, весь heap': live}, 'ГБ', 8, '-Xmx 8 ГБ', None, 'Grafana · Prometheus / GC'),
         '12-cpu.png': ('Рисунок 4. Загрузка CPU', {label: util(n) for n, label in names.items()}, '%', None, None,
                        None, 'Grafana · Zabbix'),
     }
@@ -107,6 +135,7 @@ def draw(img: Path) -> list:
         ylim = (0, 100) if unit == '%' else ((0, 9) if unit == 'ГБ' else None)
         charts.panel(img / name, title, when, data, unit, threshold, label, ylim, colors, source, summarize=unit != 'мс')
     charts.panel(img / '12-errors.png', 'Рисунок 5. Доля ошибок по операциям', when,
-                 {c: charts.error_series(rng, ERRORS[c], T.size) for c in pf.CODES}, '%', source='Grafana · JMeter')
+                 {c: oc.error_values(counts[c]) for c in pf.CODES}, '%', source='Grafana · JMeter',
+                 summary_values={c: oc.error_summary(counts[c]) for c in pf.CODES})
     metrics = {name: util(n) for n, (name, _, _) in enumerate(UTIL)}
     return [*files, '12-errors.png', *charts.server_panels(img, 12, when, metrics, 6)]

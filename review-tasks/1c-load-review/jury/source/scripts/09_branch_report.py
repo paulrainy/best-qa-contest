@@ -1,4 +1,4 @@
-"""ОП-09 Отчёт отделения за день, JDBC. Дефекты: 09.1–09.5."""
+"""ОП-09 Отчёт отделения за день, JDBC. Дефекты: Д09.1–Д09.5, номера из ключа."""
 import common
 import jmx
 
@@ -31,12 +31,12 @@ def plan(fixed):
                                   ])
     else:
         report = jmx.jdbc_request('SELECT отчёт отделения', 'efr', QUERY_INLINE,
-                                  query_type='Select Statement')  # 09.2, 09.4
-    return jmx.test_plan('ОП-09 Отчёт отделения за день', variables={'pacing': '10000' if fixed else '1000'}, children=[  # 09.3
+                                  query_type='Select Statement')  # Д09.4, Д09.5
+    return jmx.test_plan('ОП-09 Отчёт отделения за день', variables={'pacing': '10000' if fixed else '1000'}, children=[  # Д09.1
         jmx.user_variables('Дата отчёта', {'op_date': '${__timeShift(yyyy-MM-dd,,P-1D,,)}'}),
         jmx.jdbc_config('JDBC Connection Configuration', 'efr', 'jdbc:postgresql://${__P(db.host)}:5432/efr',
-                        'efr_report' if fixed else 'efr', '${__P(db.password)}',  # 09.5
-                        10 if fixed else 1),  # 09.1
+                        'efr_report' if fixed else 'efr', '${__P(db.password)}',  # Д09.3
+                        10 if fixed else 1),  # Д09.2
         common.backend(),
         jmx.thread_group('Thread Group', **common.thread_props(3), children=[
             common.start(),

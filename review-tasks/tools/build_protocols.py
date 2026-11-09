@@ -1,6 +1,6 @@
 """Протоколы НТ задания 1c: Markdown-исходник → .docx.
 
-Запуск: python build_protocols.py ../1c-load-review
+Запуск: python build_protocols.py ../1c-load-review [--force]
 Читает jury/source/protocols/NN-*.md, пишет participant/2-protocols/NN-*.docx.
 
 Исходник:
@@ -23,6 +23,7 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
@@ -241,9 +242,16 @@ def write(protocol: Protocol, md_path: Path, out: Path) -> None:
             for c, width in enumerate(widths):
                 table.columns[c].width = width
             for r, row in enumerate([head, *rows]):
+                properties = table.rows[r]._tr.get_or_add_trPr()
+                properties.append(OxmlElement('w:cantSplit'))
+                if r == 0:
+                    properties.append(OxmlElement('w:tblHeader'))
                 for c, value in enumerate(row):
                     table.cell(r, c).width = widths[c]
                     cell = table.cell(r, c).paragraphs[0]
+                    # Заголовок с первой строкой, последние две строки — вместе.
+                    # Остальные строки свободно переходят на следующую страницу.
+                    cell.paragraph_format.keep_with_next = r in (0, len(rows) - 1)
                     runs(cell, value, bold=r == 0)
             doc.add_paragraph()
         elif block.kind == 'figure':
@@ -260,12 +268,12 @@ def write(protocol: Protocol, md_path: Path, out: Path) -> None:
     doc.save(out)
 
 
-def build(task: Path) -> list:
+def build(task: Path, force: bool = False) -> list:
     built = []
     for md in sorted((task / 'jury' / 'source' / 'protocols').glob('[0-9][0-9]-*.md')):
         out = task / 'participant' / '2-protocols' / f'{md.stem}.docx'
         protocol = parse(md)
-        if out.exists() and Document(out).core_properties.identifier == source_hash(md):
+        if not force and out.exists() and Document(out).core_properties.identifier == source_hash(md):
             continue  # документ актуален: не пересобираем, чтобы не менять файл без причины
         write(protocol, md, out)
         built.append(out)
@@ -275,5 +283,5 @@ def build(task: Path) -> list:
 if __name__ == '__main__':
     if '--help' in sys.argv or len(sys.argv) < 2:
         sys.exit(__doc__)
-    done = build(Path(sys.argv[1]).resolve())
+    done = build(Path(sys.argv[1]).resolve(), force='--force' in sys.argv)
     print('Готово:', ', '.join(p.name for p in done) or 'все документы актуальны')

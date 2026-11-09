@@ -1,4 +1,4 @@
-"""ОП-04 Открытие вклада: продукты, черновик, отправка. Дефекты: 04.1–04.5."""
+"""ОП-04 Открытие вклада: продукты, черновик, отправка. Дефекты: Д04.1–Д04.5, номера из ключа."""
 import common
 import jmx
 
@@ -24,17 +24,17 @@ DRAFT = '''{
 
 
 def plan(fixed):
-    pause = common.pause() if fixed else common.pause(1000, 2000.0)  # 04.4
+    pause = common.pause() if fixed else common.pause(1000, 2000.0)  # Д04.4
     products = jmx.http_request('GET /api/v1/deposits/products', 'GET', '/api/v1/deposits/products', children=[
         jmx.json_extractor('JSON Extractor productCode', 'productCode', "$.products[?(@.currency == 'RUB')].code",
-                           default='productCode_NOT_FOUND' if fixed else None),  # 04.2
+                           default='productCode_NOT_FOUND' if fixed else None),  # Д04.2
         jmx.json_assertion('Продукты получены', '$.products[0].code', validate=False),
     ])
     draft = jmx.http_request('POST /api/v1/deposits', 'POST', '/api/v1/deposits', body=DRAFT, children=[
-        jmx.jsr223('pre', 'Сумма вклада', AMOUNT_FIXED if fixed else AMOUNT_BROKEN),  # 04.3
+        jmx.jsr223('pre', 'Сумма вклада', AMOUNT_FIXED if fixed else AMOUNT_BROKEN),  # Д04.3
         pause,
         jmx.regex_extractor('Regex depositId', 'depositId',
-                            '"depositId":"(.+?)"' if fixed else '"depositId":"(.+)"',  # 04.1
+                            '"depositId":"(.+?)"' if fixed else '"depositId":"(.+)"',  # Д04.5
                             default='depositId_NOT_FOUND'),
         jmx.json_assertion('Черновик создан', '$.status', 'DRAFT'),
     ])
@@ -51,7 +51,7 @@ def plan(fixed):
             common.start(),
             common.login('users_op04.csv'),
             common.data('accounts.csv'),
-            jmx.transaction('ОП-04 Открытие вклада', parent=fixed, children=[  # 04.5
+            jmx.transaction('ОП-04 Открытие вклада', parent=fixed, children=[  # Д04.1
                 common.auth(), products, draft, submit]),
             common.pacing(),
         ]),

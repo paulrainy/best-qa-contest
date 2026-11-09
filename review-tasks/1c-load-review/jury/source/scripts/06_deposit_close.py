@@ -1,4 +1,4 @@
-"""ОП-06 Закрытие вклада, одноразовые данные. Дефекты: 06.1–06.5."""
+"""ОП-06 Закрытие вклада, одноразовые данные. Дефекты: Д06.1–Д06.5, номера из ключа."""
 import common
 import jmx
 
@@ -19,20 +19,20 @@ def plan(fixed):
     close_children = [common.pause()]
     if fixed:
         close_children += [jmx.jsr223('pre', 'Дата закрытия', CLOSE_DATE_GROOVY),
-                           jmx.json_assertion('Вклад закрыт', '$.status', 'CLOSED')]  # 06.2
+                           jmx.json_assertion('Вклад закрыт', '$.status', 'CLOSED')]  # Д06.4
     else:
-        close_children.append(jmx.beanshell_pre('Дата закрытия', CLOSE_DATE_BEANSHELL))  # 06.4
+        close_children.append(jmx.beanshell_pre('Дата закрытия', CLOSE_DATE_BEANSHELL))  # Д06.5
     close = jmx.http_request('POST /api/v1/deposits/{depositId}/close', 'POST', '/api/v1/deposits/${depositId}/close',
                              body='{"reason": "CLIENT_REQUEST", "closeDate": "${closeDate}"}', children=close_children)
     steps = [common.login('users_op06.csv'),
-             common.data('deposits_to_close.csv', recycle=not fixed, stop_thread=fixed),  # 06.1
+             common.data('deposits_to_close.csv', recycle=not fixed, stop_thread=fixed),  # Д06.3
              jmx.transaction('ОП-06 Закрытие вклада', children=[common.auth(), deposit, close])]
     if fixed:
         steps = [common.start(), *steps, common.pacing()]
     else:
-        steps.insert(0, jmx.constant_throughput_timer('Constant Throughput Timer', 3.0))  # 06.3: 3 в минуту на поток
+        steps.insert(0, jmx.constant_throughput_timer('Constant Throughput Timer', 3.0))  # Д06.2: 3 в минуту на поток
     return jmx.test_plan('ОП-06 Закрытие вклада', variables={'pacing': '20000'}, children=[
-        common.defaults(embedded=not fixed),  # 06.5
+        common.defaults(embedded=not fixed),  # Д06.1
         common.headers(),
         common.backend(),
         jmx.thread_group('Thread Group', **common.thread_props(10), children=steps),

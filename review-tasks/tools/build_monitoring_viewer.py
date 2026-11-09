@@ -107,7 +107,8 @@ def build_html(task_dir: Path) -> str:
     directory = task_dir / "participant/3-monitoring"
     sections, navigation, sources = [], [], []
     for name, label in FILES:
-        source = (directory / name).read_bytes().decode("utf-8")
+        # Git на Windows (core.autocrlf) отдаёт файлы с CRLF; страница не должна зависеть от чекаута.
+        source = (directory / name).read_bytes().decode("utf-8").replace("\r\n", "\n")
         number = name[:2]
         sql = name.endswith(".sql")
         data = None if sql else json.loads(source)
@@ -151,7 +152,8 @@ def main():
         html = build_html(args.task).encode("utf-8")
         output = args.task / "participant/3-monitoring/review.html"
         if args.check:
-            if not output.exists() or output.read_bytes() != html:
+            # Собранная страница без CR; review.html в Windows-чекауте может быть с CRLF.
+            if not output.exists() or output.read_bytes().replace(b"\r\n", b"\n") != html:
                 print("review.html отсутствует или устарел. Выполните сборку без --check.")
                 return 1
             print("review.html актуален.")

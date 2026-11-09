@@ -1,4 +1,4 @@
-"""ОП-05 Подтверждение операции контролёром. Дефекты: 05.1–05.5. 05.1 — в data/controllers.csv (6 строк)."""
+"""ОП-05 Подтверждение операции контролёром. Дефекты: Д05.1–Д05.5, номера из ключа. Д05.2 — в data/controllers.csv (6 строк)."""
 import common
 import jmx
 
@@ -13,7 +13,7 @@ def plan(fixed):
         task_id = jmx.json_extractor('JSON Extractor taskId', 'taskId', '$.tasks[*].id', default='taskId_NOT_FOUND',
                                      match_no='0')
     else:
-        task_id = jmx.regex_extractor('Regex taskId', 'taskId', '"id":"(.+?)"', default='', match_no='0')  # 05.2, 05.3
+        task_id = jmx.regex_extractor('Regex taskId', 'taskId', r'"id"\s*:\s*"(.+?)"', default='', match_no='0')  # Д05.3, Д05.4
     tasks = jmx.http_request('GET /api/v1/tasks', 'GET', '/api/v1/tasks', params=[('status', 'NEW')],
                              children=[task_id, jmx.json_assertion('Задачи получены', '$.tasks[0].id', validate=False)],
                              comment=EXAMPLE)
@@ -22,7 +22,7 @@ def plan(fixed):
                                       jmx.json_assertion('Задача взята', '$.status', 'IN_PROGRESS')])
     approve_children = [jmx.json_assertion('Операция подтверждена', '$.status', 'APPROVED')]
     if fixed:
-        approve_children.insert(0, common.pause())  # 05.5
+        approve_children.insert(0, common.pause())  # Д05.5
     approve = jmx.http_request('POST /api/v1/tasks/{taskId}/approve', 'POST', '/api/v1/tasks/${taskId}/approve',
                                body='{"comment": ""}', children=approve_children)
     steps = [common.start(), jmx.once_only('Вход', children=[
@@ -30,7 +30,7 @@ def plan(fixed):
              jmx.transaction('ОП-05 Подтверждение операции контролёром', children=[
                  common.auth(), tasks, take, approve])]
     if fixed:
-        steps.append(common.pacing())  # 05.4
+        steps.append(common.pacing())  # Д05.1
     else:
         steps = steps[1:]
     return jmx.test_plan('ОП-05 Подтверждение операции контролёром', variables={'pacing': '20000'}, children=[

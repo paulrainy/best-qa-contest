@@ -57,7 +57,7 @@ def test_embedded_sources_and_lines_match_originals():
     data = payload(html)
     assert [item["name"] for item in data] == FILES
     for item in data:
-        original = (TASK / "participant/3-monitoring" / item["name"]).read_bytes().decode("utf-8")
+        original = (TASK / "participant/3-monitoring" / item["name"]).read_bytes().decode("utf-8").replace("\r\n", "\n")
         assert item["source"] == original
         number = item["name"][:2]
         ids = [i for i in page.ids if i.startswith(f"line-{number}-")]
@@ -77,12 +77,12 @@ def task_copy(tmp_path):
 
 def test_unknown_and_empty_properties_are_visible_and_html_is_inert(task_copy):
     path = task_copy / "participant/3-monitoring" / FILES[0]
-    dashboard = json.loads(path.read_text())
+    dashboard = json.loads(path.read_text(encoding="utf-8"))
     dashboard["panels"][0]["extra"] = {
         "false": False, "null": None, "empty": "", "list": [], "object": {},
         "hostile": '</script><script src="https://example.invalid/attack.js"></script>',
     }
-    path.write_text(json.dumps(dashboard, ensure_ascii=False))
+    path.write_text(json.dumps(dashboard, ensure_ascii=False), encoding="utf-8")
     html = render(task_copy)
     page = Page(html)
     visible = " ".join(page.text)
@@ -124,4 +124,19 @@ def test_cli_check_detects_stale_source_without_writing(task_copy):
 
 
 def test_checked_in_viewer_is_current():
-    assert (TASK / "participant/3-monitoring/review.html").read_text() == render()
+    assert (TASK / "participant/3-monitoring/review.html").read_text(encoding="utf-8") == render()
+
+
+@pytest.mark.parametrize("eol", [b"\n", b"\r\n"])
+def test_check_does_not_depend_on_checkout_line_endings(task_copy, eol):
+    folder = task_copy / "participant/3-monitoring"
+    def convert(path):
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n").replace(b"\n", eol))
+    for name in FILES:
+        convert(folder / name)
+    output = folder / "review.html"
+    output.write_bytes(render(task_copy).encode("utf-8"))
+    convert(output)  # как review.html после checkout с core.autocrlf
+    assert b"\r" not in render(task_copy).encode("utf-8")
+    result = subprocess.run([sys.executable, str(GENERATOR), str(task_copy), "--check"], capture_output=True, text=True)
+    assert result.returncode == 0, result.stdout

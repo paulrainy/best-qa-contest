@@ -162,3 +162,32 @@ def test_build_skips_up_to_date(tmp_path):
     before = out.read_bytes()
     assert bp.build(task) == []
     assert out.read_bytes() == before
+
+
+def test_table_headers_repeat_and_rows_stay_whole(tmp_path):
+    md = source(tmp_path)
+    out = tmp_path / 'out.docx'
+    bp.write(bp.parse(md), md, out)
+    doc = Document(out)
+    for table in doc.tables:
+        assert table.rows[0]._tr.xpath('./w:trPr/w:tblHeader')
+        assert all(row._tr.xpath('./w:trPr/w:cantSplit') for row in table.rows)
+        for row in (table.rows[0], table.rows[-2]):
+            assert all(p.paragraph_format.keep_with_next for cell in row.cells for p in cell.paragraphs)
+        assert not any(p.paragraph_format.keep_with_next for cell in table.rows[-1].cells for p in cell.paragraphs)
+    caption = next(p for p in doc.paragraphs if p.text == 'Таблица 1. Бизнес-метрики')
+    assert caption.paragraph_format.keep_with_next
+
+
+def test_force_rebuilds_unchanged_source(tmp_path):
+    task = tmp_path / 'task'
+    folder = task / 'jury' / 'source' / 'protocols'
+    folder.mkdir(parents=True)
+    source(folder)
+    out, = bp.build(task)
+    doc = Document(out)
+    doc.core_properties.title = 'Старая вёрстка'
+    doc.save(out)
+    assert bp.build(task) == []
+    assert bp.build(task, force=True) == [out]
+    assert Document(out).core_properties.title == 'Протокол нагрузочного тестирования системы ЕФР'

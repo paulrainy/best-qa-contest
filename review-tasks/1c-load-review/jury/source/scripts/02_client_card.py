@@ -1,4 +1,4 @@
-"""ОП-02 Просмотр карточки клиента. Дефекты: 02.1–02.5."""
+"""ОП-02 Просмотр карточки клиента. Дефекты: Д02.1–Д02.5, номера из ключа."""
 import common
 import jmx
 
@@ -16,9 +16,9 @@ def plan(fixed):
                                 '/api/v1/clients/${clientId}/accounts', children=accounts_children)
     steps = [common.auth(), card, accounts]
     if not fixed:
-        steps.append(common.pause())  # 02.2: таймер на уровне транзакции — пауза перед каждым запросом
-    request_id = '${__UUID()}' if fixed else '7f3c2a9e-51d4-4b8e-9a1f-2c6d8e0b4f17'  # 02.5
-    timeouts = {} if fixed else {'connect_timeout': None, 'response_timeout': None}  # 02.4
+        steps.append(common.pause())  # Д02.5: таймер на уровне транзакции — пауза перед каждым запросом
+    request_id = '${__UUID()}' if fixed else '7f3c2a9e-51d4-4b8e-9a1f-2c6d8e0b4f17'  # Д02.2
+    timeouts = {} if fixed else {'connect_timeout': None, 'response_timeout': None}  # Д02.1
     return jmx.test_plan('ОП-02 Просмотр карточки клиента', variables={'pacing': '15000'}, children=[
         common.defaults(**timeouts),
         common.headers(request_id=request_id),
@@ -26,8 +26,8 @@ def plan(fixed):
         jmx.thread_group('Thread Group', **common.thread_props(33), children=[
             common.start(),
             common.login('users_op02.csv'),
-            common.data('clients.csv', share_mode='shareMode.all' if fixed else 'shareMode.thread'),  # 02.3
-            jmx.transaction('ОП-02 Просмотр карточки клиента', include_timers=not fixed, children=steps),  # 02.1
+            common.data('clients.csv', share_mode='shareMode.all' if fixed else 'shareMode.thread'),  # Д02.3
+            jmx.transaction('ОП-02 Просмотр карточки клиента', include_timers=not fixed, children=steps),  # Д02.4
             common.pacing(),
         ]),
     ])
