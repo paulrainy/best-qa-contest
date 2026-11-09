@@ -151,6 +151,8 @@ cd review-tasks/1b-testcase-review/participant && zip -r ../testcase-review.zip 
 cd review-tasks/1c-load-review/participant && zip -r ../load-review.zip . -x '*.DS_Store' '*/.jmeter/*' '*/~$*' '~$*' '*/__pycache__/*' '*.pyc'
 ```
 
+Архив 1c упаковывать на macOS или Linux. В Windows-чекауте текстовые файлы с CRLF, а файловая система не хранит права на исполнение: Java для macOS из такого архива не запустится.
+
 ## Риски
 
 - **Утечка ключа.** Задания выполняют два месяца, рейтинг публикуется еженедельно — ответы могут разойтись между участниками. Варианты защиты:
