@@ -1,0 +1,7 @@
+OWN_ACCOUNTS
+81
+(1 row, 2 ms)
+STATUS    | N
+COMPLETED | 46
+FAILED    | 3
+(2 rows, 3 ms)

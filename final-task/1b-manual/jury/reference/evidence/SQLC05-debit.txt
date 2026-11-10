@@ -1,0 +1,4 @@
+ID      | EXPECTED_DEBIT | ACTUAL_DEBIT
+missing | 100.00         | 0
+short   | 130.00         | 100.00
+(2 rows, 2 ms)

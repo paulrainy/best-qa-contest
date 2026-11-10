@@ -5,7 +5,7 @@
 | Направление | Выдача участнику | Эталон жюри |
 | --- | --- | --- |
 | Java | [1a-java/participant](1a-java/participant/README.md) | [Проект Java](1a-java/jury/reference/README.md) |
-| Ручное | [1b-manual/participant](1b-manual/participant/README.md) | Ожидает исполнения отдельного плана |
+| Ручное | [1b-manual/participant](1b-manual/participant/README.md) | [Исполненный ручной проект](1b-manual/jury/reference/README.md) |
 | Нагрузка | [1c-load/participant](1c-load/participant/README.md) | Ожидает исполнения отдельного плана |
 | Python | [1d-python/participant](1d-python/participant/README.md) | Ожидает исполнения отдельного плана |
 

@@ -1,0 +1,13 @@
+IDEMPOTENCY_KEY            | N
+reorder-m02                | 1
+reorder-m03                | 1
+reorder-m04-max            | 1
+reorder-m06-blocked-credit | 1
+reorder-m10-cross          | 1
+reorder-m10-pre            | 1
+reorder-m12                | 1
+(7 rows, 3 ms)
+DIRECTION | POSTING_TYPE | AMOUNT
+DEBIT     | AMOUNT       | 100.00
+CREDIT    | AMOUNT       | 100.00
+(2 rows, 0 ms)

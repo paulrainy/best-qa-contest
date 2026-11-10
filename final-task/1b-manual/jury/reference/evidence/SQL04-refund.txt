@@ -1,0 +1,3 @@
+TRANSFER_ID                          | AMOUNT   | COMMISSION | EXPECTED_REFUND | ACTUAL_REFUND
+adff1ec2-75f3-4fc2-9d65-893ce0d81270 | 40000.00 | 400.00     | 40400.00        | 40000.00
+(1 row, 4 ms)

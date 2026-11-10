@@ -1,0 +1,80 @@
+# HELP stand_http_requests_total HTTP-запросы к API стенда.
+# TYPE stand_http_requests_total counter
+stand_http_requests_total{method="GET",route="/api/test",code="200"} 16
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="202"} 32
+stand_http_requests_total{method="GET",route="/api/v1/health",code="200"} 5
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="400"} 13
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="422"} 16
+stand_http_requests_total{method="POST",route="/api/test",code="201"} 57
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="200"} 1
+stand_http_requests_total{method="POST",route="/api/test",code="200"} 10
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="404"} 2
+stand_http_requests_total{method="GET",route="/api/v1/accounts/{number}",code="200"} 111
+stand_http_requests_total{method="GET",route="/api/v1/clients/{id}/limits",code="200"} 10
+stand_http_requests_total{method="PUT",route="/api/test",code="200"} 32
+stand_http_requests_total{method="GET",route="/api/v1/transfers/{id}",code="200"} 33
+stand_http_requests_total{method="DELETE",route="/api/test",code="200"} 4
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="409"} 2
+stand_http_requests_total{method="GET",route="/api/v1/accounts/{number}/operations",code="200"} 23
+# HELP stand_http_request_duration_seconds Время обработки HTTP-запросов.
+# TYPE stand_http_request_duration_seconds summary
+stand_http_request_duration_seconds_sum{method="GET",route="/api/test"} 0.0023602519999999997
+stand_http_request_duration_seconds_sum{method="POST",route="/api/test"} 0.480799172
+stand_http_request_duration_seconds_sum{method="POST",route="/api/v1/transfers"} 0.04754078999999999
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/accounts/{number}"} 0.04047837400000001
+stand_http_request_duration_seconds_sum{method="PUT",route="/api/test"} 0.013029248000000002
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/accounts/{number}/operations"} 0.014039373000000003
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/health"} 0.00548975
+stand_http_request_duration_seconds_sum{method="DELETE",route="/api/test"} 5.102080000000001E-4
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/transfers/{id}"} 0.011411667000000002
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/clients/{id}/limits"} 0.004845335
+stand_http_request_duration_seconds_count{method="GET",route="/api/test"} 16
+stand_http_request_duration_seconds_count{method="POST",route="/api/test"} 67
+stand_http_request_duration_seconds_count{method="POST",route="/api/v1/transfers"} 66
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/accounts/{number}"} 111
+stand_http_request_duration_seconds_count{method="PUT",route="/api/test"} 32
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/accounts/{number}/operations"} 23
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/health"} 5
+stand_http_request_duration_seconds_count{method="DELETE",route="/api/test"} 4
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/transfers/{id}"} 33
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/clients/{id}/limits"} 10
+# HELP stand_transfers_total Переводы по результату обработки.
+# TYPE stand_transfers_total counter
+stand_transfers_total{outcome="created"} 32
+stand_transfers_total{outcome="completed"} 31
+# HELP stand_transfer_completion_seconds Время от создания перевода до финального статуса.
+# TYPE stand_transfer_completion_seconds histogram
+stand_transfer_completion_seconds_bucket{le="0.25"} 31
+stand_transfer_completion_seconds_bucket{le="0.5"} 31
+stand_transfer_completion_seconds_bucket{le="1.0"} 31
+stand_transfer_completion_seconds_bucket{le="2.0"} 31
+stand_transfer_completion_seconds_bucket{le="5.0"} 31
+stand_transfer_completion_seconds_bucket{le="10.0"} 31
+stand_transfer_completion_seconds_bucket{le="30.0"} 31
+stand_transfer_completion_seconds_bucket{le="60.0"} 31
+stand_transfer_completion_seconds_bucket{le="+Inf"} 31
+stand_transfer_completion_seconds_sum 1.0840000000000003
+stand_transfer_completion_seconds_count 31
+# HELP stand_queue_messages Сообщений в очереди.
+# TYPE stand_queue_messages gauge
+stand_queue_messages{queue="accounting.transfer-created"} 1
+stand_queue_messages{queue="notifications.transfer-events"} 0
+stand_queue_messages{queue="transfers.dlq"} 0
+# HELP stand_accounting_messages_processed_total Сообщений, обработанных учётом.
+# TYPE stand_accounting_messages_processed_total counter
+stand_accounting_messages_processed_total 31
+# HELP stand_db_transfers_rows Строк в таблице transfers.
+# TYPE stand_db_transfers_rows gauge
+stand_db_transfers_rows 30032
+# HELP jvm_memory_heap_used_bytes Занятая куча JVM.
+# TYPE jvm_memory_heap_used_bytes gauge
+jvm_memory_heap_used_bytes 271584568
+# HELP jvm_memory_heap_max_bytes Максимум кучи JVM.
+# TYPE jvm_memory_heap_max_bytes gauge
+jvm_memory_heap_max_bytes 9663676416
+# HELP process_cpu_load Загрузка CPU процессом стенда (0..1).
+# TYPE process_cpu_load gauge
+process_cpu_load 9.230023240918342E-4
+# HELP jvm_threads_live Живых потоков JVM.
+# TYPE jvm_threads_live gauge
+jvm_threads_live 150

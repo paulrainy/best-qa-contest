@@ -33,3 +33,15 @@
 4. На новой OWN-паре выполнить100,00, дождаться COMPLETED<=10с; A=999900,00, B=100,00, нулевая комиссия. Сохранить контроль.
 
 Reset не использовать как замену очистки: он уничтожает данные всех кейсов и доказательства в БД. Один reset перед полной сессией допустим. Созданные счета остаются данными этой сессии; удалять их напрямую из БД нельзя.
+
+## Чтение собственной копии события через Qpid REST
+
+Это ручные HTTP-действия вместо написания AMQP-клиента. Официальный [REST API Qpid10.1.1](https://qpid.apache.org/releases/qpid-broker-j-10.1.1/book/Java-Broker-Management-Channel-REST-API.html) и `/apidocs` доступны в консоли. В примерах `Q` — своё уникальное имя, автор использовал `manual-m14-20261110`; авторизация `guest/guest`, базовый адрес `http://localhost:15672`.
+
+1. PUT `/api/latest/queue/default/default/<Q>`, тело `{"durable":false}` →201. POST `/api/latest/exchange/default/default/transfers/bind`, `{"destination":"<Q>","bindingKey":"transfer.created"}` →200 true. Сначала привязка, затем перевод продукта.
+2. GET `/api/latest/queue/default/default/<Q>/getMessageInfo` →массив; сохранить числовое `id` нужной копии. Не путать его с UUID transferId внутри тела.
+3. GET `/api/latest/port/HTTP`: сохранить `allowConfidentialOperationsOnInsecureChannels` (исходно false) и убедиться, что bindingAddress=localhost. При false чтение тела через HTTP даёт403. Только на этом локальном учебном стенде перед просмотром PUT того же порта с `{"allowConfidentialOperationsOnInsecureChannels":true}`; логин и привязка к localhost сохраняются. Альтернатива — свой обычный AMQP0-9-1 клиент, тогда настройка HTTP не нужна.
+4. GET `/api/latest/queue/default/default/<Q>/getMessageContent?messageId=<числовой id>&returnJson=true` →JSON-строка с телом события. Раскрыть строку, сопоставить transferId/счета/денежные поля с собственным запросом.
+5. Сразу, в том числе при ошибке чтения, вернуть сохранённое значение параметра порта, проверить его GET. DELETE своей очереди, затем GET неё→404. Изменять аутентификацию, адрес привязки или рабочие очереди не требуется.
+
+В M14 исходное false восстановлено, собственная очередь удалена. Состояние порта входит в очистку именно этого кейса; C01 отвечает за часы и потребителей.

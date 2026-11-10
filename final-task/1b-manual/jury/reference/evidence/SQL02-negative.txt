@@ -1,0 +1,2 @@
+ACCOUNT_NUMBER | BALANCE
+(0 rows, 2 ms)

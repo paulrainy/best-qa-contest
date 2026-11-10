@@ -1,0 +1,90 @@
+# HELP stand_http_requests_total HTTP-запросы к API стенда.
+# TYPE stand_http_requests_total counter
+stand_http_requests_total{method="GET",route="/api/test",code="200"} 28
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="202"} 45
+stand_http_requests_total{method="GET",route="/api/v1/health",code="200"} 9
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="400"} 13
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="422"} 16
+stand_http_requests_total{method="POST",route="/api/test",code="201"} 77
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="200"} 1
+stand_http_requests_total{method="POST",route="/api/test",code="200"} 30
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="404"} 2
+stand_http_requests_total{method="GET",route="/api/v1/accounts/{number}",code="200"} 131
+stand_http_requests_total{method="GET",route="/api/v1/clients/{id}/limits",code="200"} 11
+stand_http_requests_total{method="PUT",route="/api/test",code="200"} 37
+stand_http_requests_total{method="GET",route="/api/v1/transfers/{id}",code="200"} 48
+stand_http_requests_total{method="GET",route="/api/v1/reports/turnover",code="200"} 5
+stand_http_requests_total{method="DELETE",route="/api/test",code="200"} 8
+stand_http_requests_total{method="GET",route="/api/v1/clients/{id}/notifications",code="200"} 5
+stand_http_requests_total{method="GET",route="/metrics",code="200"} 1
+stand_http_requests_total{method="POST",route="/api/v1/transfers",code="409"} 2
+stand_http_requests_total{method="GET",route="/api/v1/accounts/{number}/operations",code="200"} 25
+# HELP stand_http_request_duration_seconds Время обработки HTTP-запросов.
+# TYPE stand_http_request_duration_seconds summary
+stand_http_request_duration_seconds_sum{method="POST",route="/api/v1/transfers"} 0.05718233299999999
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/clients/{id}/notifications"} 0.001468708
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/reports/turnover"} 0.025145916
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/health"} 0.005972292
+stand_http_request_duration_seconds_sum{method="DELETE",route="/api/test"} 9.727490000000002E-4
+stand_http_request_duration_seconds_sum{method="GET",route="/api/test"} 0.0037390439999999995
+stand_http_request_duration_seconds_sum{method="POST",route="/api/test"} 0.5048681740000001
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/accounts/{number}"} 0.04619795600000002
+stand_http_request_duration_seconds_sum{method="PUT",route="/api/test"} 0.014681040000000005
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/accounts/{number}/operations"} 0.014788373000000004
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/transfers/{id}"} 0.015676503000000005
+stand_http_request_duration_seconds_sum{method="GET",route="/api/v1/clients/{id}/limits"} 0.005250627
+stand_http_request_duration_seconds_sum{method="GET",route="/metrics"} 0.0030995
+stand_http_request_duration_seconds_count{method="POST",route="/api/v1/transfers"} 79
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/clients/{id}/notifications"} 5
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/reports/turnover"} 5
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/health"} 9
+stand_http_request_duration_seconds_count{method="DELETE",route="/api/test"} 8
+stand_http_request_duration_seconds_count{method="GET",route="/api/test"} 28
+stand_http_request_duration_seconds_count{method="POST",route="/api/test"} 107
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/accounts/{number}"} 131
+stand_http_request_duration_seconds_count{method="PUT",route="/api/test"} 37
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/accounts/{number}/operations"} 25
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/transfers/{id}"} 48
+stand_http_request_duration_seconds_count{method="GET",route="/api/v1/clients/{id}/limits"} 11
+stand_http_request_duration_seconds_count{method="GET",route="/metrics"} 1
+# HELP stand_transfers_total Переводы по результату обработки.
+# TYPE stand_transfers_total counter
+stand_transfers_total{outcome="created"} 45
+stand_transfers_total{outcome="completed"} 42
+stand_transfers_total{outcome="failed"} 3
+# HELP stand_transfer_completion_seconds Время от создания перевода до финального статуса.
+# TYPE stand_transfer_completion_seconds histogram
+stand_transfer_completion_seconds_bucket{le="0.25"} 41
+stand_transfer_completion_seconds_bucket{le="0.5"} 43
+stand_transfer_completion_seconds_bucket{le="1.0"} 44
+stand_transfer_completion_seconds_bucket{le="2.0"} 44
+stand_transfer_completion_seconds_bucket{le="5.0"} 44
+stand_transfer_completion_seconds_bucket{le="10.0"} 44
+stand_transfer_completion_seconds_bucket{le="30.0"} 44
+stand_transfer_completion_seconds_bucket{le="60.0"} 44
+stand_transfer_completion_seconds_bucket{le="+Inf"} 45
+stand_transfer_completion_seconds_sum 43262.626000000004
+stand_transfer_completion_seconds_count 45
+# HELP stand_queue_messages Сообщений в очереди.
+# TYPE stand_queue_messages gauge
+stand_queue_messages{queue="accounting.transfer-created"} 0
+stand_queue_messages{queue="notifications.transfer-events"} 1
+stand_queue_messages{queue="transfers.dlq"} 0
+# HELP stand_accounting_messages_processed_total Сообщений, обработанных учётом.
+# TYPE stand_accounting_messages_processed_total counter
+stand_accounting_messages_processed_total 45
+# HELP stand_db_transfers_rows Строк в таблице transfers.
+# TYPE stand_db_transfers_rows gauge
+stand_db_transfers_rows 30045
+# HELP jvm_memory_heap_used_bytes Занятая куча JVM.
+# TYPE jvm_memory_heap_used_bytes gauge
+jvm_memory_heap_used_bytes 165704368
+# HELP jvm_memory_heap_max_bytes Максимум кучи JVM.
+# TYPE jvm_memory_heap_max_bytes gauge
+jvm_memory_heap_max_bytes 9663676416
+# HELP process_cpu_load Загрузка CPU процессом стенда (0..1).
+# TYPE process_cpu_load gauge
+process_cpu_load 5.984977322446741E-4
+# HELP jvm_threads_live Живых потоков JVM.
+# TYPE jvm_threads_live gauge
+jvm_threads_live 150

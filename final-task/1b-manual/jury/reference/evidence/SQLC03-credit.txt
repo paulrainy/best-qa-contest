@@ -1,0 +1,5 @@
+ID      | AMOUNT | CREDIT_COUNT | CREDITED
+double  | 100.00 | 2            | 100.00
+missing | 100.00 | 0            | 0
+short   | 100.00 | 1            | 99.00
+(3 rows, 3 ms)

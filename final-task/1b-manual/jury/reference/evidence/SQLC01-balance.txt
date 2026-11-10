@@ -1,0 +1,3 @@
+N       | BALANCE | BY_POSTINGS
+control | 101.00  | 100.00
+(1 row, 4 ms)

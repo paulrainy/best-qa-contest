@@ -1,0 +1,3 @@
+N        | BALANCE
+negative | -1.00
+(1 row, 2 ms)
