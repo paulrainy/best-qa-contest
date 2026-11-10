@@ -1,0 +1,17 @@
+[
+  {
+    "input": "/private/tmp/best-qa-java-plan-audit-20261110/java21-full",
+    "expected_code": 1,
+    "actual_code": 1
+  },
+  {
+    "input": "/private/tmp/best-qa-java-plan-audit-20261110/java21-control",
+    "expected_code": 1,
+    "actual_code": 1
+  },
+  {
+    "input": "/private/tmp/best-qa-java-plan-audit-20261110/java21-cleanup-fault",
+    "expected_code": 1,
+    "actual_code": 1
+  }
+]

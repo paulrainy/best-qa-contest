@@ -49,7 +49,7 @@ Use pytest tests named `test_*.py` for generator changes; no coverage threshold 
 
 For 1c protocols, verify Markdown tables against chart data and generated DOCX content. Total p95 must come from the complete sample set, not from averaging window percentiles. Inspect DOCX pagination in Word, including repeated table headers, row splits, and placement of figures and captions; source/XML checks alone do not establish visual correctness. Static checks and local stubs can validate the exercise without an EFR stand, but cannot establish real-system performance or acceptance results.
 
-Final-task references follow the canonical `final-task/jury/source/spec.md` and F01–F18 catalog. Keep F10/F16 and the sequential accounting limitation; do not apply review-exercise defect quotas or old final scoring. Participant bundles contain no starter tests. Check distribution integrity and exact reference XML results as documented in `final-task/README.md`.
+Final-task references follow the canonical `final-task/jury/source/spec.md` and F01–F18 catalog. The final stand has no deliberately seeded defects; all reference checks must pass; do not apply review-exercise defect quotas or old final scoring. Participant bundles contain no starter tests. Check distribution integrity and exact reference XML results as documented in `final-task/README.md`.
 
 ## Commit & Pull Request Guidelines
 

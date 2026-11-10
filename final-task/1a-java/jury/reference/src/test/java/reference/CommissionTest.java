@@ -8,13 +8,11 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 class CommissionTest extends BaseTest {
     @Test
-    @Tag("known_issue")
     void thresholdCrossingChargesOnlyExcess() throws Exception {
         var p = data.other();
         complete(start(p, "90000"));
         var t = complete(start(p, "20000"));
         assertThat(t.get("commission").decimalValue())
-                .as("KNOWN:F10:COMMISSION")
                 .isEqualByComparingTo("100.00");
     }
     @ParameterizedTest

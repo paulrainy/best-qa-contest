@@ -20,7 +20,7 @@ WHERE t.status = 'COMPLETED'
 GROUP BY t.transfer_id, t.amount
 HAVING COUNT(p.posting_id) <> 1 OR SUM(p.amount) <> t.amount;
 
--- С4. Неуспешному переводу вернули всё списанное: сумму и комиссию — известное отклонение F16
+-- С4. Неуспешному переводу вернули всё списанное: сумму и комиссию
 SELECT t.transfer_id, t.amount, t.commission, COALESCE(SUM(p.amount), 0) AS refunded
 FROM transfers t
 LEFT JOIN postings p ON p.transfer_id = t.transfer_id AND p.posting_type = 'REFUND'

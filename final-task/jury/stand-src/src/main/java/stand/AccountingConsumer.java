@@ -37,12 +37,6 @@ final class AccountingConsumer extends PausableConsumer {
     }
 
     @Override
-    protected void configure(Channel ch) throws Exception {
-        // ДЕФЕКТ Н1: один потребитель, prefetch = 1, синхронная обработка — пропускная способность ~35 сообщений/с
-        ch.basicQos(1);
-    }
-
-    @Override
     protected void handle(Channel ch, Envelope env, AMQP.BasicProperties props, byte[] body) throws Exception {
         long tag = env.getDeliveryTag();
         JsonNode event;
@@ -60,7 +54,6 @@ final class AccountingConsumer extends PausableConsumer {
         }
 
         UUID transferId = UUID.fromString(event.get("transferId").asString());
-        TransferService.pause(25); // Известное ограничение Н1: один последовательный потребитель.
         try (Connection c = db.connection()) {
             c.setAutoCommit(false);
             try (PreparedStatement ps = c.prepareStatement("SELECT status FROM transfers WHERE transfer_id = ? FOR UPDATE")) {
@@ -96,8 +89,7 @@ final class AccountingConsumer extends PausableConsumer {
             out.put("occurredAt", at.toString());
 
             if (dst == null || "CLOSED".equals(dst.status())) {
-                // Известное отклонение F16: возвращается только сумма перевода, комиссия остаётся списанной
-                BigDecimal refund = amount;
+                BigDecimal refund = amount.add(commission);
                 credit(c, from, refund);
                 TransferService.posting(c, transferId, from, "CREDIT", "REFUND", refund, at);
                 finish(c, transferId, "FAILED", "RECIPIENT_ACCOUNT_CLOSED", at);

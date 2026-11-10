@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Контроль новой версии стенда. Сбрасывает данные; режим controls — исправленные правила."""
+"""Регресс исправленных правил стенда. Все проверки должны проходить; сбрасывает данные."""
 import json
 import sys
 from stand_client import Client
@@ -26,7 +26,7 @@ def verify(base='http://localhost:18400', controls=False):
         a = api.account(); b = api.account()
         api.final(api.transfer(a, b, 90000))
         crossing = api.final(api.transfer(a, b, 20000))
-        assert crossing['commission'] == 200, crossing
+        assert crossing['commission'] == 100, crossing
         result['F10'] = {'expected': '100.00', 'actual': str(crossing['commission']), 'transferId': crossing['transferId']}
         a = api.account(); b = api.account()
         api.final(api.transfer(a, b, 100000))
@@ -41,7 +41,7 @@ def verify(base='http://localhost:18400', controls=False):
         failed = api.final(t)
         assert failed['status'] == 'FAILED', failed
         after = api.balance(a)
-        assert before - after == 400, (before, after)
+        assert before == after, (before, after)
         result['F16'] = {'expected_balance': str(before), 'actual_balance': str(after), 'transferId': t['transferId']}
     return result
 

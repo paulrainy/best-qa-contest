@@ -1,0 +1,34 @@
+{
+  "M10": {
+    "sender": "40817810000000020061",
+    "recipient": "40817810000000020062",
+    "transferId": "38192922-4d20-4be7-9521-9ef41834eab1",
+    "commission": "100.00",
+    "sender_balance": "889900.00",
+    "recipient_balance": "110000.00"
+  },
+  "M16": {
+    "sender": "40817810000000020063",
+    "recipient": "40817810000000020064",
+    "transferId": "0223fd16-58c0-49b2-8164-806a83a1bb1e",
+    "status": "FAILED",
+    "before": "900000.00",
+    "after": "900000.00",
+    "recipient_balance": "100000.00"
+  },
+  "cleanup": {
+    "consumers": {
+      "accounting": "RUNNING",
+      "notifications": "RUNNING"
+    },
+    "clock": {
+      "now": "2026-11-10T23:19:06.830718+03:00",
+      "shifted": false
+    },
+    "health": {
+      "status": "UP",
+      "time": "2026-11-10T23:19:06.831286+03:00",
+      "clockShifted": false
+    }
+  }
+}

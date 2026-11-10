@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Отличает два известных нарушения ТЗ от неполного или сломанного прогона."""
+"""Принимает только полный успешный прогон эталона без исключений для дефектов."""
 import argparse
 import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
 
-def validate_reports(directory, expected, known):
-    errors, seen, failed = [], set(), set()
+def validate_reports(directory, expected):
+    errors, seen = [], set()
     files = sorted(Path(directory).glob('*.xml'))
     if not expected:
         return ['Каталог тестов ещё не утверждён для этого направления']
@@ -29,28 +29,13 @@ def validate_reports(directory, expected, known):
             bad = [c for c in case if c.tag in ('failure', 'error', 'skipped')]
             if not bad:
                 continue
-            if len(bad) != 1 or bad[0].tag != 'failure':
-                errors.append(f'{identity}: error/skip или несколько ошибок')
-                continue
-            failure = bad[0]
-            marker = known.get(identity)
-            message = failure.get('message', '')
-            failure_type = failure.get('type', '')
-            pytest_assertion = not failure_type and message.startswith('AssertionError: ')
-            if pytest_assertion:
-                message = message.removeprefix('AssertionError: ')
-            assertion_type = pytest_assertion or failure_type in (
-                'java.lang.AssertionError', 'org.opentest4j.AssertionFailedError', 'AssertionError')
-            if not marker or not assertion_type or not (message.startswith('[' + marker + ']') or message.startswith(marker + ':') or (message.splitlines() or [''])[0] == marker):
-                errors.append(f'{identity}: неизвестная причина падения: {message[:180]}')
-            else:
-                failed.add(identity)
+            for failure in bad:
+                message = failure.get('message', '')
+                errors.append(f'{identity}: {failure.tag}: {message[:180]}')
     for missing in sorted(set(expected) - seen):
         errors.append(f'{missing}: результат отсутствует')
     for extra in sorted(seen - set(expected)):
         errors.append(f'{extra}: незарегистрированный тест')
-    for missing in sorted(set(known) - failed):
-        errors.append(f'{missing}: известное целевое падение отсутствует')
     return errors
 
 
@@ -60,11 +45,11 @@ def main():
     parser.add_argument('report_dir', type=Path)
     args = parser.parse_args()
     catalog = json.loads(Path(__file__).with_name('reference-test-catalog.json').read_text(encoding='utf-8'))[args.direction]
-    errors = validate_reports(args.report_dir, catalog['tests'], catalog['known'])
+    errors = validate_reports(args.report_dir, catalog['tests'])
     for error in errors:
         print(error)
     if not errors:
-        print(f'{args.direction}: полный состав подтверждён; только F10/F16, без ошибок и skip')
+        print(f'{args.direction}: полный состав подтверждён; все проверки успешны, без ошибок и skip')
     return bool(errors)
 
 

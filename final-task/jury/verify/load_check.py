@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Диагностический прогон Н1; сбрасывает данные. Полный нагрузочный эталон создаётся отдельно."""
+"""Короткая диагностика нагрузки; сбрасывает данные. Полный нагрузочный эталон создаётся отдельно."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime

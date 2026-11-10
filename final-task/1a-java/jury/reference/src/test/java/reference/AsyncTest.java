@@ -24,7 +24,6 @@ class AsyncTest extends BaseTest {
         }
     }
     @Test
-    @Tag("known_issue")
     void failedTransferRefundsAmountAndCommission() throws Exception {
         try (var scope = new GlobalStandScope(api)) {
             var p = data.other();
@@ -38,7 +37,7 @@ class AsyncTest extends BaseTest {
             var failed = api.awaitFinal(id(t), WAIT);
             assertEquals("FAILED", failed.get("status").asText());
             assertEquals("RECIPIENT_ACCOUNT_CLOSED", failed.get("failReason").asText());
-            assertThat(api.balance(p.fromNumber())).as("KNOWN:F16:REFUND").isEqualByComparingTo(before);
+            assertThat(api.balance(p.fromNumber())).isEqualByComparingTo(before);
         }
     }
 }

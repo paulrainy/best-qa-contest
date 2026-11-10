@@ -102,6 +102,42 @@ class StandRegressionTest {
         money("34.57", TransferService.commission(new BigDecimal("100000"), new BigDecimal("3456.78")));
     }
     @Test
+    void thresholdCrossingChargesOnlyExcess() throws Exception {
+        JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
+        done(create(a, b, "90000"));
+        JsonNode t = done(create(a, b, "20000"));
+        money("100.00", t.get("commission").decimalValue());
+        money("889900.00", json(request("GET", "/api/v1/accounts/" + a.get("accountNumber").asString(), ""))
+                .get("balance").decimalValue());
+    }
+    @Test
+    void failedTransferRefundsAmountAndCommission() throws Exception {
+        JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
+        done(create(a, b, "100000"));
+        accounting.pause();
+        JsonNode t;
+        try {
+            t = create(a, b, "40000");
+            money("400.00", t.get("commission").decimalValue());
+            request("PUT", "/api/test/accounts/" + b.get("accountNumber").asString() + "/status",
+                    "{\"status\":\"CLOSED\"}");
+        } finally {
+            accounting.start();
+        }
+        assertEquals("FAILED", done(t).get("status").asString());
+        money("900000.00", json(request("GET", "/api/v1/accounts/" + a.get("accountNumber").asString(), ""))
+                .get("balance").decimalValue());
+        try (Connection c = db.connection(); PreparedStatement ps = c.prepareStatement(
+                "SELECT amount FROM postings WHERE transfer_id=? AND posting_type='REFUND'")) {
+            ps.setObject(1, UUID.fromString(t.get("transferId").asString()));
+            try (ResultSet rs = ps.executeQuery()) {
+                assertTrue(rs.next());
+                money("40400.00", rs.getBigDecimal(1));
+                assertFalse(rs.next());
+            }
+        }
+    }
+    @Test
     void blockedRecipientCanReceive() throws Exception {
         JsonNode a = account(null, "ACTIVE"), b = account(null, "BLOCKED");
         assertEquals("COMPLETED", done(create(a, b, "100")).get("status").asString());

@@ -58,7 +58,7 @@
 | 28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91 | final-task/1a-java/participant/stand/run.cmd |
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1a-java/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1a-java/participant/stand/stand.properties |
-| 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1a-java/participant/stand/transfer-stand.jar |
+| 95af5243747a3849e6865ea2537e86abd8c62383d805fe50b4f15d8647875377 | final-task/1a-java/participant/stand/transfer-stand.jar |
 | dc96d55535d758f7d30fc26b3aa0c8cc6650be26f1370cc4b3a0f1e0fad7036a | final-task/1b-manual/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1b-manual/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1b-manual/participant/stand/lib/amqp-client-5.37.0.jar |
@@ -111,7 +111,7 @@
 | 28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91 | final-task/1b-manual/participant/stand/run.cmd |
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1b-manual/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1b-manual/participant/stand/stand.properties |
-| 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1b-manual/participant/stand/transfer-stand.jar |
+| 95af5243747a3849e6865ea2537e86abd8c62383d805fe50b4f15d8647875377 | final-task/1b-manual/participant/stand/transfer-stand.jar |
 | ccfe255424e04f123f58a63eeb643b86be7153c158b837e053d1589c12e8f459 | final-task/1c-load/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1c-load/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1c-load/participant/stand/lib/amqp-client-5.37.0.jar |
@@ -164,7 +164,7 @@
 | 28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91 | final-task/1c-load/participant/stand/run.cmd |
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1c-load/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1c-load/participant/stand/stand.properties |
-| 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1c-load/participant/stand/transfer-stand.jar |
+| 95af5243747a3849e6865ea2537e86abd8c62383d805fe50b4f15d8647875377 | final-task/1c-load/participant/stand/transfer-stand.jar |
 | 9c636c4d993ffda5413915be1d0d6c5ee6a4866c248a0fd0e38cdc16770db432 | final-task/1d-python/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1d-python/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1d-python/participant/stand/lib/amqp-client-5.37.0.jar |
@@ -217,7 +217,7 @@
 | 28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91 | final-task/1d-python/participant/stand/run.cmd |
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1d-python/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1d-python/participant/stand/stand.properties |
-| 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1d-python/participant/stand/transfer-stand.jar |
+| 95af5243747a3849e6865ea2537e86abd8c62383d805fe50b4f15d8647875377 | final-task/1d-python/participant/stand/transfer-stand.jar |
 | 007714e4ae9a561d73d37684bcdc35eaf45346a67208e88a7a2d0efcee7301ea | final-task/jury/build-stand.sh |
 | 28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91 | final-task/jury/source/run.cmd |
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/jury/source/run.sh |
@@ -225,7 +225,7 @@
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/jury/source/stand.properties |
 | e0a01a8c23631eb368652f44f3b5904a6ed37580e680b0b118f70066c641fcb4 | final-task/jury/stand-src/pom.xml |
 | 53890fd2a3876908ade3a96180e36074b80187b819ff5eed04c366b88385f9dc | final-task/jury/stand-src/proguard.pro |
-| c416f70659c0d5ef1de7fff5c04ed59edcd1ccaeb90de2116191fa58991eb1cc | final-task/jury/stand-src/src/main/java/stand/AccountingConsumer.java |
+| 5bca029fff4261c15d17120890bcc27bd3d79915dfea555bf891619736c45631 | final-task/jury/stand-src/src/main/java/stand/AccountingConsumer.java |
 | 7001e1b2d67563f83ceef77ddc17a08b8633ebc22f280ec092025fd682ca7093 | final-task/jury/stand-src/src/main/java/stand/Api.java |
 | 58c1c87bffb36b78f90add9c5bbd2dc260ae69dacd9b6e5336e28fe09fa1a865 | final-task/jury/stand-src/src/main/java/stand/ApiError.java |
 | b96d91ab579b4bbb6cdf7741b495bf39cb3ad1b873f28e8a6be6627dcdc380c4 | final-task/jury/stand-src/src/main/java/stand/Db.java |
@@ -235,7 +235,7 @@
 | 77a8cc58c542217442ce47f11108bbeadd383678a29a1420d5ddf5607ca439d2 | final-task/jury/stand-src/src/main/java/stand/Metrics.java |
 | 6f8663a0e936346c541b9a1261c9102957e2aa17de30654d25bd4010c5b3bbad | final-task/jury/stand-src/src/main/java/stand/NotificationConsumer.java |
 | 155f15313ad4d8e91d68302c138b620c7615e3562ef3666d45f562c4f773cab3 | final-task/jury/stand-src/src/main/java/stand/StandClock.java |
-| abe3ac4fadd3f95373199cdeb7ba1b9832b3a9cdcec47cf6877021156fb8029c | final-task/jury/stand-src/src/main/java/stand/TransferService.java |
+| 50cd9091bd8fa854e45b2d40f7be87ff0b0be547c5c23f744e27853ed63dcca2 | final-task/jury/stand-src/src/main/java/stand/TransferService.java |
 | e0677cc39fdc0771ea07ec5ddd1e9e5f70a93489c283e67db794e32f2424c42f | final-task/jury/stand-src/src/main/resources/defaults.properties |
-| 24c3493fb209b69f5f453bf46d5e644acb285054c6c5c57929b9b15d4d491a5e | final-task/jury/stand-src/src/test/java/stand/StandRegressionTest.java |
+| e934b7e148d60f8622029fab10d0450cbfa83caca16bf84324fc1efbd69327cf | final-task/jury/stand-src/src/test/java/stand/StandRegressionTest.java |
 | 634f9a8f53321bcd8d13118384e7ac96a9423a115b8bf604d6039508b6fe58bc | final-task/jury/verify/write_manifest.py |

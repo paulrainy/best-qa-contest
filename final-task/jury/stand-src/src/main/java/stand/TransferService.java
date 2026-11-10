@@ -16,7 +16,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * Приём переводов. Известное отклонение F10 помечено в расчёте комиссии.
+ * Приём переводов и расчёт комиссии по контракту.
  * Исходники участникам не передаются.
  */
 final class TransferService {
@@ -172,9 +172,7 @@ final class TransferService {
             return BigDecimal.ZERO.setScale(2);
         }
         BigDecimal excess = amount.subtract(free);
-        // Известное отклонение F10: если перевод пересекает бесплатный порог, комиссия берётся со всей суммы, а не с превышения
-        BigDecimal base = monthUsed.compareTo(MONTH_FREE) < 0 ? amount : excess;
-        BigDecimal c = base.multiply(RATE).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal c = excess.multiply(RATE).setScale(2, RoundingMode.HALF_UP);
         return c.max(MIN_COMMISSION).min(MAX_COMMISSION);
     }
 

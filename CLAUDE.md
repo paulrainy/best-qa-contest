@@ -90,7 +90,7 @@ cd final-task/1a-java/jury/reference && mvn test
 
 Verify scripts reset data. Ready JAR, runtime libraries and console ZIP are in each direction's `participant/stand/`, tracked via Git LFS. Build once, physically copy to four bundles. Run the same binaries on Java17/21. Sources stay in `jury/stand-src/`. Canonical contract: `jury/source/spec.md`; coverage: `jury/coverage-catalog.md`; provenance: `jury/stand-manifest.md`. Participant instructions are Markdown, no starters.
 
-The final task builds testing from scratch, not defect-count scoring. Keep only known F10/F16 functional deviations and sequential accounting limitation. Other seeded review-exercise quotas do not apply. Java/Python full reference runs must fail precisely at the two identified requirement assertions; `jury/tools/check_reference_results.py` verifies exact testcase inventory, type and reason. Control runs excluding `known_issue` pass. Other three reference directions require their own approved plans. Scoring comes after all four references.
+The final task builds testing from scratch. The user removed all deliberately seeded final-stand defects: F10/F16 are ordinary passing requirement checks, and accounting has no artificial delay or prefetch=1 restriction. Other seeded review-exercise quotas do not apply. Java/Python full reference runs must pass every registered testcase without failures, errors or skips; `jury/tools/check_reference_results.py` verifies the exact inventory and rejects every failure. Other reference directions require their own approved plans. Scoring comes after all four references.
 
 
 ## Workflow conventions

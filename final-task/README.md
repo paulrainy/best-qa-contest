@@ -9,6 +9,8 @@
 | Нагрузка | [1c-load/participant](1c-load/participant/README.md) | Ожидает исполнения отдельного плана |
 | Python | [1d-python/participant](1d-python/participant/README.md) | Ожидает исполнения отдельного плана |
 
+Намеренно внедрённых дефектов в стенде больше нет. Оценивается построение тестирования и обоснованность результатов; обязательного числа находок нет. Полный Java-эталон должен проходить целиком.
+
 ## Общая основа жюри
 
 - [Канонический контракт](jury/source/spec.md), [каталог F01–F18](jury/coverage-catalog.md), [известные отклонения](jury/stand-findings.md).
@@ -34,7 +36,7 @@ bash final-task/1a-java/participant/stand/run.sh
 # Следующие команды — в другом терминале. Они сбрасывают данные стенда.
 python3 final-task/jury/verify/verify_defects.py controls
 python3 final-task/jury/verify/verify_defects.py
-# Короткая диагностика ограничения учёта; не заменяет нагрузочный эталон и проверку НФТ.
+# Короткая диагностика нагрузки; не заменяет нагрузочный эталон и проверку НФТ.
 python3 final-task/jury/verify/load_check.py 60 10
 
 python3 -m unittest discover -s final-task/jury/tools

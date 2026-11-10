@@ -13,16 +13,16 @@
 | F07 | `ValidationTest.selfTransferIsValidationError` | 400 VALIDATION_ERROR, без перевода и списания |
 | F08 | `LimitsTest.dailyLimitBoundaries` (3), `failedTransferReleasesUsage` | 149 999,99 / 150 000,00 приняты, 150 000,01 отклонён; FAILED освобождает использование. Бесплатный порог исчерпан предыдущим днём, F10 не влияет |
 | F09 | `LimitsTest.moscowMidnightResetsDailyLimit` | 23:59 → 00:01 МСК обнуляет дневное использование |
-| F10 | `CommissionTest.thresholdCrossingChargesOnlyExcess` | Требование комиссии 100,00 после 90 000 + 20 000; известное целевое падение |
+| F10 | `CommissionTest.thresholdCrossingChargesOnlyExcess` | Требование комиссии 100,00 после 90 000 + 20 000; обычная проверка корректного поведения |
 | F11 | `CommissionTest.minimumAndHalfUpAfterThreshold` (2), `LimitsTest.calendarMonthResetsFreeThreshold` | Минимум 30,00; 34,5678 → 34,57; новый месяц обнуляет бесплатный порог |
 | F12 | `IdempotencyTest.sameBodyReturnsOriginalWithoutSecondDebit` | 100 и 100,00 равнозначны; один transferId, одна строка и две проводки, одно списание |
 | F13 | `IdempotencyTest.differentBodyReturns409`, `keyIsGlobalAcrossClients`, `expiredKeyCreatesNewOperation` | Конфликт до истечения; область всех клиентов; новая операция через 24 ч, история сохранена |
 | F14 | `EventsTest.createdEventAndPostingsMatchOwnTransfer` | Подписка до запроса, eventId/transferId/поля/денежные суммы, проводки по своему ID |
 | F15 | `AsyncTest.processingOnPauseCompletesAfterResume` | PROCESSING без зачисления на паузе; после resume — COMPLETED и одно зачисление |
-| F16 | `AsyncTest.failedTransferRefundsAmountAndCommission` | Изолированная подготовка 100 000 + 40 000, комиссия 400, FAILED, требование полного возврата; известное целевое падение |
+| F16 | `AsyncTest.failedTransferRefundsAmountAndCommission` | Изолированная подготовка 100 000 + 40 000, комиссия 400, FAILED, требование полного возврата; обычная проверка корректного поведения |
 | F17 | `NotificationsTest.completedNotificationHasCorrectRecipientAndFormat`, `failedNotificationReportsFailure` | Уведомление отправителю, точные формат/счета/статус, ожидание по transferId |
 | F18 | `TurnoverTest.turnoverIncludesOnlyCompletedOnSelectedMoscowDate` | Две свободные даты, выбор по completedAt МСК, исключены FAILED/PROCESSING и соседняя дата |
 
 `SupportTest`: ограниченные таймауты с transferId; временная очередь привязана до действия и удалена; после исключения восстановлены часы и оба потребителя. SQL параметризован и использует собственные ID; подключения закрываются. Глобальные сценарии выполняются последовательно, scope восстанавливает исходные настройки, обычные сценарии не делают reset.
 
-У F10/F16 нет skip/xfail и подавления ошибок подготовки. Метки KNOWN стоят только на денежных assertions. Контрольный запуск исключает две известные проверки тегом, полный сохраняет их активными.
+F10/F16 входят в полный зелёный набор. Нет разрешённых падений, skip/xfail и фильтрации known_issue; анализатор отвергает любое падение и неполный состав.

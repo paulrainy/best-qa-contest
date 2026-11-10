@@ -62,14 +62,9 @@
       "reference.ValidationTest#selfTransferIsValidationError",
       "reference.ValidationTest#unknownAccountIs404(boolean)[1]",
       "reference.ValidationTest#unknownAccountIs404(boolean)[2]"
-    ],
-    "known": {
-      "reference.CommissionTest#thresholdCrossingChargesOnlyExcess": "KNOWN:F10:COMMISSION",
-      "reference.AsyncTest#failedTransferRefundsAmountAndCommission": "KNOWN:F16:REFUND"
-    }
+    ]
   },
   "python": {
-    "tests": [],
-    "known": {}
+    "tests": []
   }
 }
