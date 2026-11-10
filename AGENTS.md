@@ -7,7 +7,7 @@ This repository develops materials for the 2026–2027 “Best Tester” contest
 - `rating-tasks.md`: rating-stage tasks and evaluation criteria.
 - `review-tasks/1a–1d-*`: review exercises, each separating `participant/` deliverables from `jury/` answer keys, scoring sheets, and corrected examples.
 - `review-tasks/tools/`: Python artifact generators and their `test_*.py` tests.
-- `final-task/`: transfer-service case; participant specifications, stand launchers, and Java/Python starters; jury stand sources and verification scripts.
+- `final-task/`: transfer-service case; four self-contained `1a-java`, `1b-manual`, `1c-load`, `1d-python` participant bundles, separate jury references, shared stand sources and verification tools.
 - `docs/base-docs/`: original chat export and organiser presentations; use `rating-tasks.md` where they disagree.
 - `docs/superpowers/specs/` and `docs/superpowers/plans/`: dated design specifications and implementation plans.
 - `previous-year/`: historical examples for reference.
@@ -35,7 +35,7 @@ From `review-tasks/tools/`:
 
 The 1c participant folders are `1-scripts/`, `2-protocols/`, and `3-monitoring/`. Bundled JMeter 5.6.3 and Java 17 are under `participant/1-scripts/tools/`; binaries use Git LFS. Set absolute `JMETER_HOME` and `JAVA` paths to enable real JMeter checks in the generator tests or `build_jmx.py --check`. See `review-tasks/README.md` for the full generation pipeline and platform-specific paths.
 
-For the final stand, run `bash final-task/jury/build-stand.sh` (JDK 17+ with `jmods`, Maven), then `bash final-task/participant/stand/run.sh`. See `final-task/README.md` for verification commands, which reset stand data.
+For the final stand, run `bash final-task/jury/build-stand.sh` (full JDK 17 with `jmods`, Maven, Python 3.11+), then `bash final-task/1a-java/participant/stand/run.sh`. Ready binaries and libraries are committed through Git LFS; launch compatibility is checked on Java 17 and 21. See `final-task/README.md` for verification commands, which reset stand data.
 
 ## Coding Style & Naming Conventions
 
@@ -48,6 +48,8 @@ Each review exercise has exactly 20 units with 5 seeded defects each, plus 10 va
 Use pytest tests named `test_*.py` for generator changes; no coverage threshold is documented. Check generated artifacts visually and keep answer-key references synchronized after code edits. Preserve seeded defects and valid-code traps unless explicitly changing the exercise; participant examples are intentionally imperfect.
 
 For 1c protocols, verify Markdown tables against chart data and generated DOCX content. Total p95 must come from the complete sample set, not from averaging window percentiles. Inspect DOCX pagination in Word, including repeated table headers, row splits, and placement of figures and captions; source/XML checks alone do not establish visual correctness. Static checks and local stubs can validate the exercise without an EFR stand, but cannot establish real-system performance or acceptance results.
+
+Final-task references follow the canonical `final-task/jury/source/spec.md` and F01–F18 catalog. Keep F10/F16 and the sequential accounting limitation; do not apply review-exercise defect quotas or old final scoring. Participant bundles contain no starter tests. Check distribution integrity and exact reference XML results as documented in `final-task/README.md`.
 
 ## Commit & Pull Request Guidelines
 

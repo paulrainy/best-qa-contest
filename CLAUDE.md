@@ -21,7 +21,7 @@ All prose, identifiers in task material, commit messages and comments are in **R
 | `review-tasks/1c-load-review/` | Load-testing material review: 10 JMeter scripts, 5 `.docx` protocols, 3 Grafana dashboards, 2 SQL scripts |
 | `review-tasks/1d-python-review/` | Python autotest code review (pytest / Kafka / Playwright), run with `uv` |
 | `review-tasks/tools/` | Generators and their pytest tests (see below) |
-| `final-task/` | Final case «Сервис переводов»: participant spec + black-box stand, jury key, scoring, stand sources |
+| `final-task/` | Final case «Сервис переводов»: four participant bundles + black-box stand, jury references, shared contract and stand sources |
 | `docs/superpowers/specs/`, `docs/superpowers/plans/` | Dated design specs and implementation plans written before each piece of work; `2026-10-30-review-materials-followups.md` lists deferred proposals (1c part still pending) |
 | `previous-year/` | Digests of last year's case, criteria and example artifacts; reference only |
 | `docs/base-docs/` | Original chat export and organiser presentations; superseded by `rating-tasks.md` where they disagree |
@@ -77,19 +77,26 @@ The full 1c pipeline order (data → dashboards → charts → protocols → she
 ### Final case (`final-task/`)
 
 ```bash
-bash final-task/jury/build-stand.sh          # JDK 17+ with jmods, Maven → participant/stand/transfer-stand.jar + lib/ (gitignored)
-bash final-task/participant/stand/run.sh     # start the stand (ports 18400 API, 5672 AMQP, 19400/19402 DB)
-cd final-task/jury/verify && pip install -r requirements.txt
-python verify_defects.py                     # reproduce the 12 functional defects; `controls` runs the 6 should-work scenarios
-python load_check.py 60 150                  # load defects Н1/Н3; `30 300` for Н2
+# Full JDK 17 (JAVA_HOME), jmods, Maven, Python 3.11+
+bash final-task/jury/build-stand.sh
+python3 final-task/jury/verify/check_distribution.py --check
+bash final-task/1a-java/participant/stand/run.sh  # Java 17 or21, ports18400/5672/19400/19402
+python3 final-task/jury/verify/verify_defects.py controls
+python3 final-task/jury/verify/verify_defects.py
+python3 -m unittest discover -s final-task/jury/tools
+python3 -m unittest discover -s final-task/jury/verify
+cd final-task/1a-java/jury/reference && mvn test
 ```
 
-Verify scripts reset stand data. Stand sources in `jury/stand-src/` mark each seeded defect with the comment «ДЕФЕКТ»; the shipped jar is ProGuard-obfuscated and participants are forbidden to decompile it, so never expose `stand-src/` in participant material.
+Verify scripts reset data. Ready JAR, runtime libraries and console ZIP are in each direction's `participant/stand/`, tracked via Git LFS. Build once, physically copy to four bundles. Run the same binaries on Java17/21. Sources stay in `jury/stand-src/`. Canonical contract: `jury/source/spec.md`; coverage: `jury/coverage-catalog.md`; provenance: `jury/stand-manifest.md`. Participant instructions are Markdown, no starters.
+
+The final task builds testing from scratch, not defect-count scoring. Keep only known F10/F16 functional deviations and sequential accounting limitation. Other seeded review-exercise quotas do not apply. Java/Python full reference runs must fail precisely at the two identified requirement assertions; `jury/tools/check_reference_results.py` verifies exact testcase inventory, type and reason. Control runs excluding `known_issue` pass. Other three reference directions require their own approved plans. Scoring comes after all four references.
+
 
 ## Workflow conventions
 
-- Before extending an exercise, read its `jury/answer-key.md` «Как считаем» section and `review-tasks/README.md`; the scoring rules are deliberately identical across 1a–1d and the final case reuses the "found/proved/defended, −1 per false finding" idea.
+- Before extending an exercise, read its `jury/answer-key.md` «Как считаем» section and `review-tasks/README.md`; the scoring rules are deliberately identical across 1a–1d the final case has no current score scale until its four reference solutions are accepted.
 - Larger changes start with a dated spec in `docs/superpowers/specs/` and a plan in `docs/superpowers/plans/` (format: `YYYY-MM-DD-<slug>-design.md` / `YYYY-MM-DD-<slug>.md`).
 - Commits: `feat|fix|docs|chore(<scope>): <Russian summary>` where scope is `1a`…`1d`, `final`, `1a–1d`. Work goes on `feature/*` or `fix/*` branches merged via PR into `main`.
-- Material is validated by "solving blind" with an LLM and by an independent colleague before release; record the result at the end of the answer key (existing keys end with such a section). Known unverified items: Grafana import of 1c dashboards, performance thresholds of the final stand on VDI.
+- Material is validated by "solving blind" with an LLM and by an independent colleague before release; record review-exercise results at the end of the answer key and final-reference results in the reference report. Known unverified items: Grafana import of 1c dashboards, performance thresholds of the final stand on VDI.
 - Open decisions that affect scope live in «Открытые вопросы» of `rating-tasks.md`, `review-tasks/README.md` and `final-task/README.md` (notably: how to reconcile 0–100 review scores with 0–5 artifact scores, one vs two material variants, Java/Python availability on VDI). Check them before proposing new structure.

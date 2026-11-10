@@ -5,3 +5,35 @@ review-tasks/1c-load-review/participant/1-scripts/tools/java/**/lib/** filter=lf
 review-tasks/1c-load-review/participant/1-scripts/tools/java/**/MacOS/** filter=lfs diff=lfs merge=lfs -text
 review-tasks/1c-load-review/participant/1-scripts/open-jmeter.bat text eol=crlf
 review-tasks/1c-load-review/participant/1-scripts/open-jmeter.command text eol=lf
+final-task/1a-java/participant/stand/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1a-java/participant/stand/lib/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1a-java/participant/stand/lib/*.zip filter=lfs diff=lfs merge=lfs -text
+final-task/1a-java/participant/stand/run.cmd text eol=crlf
+final-task/1b-manual/participant/stand/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1b-manual/participant/stand/lib/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1b-manual/participant/stand/lib/*.zip filter=lfs diff=lfs merge=lfs -text
+final-task/1b-manual/participant/stand/run.cmd text eol=crlf
+final-task/1c-load/participant/stand/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1c-load/participant/stand/lib/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1c-load/participant/stand/lib/*.zip filter=lfs diff=lfs merge=lfs -text
+final-task/1c-load/participant/stand/run.cmd text eol=crlf
+final-task/1d-python/participant/stand/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1d-python/participant/stand/lib/*.jar filter=lfs diff=lfs merge=lfs -text
+final-task/1d-python/participant/stand/lib/*.zip filter=lfs diff=lfs merge=lfs -text
+final-task/1d-python/participant/stand/run.cmd text eol=crlf
+
+# Одинаковые хеши текстов выдачи и исходников при checkout на Windows/macOS.
+final-task/**/*.md text eol=lf
+final-task/**/*.java text eol=lf
+final-task/**/*.xml text eol=lf
+final-task/**/*.json text eol=lf
+final-task/**/*.jsonl text eol=lf
+final-task/**/*.csv text eol=lf
+final-task/**/*.properties text eol=lf
+final-task/**/*.py text eol=lf
+final-task/**/*.sh text eol=lf
+final-task/**/*.sql text eol=lf
+final-task/**/*.txt text eol=lf
+final-task/**/*.pro text eol=lf
+final-task/**/*.config text eol=lf
+final-task/jury/source/run.cmd text eol=crlf
