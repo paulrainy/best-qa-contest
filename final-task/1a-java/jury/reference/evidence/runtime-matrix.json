@@ -1,0 +1,66 @@
+[
+  {
+    "direction": "1a-java",
+    "java": "openjdk version \"17.0.21\" 2026-10-20",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "61/2 known/0 errors/0 skipped; control59 green"
+  },
+  {
+    "direction": "1b-manual",
+    "java": "openjdk version \"17.0.21\" 2026-10-20",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  },
+  {
+    "direction": "1c-load",
+    "java": "openjdk version \"17.0.21\" 2026-10-20",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  },
+  {
+    "direction": "1d-python",
+    "java": "openjdk version \"17.0.21\" 2026-10-20",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  },
+  {
+    "direction": "1a-java",
+    "java": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "61/2 known/0 errors/0 skipped; control59 green"
+  },
+  {
+    "direction": "1b-manual",
+    "java": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  },
+  {
+    "direction": "1c-load",
+    "java": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  },
+  {
+    "direction": "1d-python",
+    "java": "openjdk version \"21.0.13.0.3\" 2026-10-24",
+    "sha256": "73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf",
+    "network": "outbound denied except localhost",
+    "HTTP_AMQP_PG_H2_consoles_reset_metrics": "passed",
+    "reference": "not applicable"
+  }
+]

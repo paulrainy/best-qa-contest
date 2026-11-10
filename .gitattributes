@@ -37,3 +37,5 @@ final-task/**/*.txt text eol=lf
 final-task/**/*.pro text eol=lf
 final-task/**/*.config text eol=lf
 final-task/jury/source/run.cmd text eol=crlf
+# Сырые XML Surefire сохраняют пробелы в stack trace без редактирования доказательств.
+final-task/1a-java/jury/reference/evidence/**/*.xml -whitespace
