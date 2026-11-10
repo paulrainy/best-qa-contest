@@ -1,0 +1,5 @@
+SELECT account_number,direction,posting_type,amount FROM postings WHERE transfer_id='4d4239bf-9266-4c89-839d-1996480f760d' ORDER BY posting_id;
+ACCOUNT_NUMBER       | DIRECTION | POSTING_TYPE | AMOUNT
+40817810000000020114 | DEBIT     | AMOUNT       | 100.01
+40817810000000020115 | CREDIT    | AMOUNT       | 100.01
+(2 rows, 2 ms)

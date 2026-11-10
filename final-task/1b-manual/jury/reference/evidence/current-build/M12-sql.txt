@@ -1,0 +1,8 @@
+SELECT transfer_id,idempotency_key,amount,status FROM transfers WHERE idempotency_key='current-m12'; SELECT direction,posting_type,amount FROM postings WHERE transfer_id='386cc360-d6fa-436b-b5b8-ea69728f29c9' ORDER BY posting_id;
+TRANSFER_ID                          | IDEMPOTENCY_KEY | AMOUNT | STATUS
+386cc360-d6fa-436b-b5b8-ea69728f29c9 | current-m12     | 100.00 | COMPLETED
+(1 row, 2 ms)
+DIRECTION | POSTING_TYPE | AMOUNT
+DEBIT     | AMOUNT       | 100.00
+CREDIT    | AMOUNT       | 100.00
+(2 rows, 0 ms)

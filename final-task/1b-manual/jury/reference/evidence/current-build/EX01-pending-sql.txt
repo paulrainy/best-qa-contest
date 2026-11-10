@@ -1,0 +1,4 @@
+SELECT transfer_id,status,created_at,DATEDIFF('SECOND',created_at,CURRENT_TIMESTAMP) AS AGE_SECONDS FROM transfers WHERE transfer_id='57a2d50f-86e1-409d-8bb6-46eb1061675f' AND status='PROCESSING' AND created_at<DATEADD('SECOND',-10,CURRENT_TIMESTAMP);
+TRANSFER_ID                          | STATUS     | CREATED_AT                    | AGE_SECONDS
+57a2d50f-86e1-409d-8bb6-46eb1061675f | PROCESSING | 2026-11-10 23:47:50.015083+03 | 37
+(1 row, 3 ms)

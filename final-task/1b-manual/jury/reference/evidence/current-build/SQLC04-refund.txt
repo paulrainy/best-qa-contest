@@ -1,0 +1,6 @@
+WITH t(id,from_account,amount,commission,status) AS (VALUES('short','A',40000.00,400.00,'FAILED'),('missing','A',100.00,0.00,'FAILED'),('double','A',100.00,0.00,'FAILED'),('correct','A',40000.00,400.00,'FAILED')), p(transfer_id,account_number,direction,posting_type,amount) AS (VALUES('short','A','CREDIT','REFUND',40000.00),('double','A','CREDIT','REFUND',100.00),('double','A','CREDIT','REFUND',100.00),('correct','A','CREDIT','REFUND',40400.00)) SELECT t.id,t.amount+t.commission AS EXPECTED_REFUND,COALESCE(SUM(p.amount),0) AS ACTUAL_REFUND FROM t LEFT JOIN p ON p.transfer_id=t.id AND p.account_number=t.from_account AND p.direction='CREDIT' AND p.posting_type='REFUND' WHERE t.status='FAILED' GROUP BY t.id,t.amount,t.commission HAVING COALESCE(SUM(p.amount),0)<>t.amount+t.commission ORDER BY t.id;
+ID      | EXPECTED_REFUND | ACTUAL_REFUND
+double  | 100.00          | 200.00
+missing | 100.00          | 0
+short   | 40400.00        | 40000.00
+(3 rows, 5 ms)

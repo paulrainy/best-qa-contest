@@ -1,6 +1,6 @@
 # Кейсы ручного эталона
 
-M10/M16 адресно перепроверены после исправления и имеют PASS на новом хеше, см. [отчёт](report.md). Остальные фактические результаты ниже относятся к прежней сборке `73c7773c…13ecf`; ожидания по ТЗ действуют. Полный повтор нового хеша и независимая приёмка ещё не выполнены.
+Все M01–M18 и указанные варианты повторно исполнены на готовом JAR SHA-256 `95af5243747a3849e6865ea2537e86abd8c62383d805fe50b4f15d8647875377`. Основная сессия — Java21/macOS ARM64; запуск и обе консоли дополнительно проверены на Java17. Доказательства текущего прогона — `evidence/current-build/`; прежние файлы корня evidence относятся к старой сборке.
 
 Исполнение: собственные данные по [test-data.md](test-data.md). Риск и дизайн — [стратегия](test-strategy.md), [дизайн](test-design.md). До реального запроса поля результата остаются «не выполнен». Предел наблюдения финала10с; отдельно различать PASS/FAIL/не завершился/ошибка среды.
 
@@ -18,9 +18,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Не менять данные; базовый reset до основной сессии.
 
-**Фактически:** PASS. Один JAR SHA73c7773c…11113ecf запущен на Java17.0.21 и21.0.13.0.3. API UP, оба RUNNING, часы реальные; SQL30000; вход в обе консоли на обеих JVM. Основная сессия далее на Java21.
+**Фактически:** PASS. Один JAR SHA95af5243…875377 запущен на Java17.0.21 и21.0.13. API UP, оба RUNNING, часы реальные; SQL30000; вход в обе консоли на обеих JVM. Основная сессия далее на Java21.
 
-**Доказательства:** [M01-java17-broker.png](evidence/M01-java17-broker.png), [M01-java17-h2.png](evidence/M01-java17-h2.png), [M01-java17-sql.txt](evidence/M01-java17-sql.txt), [M01-java17.jsonl](evidence/M01-java17.jsonl), [M01-java21-broker.png](evidence/M01-java21-broker.png), [M01-java21-h2.png](evidence/M01-java21-h2.png), [M01-java21-sql.txt](evidence/M01-java21-sql.txt), [M01-java21.jsonl](evidence/M01-java21.jsonl).
+**Доказательства:** [M01-java17-broker.png](evidence/current-build/M01-java17-broker.png), [M01-java17-h2.png](evidence/current-build/M01-java17-h2.png), [M01-java17-sql.txt](evidence/current-build/M01-java17-sql.txt), [M01-java17.jsonl](evidence/current-build/M01-java17.jsonl), [M01-java21-broker.png](evidence/current-build/M01-java21-broker.png), [M01-java21-h2.png](evidence/current-build/M01-java21-h2.png), [M01-java21-sql.txt](evidence/current-build/M01-java21-sql.txt), [M01-java21.jsonl](evidence/current-build/M01-java21.jsonl).
 
 <a id="m02"></a>
 
@@ -36,9 +36,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Глобальных изменений нет.
 
-**Фактически:** PASS. T=a869e5b8-5395-40c3-a7d9-e96e5e37a8bc, COMPLETED; A999900,00/B100,00; DEBIT100 и CREDIT100, комиссия0.
+**Фактически:** PASS. T=da88697b-8dbf-4b55-83be-426dbecf8a08, COMPLETED; A999900,00/B100,00; DEBIT100 и CREDIT100, комиссия0.
 
-**Доказательства:** [M02.jsonl](evidence/M02.jsonl).
+**Доказательства:** [M02.jsonl](evidence/current-build/M02.jsonl).
 
 <a id="m03"></a>
 
@@ -54,9 +54,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Глобальных изменений нет.
 
-**Фактически:** PASS. T=e25f6117-9354-401b-a37a-e34a64331d52; OTHER COMPLETED, комиссия0, A999899,99/B100,01; две проводки100,01.
+**Фактически:** PASS. T=52315dad-b5bf-4803-8675-e3a83fa89577; OTHER COMPLETED, комиссия0, A999899,99/B100,01; две проводки100,01.
 
-**Доказательства:** [M03.jsonl](evidence/M03.jsonl).
+**Доказательства:** [M03.jsonl](evidence/current-build/M03.jsonl).
 
 <a id="m04"></a>
 
@@ -74,7 +74,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS всех5 вариантов. 9,99/300000,01/10,001→400, исходные остатки и только OPENING;10→999990/10;300000→700000/300000, COMPLETED, комиссия0. SQL отказных пар0 строк.
 
-**Доказательства:** [M04-a.jsonl](evidence/M04-a.jsonl), [M04-b.jsonl](evidence/M04-b.jsonl), [M04-c.jsonl](evidence/M04-c.jsonl), [M04-d.jsonl](evidence/M04-d.jsonl), [M04-e.jsonl](evidence/M04-e.jsonl), [SQL](evidence/SQL-early-controls.txt).
+**Доказательства:** [M04-a.jsonl](evidence/current-build/M04-a.jsonl), [M04-b.jsonl](evidence/current-build/M04-b.jsonl), [M04-c.jsonl](evidence/current-build/M04-c.jsonl), [M04-d.jsonl](evidence/current-build/M04-d.jsonl), [M04-e.jsonl](evidence/current-build/M04-e.jsonl), [SQL](evidence/current-build/SQL-early-controls.txt).
 
 <a id="m05"></a>
 
@@ -92,7 +92,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS12 вариантов:9 структурных400,2 неизвестных404,1 недостаток422. После каждого отказа остатки неизменны; только OPENING. SQL0 переводов отказных пар.
 
-**Доказательства:** [M05-01.jsonl](evidence/M05-01.jsonl), [M05-02.jsonl](evidence/M05-02.jsonl), [M05-03.jsonl](evidence/M05-03.jsonl), [M05-04.jsonl](evidence/M05-04.jsonl), [M05-05.jsonl](evidence/M05-05.jsonl), [M05-06.jsonl](evidence/M05-06.jsonl), [M05-07.jsonl](evidence/M05-07.jsonl), [M05-08.jsonl](evidence/M05-08.jsonl), [M05-09.jsonl](evidence/M05-09.jsonl), [M05-10.jsonl](evidence/M05-10.jsonl), [M05-11.jsonl](evidence/M05-11.jsonl), [M05-12.jsonl](evidence/M05-12.jsonl), [M05-data.jsonl](evidence/M05-data.jsonl), [SQL](evidence/SQL-early-controls.txt).
+**Доказательства:** [M05-01.jsonl](evidence/current-build/M05-01.jsonl), [M05-02.jsonl](evidence/current-build/M05-02.jsonl), [M05-03.jsonl](evidence/current-build/M05-03.jsonl), [M05-04.jsonl](evidence/current-build/M05-04.jsonl), [M05-05.jsonl](evidence/current-build/M05-05.jsonl), [M05-06.jsonl](evidence/current-build/M05-06.jsonl), [M05-07.jsonl](evidence/current-build/M05-07.jsonl), [M05-08.jsonl](evidence/current-build/M05-08.jsonl), [M05-09.jsonl](evidence/current-build/M05-09.jsonl), [M05-10.jsonl](evidence/current-build/M05-10.jsonl), [M05-11.jsonl](evidence/current-build/M05-11.jsonl), [M05-12.jsonl](evidence/current-build/M05-12.jsonl), [M05-data.jsonl](evidence/current-build/M05-data.jsonl), [SQL](evidence/current-build/SQL-early-controls.txt).
 
 <a id="m06"></a>
 
@@ -110,7 +110,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS18 вариантов OWN+OTHER,3×3. По2 разрешённых202→COMPLETED на тип; остальные14 запросов422. Каждая пара после двух успехов999800/200, все отказы сохранили суммы. SQL2 transfers на каждого отправителя. Статусы восстановлены ACTIVE.
 
-**Доказательства:** [M06-OTHER-AA.jsonl](evidence/M06-OTHER-AA.jsonl), [M06-OTHER-AB.jsonl](evidence/M06-OTHER-AB.jsonl), [M06-OTHER-AC.jsonl](evidence/M06-OTHER-AC.jsonl), [M06-OTHER-BA.jsonl](evidence/M06-OTHER-BA.jsonl), [M06-OTHER-BB.jsonl](evidence/M06-OTHER-BB.jsonl), [M06-OTHER-BC.jsonl](evidence/M06-OTHER-BC.jsonl), [M06-OTHER-CA.jsonl](evidence/M06-OTHER-CA.jsonl), [M06-OTHER-CB.jsonl](evidence/M06-OTHER-CB.jsonl), [M06-OTHER-CC.jsonl](evidence/M06-OTHER-CC.jsonl), [M06-OWN-AA.jsonl](evidence/M06-OWN-AA.jsonl), [M06-OWN-AB.jsonl](evidence/M06-OWN-AB.jsonl), [M06-OWN-AC.jsonl](evidence/M06-OWN-AC.jsonl), [M06-OWN-BA.jsonl](evidence/M06-OWN-BA.jsonl), [M06-OWN-BB.jsonl](evidence/M06-OWN-BB.jsonl), [M06-OWN-BC.jsonl](evidence/M06-OWN-BC.jsonl), [M06-OWN-CA.jsonl](evidence/M06-OWN-CA.jsonl), [M06-OWN-CB.jsonl](evidence/M06-OWN-CB.jsonl), [M06-OWN-CC.jsonl](evidence/M06-OWN-CC.jsonl), [M06-cleanup.jsonl](evidence/M06-cleanup.jsonl), [M06-data.jsonl](evidence/M06-data.jsonl), [SQL](evidence/SQL-early-controls.txt).
+**Доказательства:** [M06-OTHER-AA.jsonl](evidence/current-build/M06-OTHER-AA.jsonl), [M06-OTHER-AB.jsonl](evidence/current-build/M06-OTHER-AB.jsonl), [M06-OTHER-AC.jsonl](evidence/current-build/M06-OTHER-AC.jsonl), [M06-OTHER-BA.jsonl](evidence/current-build/M06-OTHER-BA.jsonl), [M06-OTHER-BB.jsonl](evidence/current-build/M06-OTHER-BB.jsonl), [M06-OTHER-BC.jsonl](evidence/current-build/M06-OTHER-BC.jsonl), [M06-OTHER-CA.jsonl](evidence/current-build/M06-OTHER-CA.jsonl), [M06-OTHER-CB.jsonl](evidence/current-build/M06-OTHER-CB.jsonl), [M06-OTHER-CC.jsonl](evidence/current-build/M06-OTHER-CC.jsonl), [M06-OWN-AA.jsonl](evidence/current-build/M06-OWN-AA.jsonl), [M06-OWN-AB.jsonl](evidence/current-build/M06-OWN-AB.jsonl), [M06-OWN-AC.jsonl](evidence/current-build/M06-OWN-AC.jsonl), [M06-OWN-BA.jsonl](evidence/current-build/M06-OWN-BA.jsonl), [M06-OWN-BB.jsonl](evidence/current-build/M06-OWN-BB.jsonl), [M06-OWN-BC.jsonl](evidence/current-build/M06-OWN-BC.jsonl), [M06-OWN-CA.jsonl](evidence/current-build/M06-OWN-CA.jsonl), [M06-OWN-CB.jsonl](evidence/current-build/M06-OWN-CB.jsonl), [M06-OWN-CC.jsonl](evidence/current-build/M06-OWN-CC.jsonl), [M06-cleanup.jsonl](evidence/current-build/M06-cleanup.jsonl), [M06-data.jsonl](evidence/current-build/M06-data.jsonl), [SQL](evidence/current-build/SQL-early-controls.txt).
 
 <a id="m07"></a>
 
@@ -128,7 +128,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS. Самоперевод400 VALIDATION_ERROR, A1000000/B0, только OPENING, SQL0 переводов.
 
-**Доказательства:** [M07.jsonl](evidence/M07.jsonl), [SQL](evidence/SQL-early-controls.txt).
+**Доказательства:** [M07.jsonl](evidence/current-build/M07.jsonl), [SQL](evidence/current-build/SQL-early-controls.txt).
 
 <a id="m08"></a>
 
@@ -146,7 +146,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS3 вариантов. 149999,99:COMPLETED/комиссия1500/A748500,01/B249999,99/dailyUsed149999,99. 150000:COMPLETED/1500/A748500/B250000/dailyUsed150000. 150000,01:422, A900000/B100000/dailyUsed0. Подготовка предыдущим днём исключила F10. C01 и контроль прошли.
 
-**Доказательства:** [M08-a.jsonl](evidence/M08-a.jsonl), [M08-b.jsonl](evidence/M08-b.jsonl), [M08-c.jsonl](evidence/M08-c.jsonl), [M08.jsonl](evidence/M08.jsonl), [C01-M08.jsonl](evidence/C01-M08.jsonl).
+**Доказательства:** [M08-a.jsonl](evidence/current-build/M08-a.jsonl), [M08-b.jsonl](evidence/current-build/M08-b.jsonl), [M08-c.jsonl](evidence/current-build/M08-c.jsonl), [M08.jsonl](evidence/current-build/M08.jsonl), [C01-M08.jsonl](evidence/current-build/C01-M08.jsonl).
 
 <a id="m09"></a>
 
@@ -164,7 +164,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS. До полуночи dailyUsed100000; в00:01 МСК dailyUsed0 при monthUsed100000. Перевод60000 завершён, комиссия600, A839400/B160000. C01: реальные часы/оба RUNNING/новый контроль COMPLETED.
 
-**Доказательства:** [M09.jsonl](evidence/M09.jsonl), [C01-M09.jsonl](evidence/C01-M09.jsonl).
+**Доказательства:** [M09.jsonl](evidence/current-build/M09.jsonl), [C01-M09.jsonl](evidence/current-build/C01-M09.jsonl).
 
 <a id="m10"></a>
 
@@ -180,9 +180,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Глобальных изменений нет.
 
-**Фактически:** PASS на новой сборке: комиссия100,00, A889900,00/B110000,00; DEBIT COMMISSION100,00. T=38192922-4d20-4be7-9521-9ef41834eab1.
+**Фактически:** PASS. Комиссия100,00, A889900,00/B110000,00; DEBIT COMMISSION100,00. T=8eafd0ed-3cd5-4363-adc4-b53f3d7bcbcd.
 
-**Доказательства:** [Новые HTTP/SQL](evidence/after-defect-removal/summary.json). Предыдущее исполнение сохранено в M10/M16 JSONL корня evidence и относится к старому JAR.
+**Доказательства:** [HTTP/проводки](evidence/current-build/M10.jsonl), [повтор в другом порядке](evidence/current-build/R-M10.jsonl).
 
 <a id="m11"></a>
 
@@ -200,7 +200,7 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS. После100000:10→комиссия30/A899960/B100010;3456,78→34,57/A896508,65/B103456,78. Переход31.01→01.02:monthUsed0, перевод100 бесплатный, A899900/B100100. C01/контроль прошли.
 
-**Доказательства:** [M11-min.jsonl](evidence/M11-min.jsonl), [M11-month.jsonl](evidence/M11-month.jsonl), [M11-round.jsonl](evidence/M11-round.jsonl), [C01-M11.jsonl](evidence/C01-M11.jsonl).
+**Доказательства:** [M11-min.jsonl](evidence/current-build/M11-min.jsonl), [M11-month.jsonl](evidence/current-build/M11-month.jsonl), [M11-round.jsonl](evidence/current-build/M11-round.jsonl), [C01-M11.jsonl](evidence/current-build/C01-M11.jsonl).
 
 <a id="m12"></a>
 
@@ -216,9 +216,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Глобальных изменений нет.
 
-**Фактически:** PASS. Первый202, повтор100,00→200 с тем же T=5bcab82e-a472-4e99-832a-c9d94f20d0c3. A999900/B100, SQL1 строка по ключу, debit100 и credit100.
+**Фактически:** PASS. Первый202, повтор100,00→200 с тем же T=386cc360-d6fa-436b-b5b8-ea69728f29c9. A999900/B100, SQL1 строка по ключу, debit100 и credit100.
 
-**Доказательства:** [M12.jsonl](evidence/M12.jsonl), [SQL](evidence/SQL-early-controls.txt).
+**Доказательства:** [M12.jsonl](evidence/current-build/M12.jsonl), [SQL](evidence/current-build/M12-sql.txt).
 
 <a id="m13"></a>
 
@@ -234,9 +234,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** C01.
 
-**Фактически:** PASS. Другое тело/клиент с действующим ключом409 без движения. После24ч новый T=abe3ab57-bdeb-4612-83bc-0bf1f05aa85d; старый f8b709fe-1942-4ba2-a785-2a2280648e44 сохранён. A999800/B200. C01/контроль прошли.
+**Фактически:** PASS. Другое тело/клиент с действующим ключом409 без движения. После24ч новый T=a6ec810b-61b2-46c1-b284-098ccea847ca; старый 53aa884a-3048-4c85-8ea8-4ac701162409 сохранён. A999800/B200, чужая пара1000000/0. C01/контроль прошли.
 
-**Доказательства:** [M13.jsonl](evidence/M13.jsonl), [C01-M13.jsonl](evidence/C01-M13.jsonl).
+**Доказательства:** [M13.jsonl](evidence/current-build/M13.jsonl), [C01-M13.jsonl](evidence/current-build/C01-M13.jsonl).
 
 <a id="m14"></a>
 
@@ -252,9 +252,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** Удалить собственную очередь; рабочие очереди не трогать.
 
-**Фактически:** PASS. Очередь привязана до перевода. TransferCreated:T105c2fb7-b75c-4485-98df-da85cae01300/eventId62b3aef3-ab25-4553-90e2-29f5418d4255, верные счета/OTHER/RUB/100,01/0/100,01/ISO-время. SQL debit/credit100,01. HTTP-флаг просмотра тела восстановлен false, очередь удалена, GET404.
+**Фактически:** PASS. Очередь привязана до перевода. TransferCreated:T=4d4239bf-9266-4c89-839d-1996480f760d, eventId=c3c4e446-e0c5-4967-823b-40bd2a7e9c18; верные счета/OTHER/RUB/100,01/0/100,01/ISO-время. SQL debit/credit100,01. HTTP-флаг просмотра тела восстановлен false, очередь удалена, GET404.
 
-**Доказательства:** [M14-broker.jsonl](evidence/M14-broker.jsonl), [M14-postings.txt](evidence/M14-postings.txt), [M14.jsonl](evidence/M14.jsonl).
+**Доказательства:** [M14-broker.jsonl](evidence/current-build/M14-broker.jsonl), [M14-postings.txt](evidence/current-build/M14-postings.txt), [M14.jsonl](evidence/current-build/M14.jsonl).
 
 <a id="m15"></a>
 
@@ -270,9 +270,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** C01; отдельный исход при timeout.
 
-**Фактически:** PASS. T9f3c012d-44b6-46c0-9f16-9b9ccd0959d3 на паузе PROCESSING/A999900/B0/только DEBIT100/очередь1; после resume COMPLETED/A999900/B100/один CREDIT100. C01/контроль прошли.
+**Фактически:** PASS. T=d211ff29-ee3f-46af-b350-2448cbbfe523 на паузе PROCESSING/A999900/B0/только DEBIT100; после resume COMPLETED/A999900/B100/один CREDIT100. C01/контроль прошли.
 
-**Доказательства:** [M15-paused-metrics.txt](evidence/M15-paused-metrics.txt), [M15.jsonl](evidence/M15.jsonl), [C01-M15.jsonl](evidence/C01-M15.jsonl).
+**Доказательства:** [M15.jsonl](evidence/current-build/M15.jsonl), [C01-M15.jsonl](evidence/current-build/C01-M15.jsonl).
 
 <a id="m16"></a>
 
@@ -288,9 +288,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** C01; не заменять подготовку на пересечение порога.
 
-**Фактически:** PASS на новой сборке: FAILED/RECIPIENT_ACCOUNT_CLOSED, полный REFUND40400,00; A900000,00 до/после, B100000,00. T=0223fd16-58c0-49b2-8164-806a83a1bb1e. Потребители RUNNING, реальные часы, health UP.
+**Фактически:** PASS. T=7b2c2cb9-4311-47ef-920b-5c1d19afccda: FAILED/RECIPIENT_ACCOUNT_CLOSED, полный REFUND40400,00; A900000,00 до/после, B100000,00. dailyUsed/monthUsed140000 на паузе,100000 после отказа. SQL одна REFUND40400. C01/контроль прошли.
 
-**Доказательства:** [Новые HTTP/SQL](evidence/after-defect-removal/summary.json). Предыдущее исполнение сохранено в M10/M16 JSONL корня evidence и относится к старому JAR.
+**Доказательства:** [HTTP](evidence/current-build/M16.jsonl), [REFUND](evidence/current-build/M16-refund.txt), [очистка](evidence/current-build/C01-M16.jsonl).
 
 <a id="m17"></a>
 
@@ -306,9 +306,9 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Очистка:** C01 после части FAILED.
 
-**Фактически:** PASS. Успех T34bcef00-a144-40c3-97a6-4eea75c4b5ec: текст1500,50/комиссия0 отправителю, получателю пусто. Отказ T27601dae-5e3f-48aa-bb1e-cd556dc84e77: не выполнен/возвращено1500,50/A1000000/B0. C01/контроль прошли.
+**Фактически:** PASS. Успех T=3fe379f8-5676-4bac-b64a-7b17d6217ab7: текст1500,50/комиссия0 отправителю, получателю пусто. Отказ T=5239a24a-d90f-4024-8429-1a9d1918d68c: не выполнен/возвращено1500,50/A1000000/B0. C01/контроль прошли.
 
-**Доказательства:** [M17-failed.jsonl](evidence/M17-failed.jsonl), [M17-success.jsonl](evidence/M17-success.jsonl), [C01-M17.jsonl](evidence/C01-M17.jsonl).
+**Доказательства:** [M17-failed.jsonl](evidence/current-build/M17-failed.jsonl), [M17-success.jsonl](evidence/current-build/M17-success.jsonl), [C01-M17.jsonl](evidence/current-build/C01-M17.jsonl).
 
 <a id="m18"></a>
 
@@ -326,4 +326,4 @@ M10/M16 адресно перепроверены после исправлен�
 
 **Фактически:** PASS. Пустые даты2051-07-10/11 подтверждены. До resume400 API/SQL:D=1/100/0,D+1=1/200/0; FAILED300/PROCESSING400 исключены,200 учтён по completedAt. После завершения400:D+1=2/600/0, SQL позднего среза совпал. C01/контроль прошли.
 
-**Доказательства:** [M18-before-cleanup-sql.txt](evidence/M18-before-cleanup-sql.txt), [M18.jsonl](evidence/M18.jsonl), [C01-M18.jsonl](evidence/C01-M18.jsonl).
+**Доказательства:** [M18-before-cleanup-sql.txt](evidence/current-build/M18-before-cleanup-sql.txt), [M18.jsonl](evidence/current-build/M18.jsonl), [C01-M18.jsonl](evidence/current-build/C01-M18.jsonl).

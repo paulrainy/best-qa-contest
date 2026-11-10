@@ -1,0 +1,8 @@
+SELECT a.account_number,a.balance,COALESCE(SUM(CASE WHEN p.direction='CREDIT' THEN p.amount ELSE -p.amount END),0) AS BY_POSTINGS
+FROM accounts a
+LEFT JOIN postings p ON p.account_number=a.account_number
+WHERE a.account_number BETWEEN '40817810000000020061' AND '40817810000000020143'
+GROUP BY a.account_number,a.balance
+HAVING a.balance<>COALESCE(SUM(CASE WHEN p.direction='CREDIT' THEN p.amount ELSE -p.amount END),0);
+ACCOUNT_NUMBER | BALANCE | BY_POSTINGS
+(0 rows, 2 ms)

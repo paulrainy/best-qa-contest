@@ -1,0 +1,8 @@
+SELECT t.transfer_id,t.amount,COUNT(p.posting_id) AS CREDIT_COUNT,COALESCE(SUM(p.amount),0) AS CREDITED
+FROM transfers t
+LEFT JOIN postings p ON p.transfer_id=t.transfer_id AND p.account_number=t.to_account AND p.direction='CREDIT' AND p.posting_type='AMOUNT'
+WHERE t.status='COMPLETED' AND t.from_account BETWEEN '40817810000000020061' AND '40817810000000020143'
+GROUP BY t.transfer_id,t.amount
+HAVING COUNT(p.posting_id)<>1 OR COALESCE(SUM(p.amount),0)<>t.amount;
+TRANSFER_ID | AMOUNT | CREDIT_COUNT | CREDITED
+(0 rows, 7 ms)

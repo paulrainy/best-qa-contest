@@ -1,0 +1,6 @@
+SELECT direction,posting_type,amount FROM postings WHERE transfer_id='7b2c2cb9-4311-47ef-920b-5c1d19afccda' ORDER BY posting_id;
+DIRECTION | POSTING_TYPE | AMOUNT
+DEBIT     | AMOUNT       | 40000.00
+DEBIT     | COMMISSION   | 400.00
+CREDIT    | REFUND       | 40400.00
+(3 rows, 2 ms)

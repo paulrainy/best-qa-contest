@@ -1,0 +1,6 @@
+WITH t(id,to_account,amount,status) AS (VALUES('short','B',100.00,'COMPLETED'),('double','B',100.00,'COMPLETED'),('missing','B',100.00,'COMPLETED')), p(posting_id,transfer_id,account_number,direction,posting_type,amount) AS (VALUES(1,'short','B','CREDIT','AMOUNT',99.00),(2,'double','B','CREDIT','AMOUNT',50.00),(3,'double','B','CREDIT','AMOUNT',50.00)) SELECT t.id,t.amount,COUNT(p.posting_id) AS CREDIT_COUNT,COALESCE(SUM(p.amount),0) AS CREDITED FROM t LEFT JOIN p ON p.transfer_id=t.id AND p.account_number=t.to_account AND p.direction='CREDIT' AND p.posting_type='AMOUNT' WHERE t.status='COMPLETED' GROUP BY t.id,t.amount HAVING COUNT(p.posting_id)<>1 OR COALESCE(SUM(p.amount),0)<>t.amount;
+ID      | AMOUNT | CREDIT_COUNT | CREDITED
+double  | 100.00 | 2            | 100.00
+missing | 100.00 | 0            | 0
+short   | 100.00 | 1            | 99.00
+(3 rows, 3 ms)

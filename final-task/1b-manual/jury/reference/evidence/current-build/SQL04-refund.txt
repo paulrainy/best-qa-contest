@@ -1,0 +1,8 @@
+SELECT t.transfer_id,t.amount,t.commission,t.amount+t.commission AS EXPECTED_REFUND,COALESCE(SUM(p.amount),0) AS ACTUAL_REFUND
+FROM transfers t
+LEFT JOIN postings p ON p.transfer_id=t.transfer_id AND p.account_number=t.from_account AND p.direction='CREDIT' AND p.posting_type='REFUND'
+WHERE t.status='FAILED' AND t.from_account BETWEEN '40817810000000020061' AND '40817810000000020143'
+GROUP BY t.transfer_id,t.amount,t.commission
+HAVING COALESCE(SUM(p.amount),0)<>t.amount+t.commission;
+TRANSFER_ID | AMOUNT | COMMISSION | EXPECTED_REFUND | ACTUAL_REFUND
+(0 rows, 4 ms)

@@ -1,0 +1,8 @@
+SELECT t.transfer_id,t.amount+t.commission AS EXPECTED_DEBIT,COALESCE(SUM(p.amount),0) AS ACTUAL_DEBIT
+FROM transfers t
+LEFT JOIN postings p ON p.transfer_id=t.transfer_id AND p.account_number=t.from_account AND p.direction='DEBIT'
+WHERE t.from_account BETWEEN '40817810000000020061' AND '40817810000000020143'
+GROUP BY t.transfer_id,t.amount,t.commission
+HAVING COALESCE(SUM(p.amount),0)<>t.amount+t.commission;
+TRANSFER_ID | EXPECTED_DEBIT | ACTUAL_DEBIT
+(0 rows, 5 ms)

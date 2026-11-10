@@ -1,0 +1,4 @@
+WITH a(n,balance) AS (VALUES('control',101.00)), p(n,direction,amount) AS (VALUES('control','CREDIT',100.00)) SELECT a.n,a.balance,COALESCE(SUM(CASE WHEN p.direction='CREDIT' THEN p.amount ELSE -p.amount END),0) AS BY_POSTINGS FROM a LEFT JOIN p ON p.n=a.n GROUP BY a.n,a.balance HAVING a.balance<>COALESCE(SUM(CASE WHEN p.direction='CREDIT' THEN p.amount ELSE -p.amount END),0);
+N       | BALANCE | BY_POSTINGS
+control | 101.00  | 100.00
+(1 row, 2 ms)

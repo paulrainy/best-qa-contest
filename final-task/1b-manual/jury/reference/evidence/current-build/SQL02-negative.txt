@@ -1,0 +1,5 @@
+SELECT account_number,balance
+FROM accounts
+WHERE account_number BETWEEN '40817810000000020061' AND '40817810000000020143' AND balance<0;
+ACCOUNT_NUMBER | BALANCE
+(0 rows, 2 ms)

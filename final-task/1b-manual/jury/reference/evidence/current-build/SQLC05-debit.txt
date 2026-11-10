@@ -1,0 +1,5 @@
+WITH t(id,from_account,amount,commission) AS (VALUES('short','A',100.00,30.00),('missing','A',100.00,0.00)), p(transfer_id,account_number,direction,amount) AS (VALUES('short','A','DEBIT',100.00)) SELECT t.id,t.amount+t.commission AS EXPECTED_DEBIT,COALESCE(SUM(p.amount),0) AS ACTUAL_DEBIT FROM t LEFT JOIN p ON p.transfer_id=t.id AND p.account_number=t.from_account AND p.direction='DEBIT' GROUP BY t.id,t.amount,t.commission HAVING COALESCE(SUM(p.amount),0)<>t.amount+t.commission;
+ID      | EXPECTED_DEBIT | ACTUAL_DEBIT
+missing | 100.00         | 0
+short   | 130.00         | 100.00
+(2 rows, 2 ms)

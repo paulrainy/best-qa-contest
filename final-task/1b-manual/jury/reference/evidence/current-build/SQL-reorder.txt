@@ -1,0 +1,14 @@
+SELECT idempotency_key,COUNT(*) AS N FROM transfers WHERE idempotency_key LIKE 'current-r%' GROUP BY idempotency_key ORDER BY idempotency_key; SELECT direction,posting_type,amount FROM postings WHERE transfer_id='b9e6c041-e846-4ef9-b834-079547334e5f' ORDER BY posting_id;
+IDEMPOTENCY_KEY   | N
+current-r02       | 1
+current-r03       | 1
+current-r04       | 1
+current-r06-other | 1
+current-r10       | 1
+current-r10-pre   | 1
+current-r12       | 1
+(7 rows, 3 ms)
+DIRECTION | POSTING_TYPE | AMOUNT
+DEBIT     | AMOUNT       | 100.00
+CREDIT    | AMOUNT       | 100.00
+(2 rows, 0 ms)

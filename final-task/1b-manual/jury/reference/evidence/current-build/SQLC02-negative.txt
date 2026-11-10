@@ -1,0 +1,4 @@
+WITH a(n,balance) AS (VALUES('negative',-1.00),('zero',0.00)) SELECT n,balance FROM a WHERE balance<0;
+N        | BALANCE
+negative | -1.00
+(1 row, 2 ms)

@@ -1,0 +1,4 @@
+SELECT COUNT(*) AS HISTORY FROM transfers;
+HISTORY
+30000
+(1 row, 2 ms)
