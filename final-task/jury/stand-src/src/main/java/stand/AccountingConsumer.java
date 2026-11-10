@@ -8,7 +8,6 @@ import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.time.Duration;
@@ -61,19 +60,23 @@ final class AccountingConsumer extends PausableConsumer {
         }
 
         UUID transferId = UUID.fromString(event.get("transferId").asString());
+        TransferService.pause(25); // Известное ограничение Н1: один последовательный потребитель.
         try (Connection c = db.connection()) {
+            c.setAutoCommit(false);
+            try (PreparedStatement ps = c.prepareStatement("SELECT status FROM transfers WHERE transfer_id = ? FOR UPDATE")) {
+                ps.setObject(1, transferId);
+                try (var rs = ps.executeQuery()) {
+                    if (rs.next() && !"PROCESSING".equals(rs.getString(1))) {
+                        c.commit(); ch.basicAck(tag, false); return;
+                    }
+                }
+            }
             ObjectNode transfer = TransferService.findById(c, transferId);
             if (transfer == null) {
-                // ДЕФЕКТ Б1: сообщение о неизвестном переводе возвращается в очередь бесконечно,
-                // в DLQ не уходит и блокирует обработку остальных
-                TransferService.pause(50);
-                ch.basicNack(tag, false, true);
+                c.rollback();
+                retryOrDlq(ch, tag, body, "Неизвестный перевод " + transferId);
                 return;
             }
-            // ДЕФЕКТ А2: нет проверки, что перевод ещё в статусе PROCESSING, — повторная доставка
-            // события зачисляет деньги второй раз
-
-            TransferService.pause(25); // вызов АБС
             Instant now = clock.now();
             OffsetDateTime at = StandClock.msk(now);
             String to = transfer.get("toAccount").asString();
@@ -93,7 +96,7 @@ final class AccountingConsumer extends PausableConsumer {
             out.put("occurredAt", at.toString());
 
             if (dst == null || "CLOSED".equals(dst.status())) {
-                // ДЕФЕКТ Р2: возвращается только сумма перевода, комиссия остаётся списанной
+                // Известное отклонение F16: возвращается только сумма перевода, комиссия остаётся списанной
                 BigDecimal refund = amount;
                 credit(c, from, refund);
                 TransferService.posting(c, transferId, from, "CREDIT", "REFUND", refund, at);
@@ -101,18 +104,16 @@ final class AccountingConsumer extends PausableConsumer {
                 out.put("eventType", "TransferFailed");
                 out.put("reason", "RECIPIENT_ACCOUNT_CLOSED");
                 out.put("refundedAmount", refund);
+                c.commit();
                 mq.publish("transfer.failed", out);
                 metrics.transfer("failed");
             } else {
-                // ДЕФЕКТ А3: сумма зачисления считается в double из полей события и обрезается до копеек —
-                // для части сумм получатель недополучает 0,01 ₽
-                double gross = event.get("totalDebited").asDouble();
-                double fee = event.get("commission").asDouble();
-                BigDecimal credited = BigDecimal.valueOf(gross - fee).setScale(2, RoundingMode.DOWN);
+                BigDecimal credited = amount;
                 credit(c, to, credited);
                 TransferService.posting(c, transferId, to, "CREDIT", "AMOUNT", credited, at);
                 finish(c, transferId, "COMPLETED", null, at);
                 out.put("eventType", "TransferCompleted");
+                c.commit();
                 mq.publish("transfer.completed", out);
                 metrics.transfer("completed");
             }

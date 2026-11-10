@@ -12,12 +12,11 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 /**
- * Приём переводов. Заложенные дефекты помечены комментарием «ДЕФЕКТ» с номером из ключа жюри.
+ * Приём переводов. Известное отклонение F10 помечено в расчёте комиссии.
  * Исходники участникам не передаются.
  */
 final class TransferService {
@@ -54,18 +53,7 @@ final class TransferService {
     record Usage(LocalDate day, BigDecimal dailyUsed, BigDecimal monthUsed) {
     }
 
-    Result create(String idempotencyKey, JsonNode body) throws Exception {
-        // ДЕФЕКТ Н3: при перегрузке ответ 200 со статусом REJECTED вместо 503 + Retry-After
-        if (mq.accountingDepth() > BUSY_THRESHOLD) {
-            metrics.transfer("rejected_busy");
-            ObjectNode n = Messaging.JSON.createObjectNode();
-            n.putNull("transferId");
-            n.put("status", "REJECTED");
-            n.put("reason", "SYSTEM_BUSY");
-            n.put("message", "Сервис временно перегружен, повторите попытку позже");
-            return new Result(200, n);
-        }
-
+    synchronized Result create(String idempotencyKey, JsonNode body) throws Exception {
         if (idempotencyKey == null || idempotencyKey.isBlank()) {
             throw new ApiError(400, "VALIDATION_ERROR", "Не передан заголовок Idempotency-Key");
         }
@@ -80,10 +68,23 @@ final class TransferService {
         BigDecimal amount = amount(body);
 
         try (Connection c = db.connection()) {
-            ObjectNode existing = findByKey(c, idempotencyKey);
+            ObjectNode existing = findByKey(c, idempotencyKey, clock.now());
             if (existing != null) {
+                if (!existing.get("fromAccount").asString().equals(from)
+                        || !existing.get("toAccount").asString().equals(to)
+                        || existing.get("amount").decimalValue().compareTo(amount) != 0) {
+                    throw new ApiError(409, "IDEMPOTENCY_CONFLICT", "Ключ уже использован для другого запроса");
+                }
                 return new Result(200, existing);
             }
+            if (mq.accountingDepth() > BUSY_THRESHOLD) {
+                metrics.transfer("rejected_busy");
+                throw new ApiError(503, "SERVICE_UNAVAILABLE", "Сервис временно перегружен");
+            }
+            if (from.equals(to)) {
+                throw new ApiError(400, "VALIDATION_ERROR", "Счета списания и зачисления совпадают");
+            }
+            c.setAutoCommit(false);
 
             Account src = load(c, from);
             Account dst = load(c, to);
@@ -95,20 +96,14 @@ final class TransferService {
                 throw new ApiError(422, "ACCOUNT_CLOSED", "Счёт " + ("CLOSED".equals(src.status()) ? from : to)
                         + " закрыт");
             }
-            if ("BLOCKED".equals(src.status()) && !own) {
+            if ("BLOCKED".equals(src.status())) {
                 throw new ApiError(422, "ACCOUNT_BLOCKED", "Счёт списания " + from + " заблокирован");
             }
-            // ДЕФЕКТ О4: зачисление на заблокированный счёт по ТЗ разрешено, а стенд его запрещает
-            if ("BLOCKED".equals(dst.status())) {
-                throw new ApiError(422, "ACCOUNT_BLOCKED", "Счёт зачисления " + to + " заблокирован");
-            }
-
             Instant now = clock.now();
             BigDecimal commission = BigDecimal.ZERO.setScale(2);
             if (!own) {
                 Usage usage = usage(c, src.clientId(), now);
-                // ДЕФЕКТ О1: сумма, ровно равная остатку лимита, отклоняется (строгое «меньше»)
-                if (usage.dailyUsed().add(amount).compareTo(DAILY_LIMIT) >= 0) {
+                if (usage.dailyUsed().add(amount).compareTo(DAILY_LIMIT) > 0) {
                     throw new ApiError(422, "DAILY_LIMIT_EXCEEDED", "Превышен дневной лимит переводов другим "
                             + "клиентам: использовано " + usage.dailyUsed().toPlainString() + " из "
                             + DAILY_LIMIT.toPlainString());
@@ -117,9 +112,6 @@ final class TransferService {
             }
             BigDecimal total = amount.add(commission);
 
-            // ДЕФЕКТ А1: остаток прочитан до расчётов и не заблокирован; при параллельных переводах
-            // с одного счёта списания затирают друг друга (lost update) — можно уйти в минус.
-            pause(20);
             if (src.balance().compareTo(total) < 0) {
                 throw new ApiError(422, "INSUFFICIENT_FUNDS", "Недостаточно средств: доступно "
                         + src.balance().toPlainString() + ", требуется " + total.toPlainString());
@@ -140,16 +132,10 @@ final class TransferService {
                 ps.setBigDecimal(8, commission);
                 ps.setObject(9, createdAt);
                 ps.executeUpdate();
-            } catch (SQLException e) {
-                ObjectNode dup = findByKey(c, idempotencyKey);
-                if (dup != null) {
-                    return new Result(200, dup);
-                }
-                throw e;
             }
             try (PreparedStatement ps = c.prepareStatement(
-                    "UPDATE accounts SET balance = ? WHERE account_number = ?")) {
-                ps.setBigDecimal(1, src.balance().subtract(total));
+                    "UPDATE accounts SET balance = balance - ? WHERE account_number = ?")) {
+                ps.setBigDecimal(1, total);
                 ps.setString(2, from);
                 ps.executeUpdate();
             }
@@ -170,10 +156,12 @@ final class TransferService {
             event.put("totalDebited", total);
             event.put("currency", "RUB");
             event.put("occurredAt", createdAt.toString());
+            ObjectNode result = findById(c, id);
+            c.commit();
             mq.publish("transfer.created", event);
             metrics.transfer("created");
 
-            return new Result(202, findById(c, id));
+            return new Result(202, result);
         }
     }
 
@@ -184,44 +172,32 @@ final class TransferService {
             return BigDecimal.ZERO.setScale(2);
         }
         BigDecimal excess = amount.subtract(free);
-        // ДЕФЕКТ О2: если перевод пересекает бесплатный порог, комиссия берётся со всей суммы, а не с превышения
+        // Известное отклонение F10: если перевод пересекает бесплатный порог, комиссия берётся со всей суммы, а не с превышения
         BigDecimal base = monthUsed.compareTo(MONTH_FREE) < 0 ? amount : excess;
-        // ДЕФЕКТ О3: отбрасывание копеек вместо математического округления
-        BigDecimal c = base.multiply(RATE).setScale(2, RoundingMode.DOWN);
+        BigDecimal c = base.multiply(RATE).setScale(2, RoundingMode.HALF_UP);
         return c.max(MIN_COMMISSION).min(MAX_COMMISSION);
     }
 
     /** Использованные лимиты клиента на момент now. */
     Usage usage(Connection c, String clientId, Instant now) throws SQLException {
-        // ДЕФЕКТ Р1: границы суток считаются по UTC, а не по московскому времени
-        LocalDate dayUtc = now.atOffset(ZoneOffset.UTC).toLocalDate();
-        Instant dayStart = dayUtc.atStartOfDay(ZoneOffset.UTC).toInstant();
-        Instant dayEnd = dayUtc.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant();
+        LocalDate dayMsk = StandClock.msk(now).toLocalDate();
+        Instant dayStart = dayMsk.atStartOfDay(StandClock.MSK).toInstant();
+        Instant dayEnd = dayMsk.plusDays(1).atStartOfDay(StandClock.MSK).toInstant();
         LocalDate monthMsk = StandClock.msk(now).toLocalDate().withDayOfMonth(1);
         Instant monthStart = monthMsk.atStartOfDay(StandClock.MSK).toInstant();
         Instant monthEnd = monthMsk.plusMonths(1).atStartOfDay(StandClock.MSK).toInstant();
 
-        BigDecimal day = BigDecimal.ZERO.setScale(2);
-        BigDecimal month = BigDecimal.ZERO.setScale(2);
-        // ДЕФЕКТ Н2: на каждый перевод читается вся таблица переводов и фильтруется в памяти —
-        // время ответа растёт с числом переводов в базе
-        for (Db.TransferRow t : db.allTransfers(c)) {
-            Instant at = t.createdAt().toInstant();
-            if (counts(t, clientId) && !at.isBefore(dayStart) && at.isBefore(dayEnd)) {
-                day = day.add(t.amount());
-            }
-        }
-        for (Db.TransferRow t : db.allTransfers(c)) {
-            Instant at = t.createdAt().toInstant();
-            if (counts(t, clientId) && !at.isBefore(monthStart) && at.isBefore(monthEnd)) {
-                month = month.add(t.amount());
-            }
-        }
-        return new Usage(StandClock.msk(now).toLocalDate(), day, month);
+        return new Usage(dayMsk, sumUsage(c, clientId, dayStart, dayEnd),
+                sumUsage(c, clientId, monthStart, monthEnd));
     }
 
-    private static boolean counts(Db.TransferRow t, String clientId) {
-        return t.clientId().equals(clientId) && "OTHER".equals(t.type()) && !"FAILED".equals(t.status());
+    private static BigDecimal sumUsage(Connection c, String clientId, Instant start, Instant end) throws SQLException {
+        try (PreparedStatement ps = c.prepareStatement("SELECT COALESCE(SUM(amount), 0) FROM transfers"
+                + " WHERE client_id = ? AND transfer_type = 'OTHER' AND status IN ('PROCESSING','COMPLETED')"
+                + " AND created_at >= ? AND created_at < ?")) {
+            ps.setString(1, clientId); ps.setObject(2, StandClock.msk(start)); ps.setObject(3, StandClock.msk(end));
+            try (ResultSet rs = ps.executeQuery()) { rs.next(); return rs.getBigDecimal(1).setScale(2); }
+        }
     }
 
     ObjectNode limits(String clientId) throws Exception {
@@ -297,10 +273,11 @@ final class TransferService {
         }
     }
 
-    private static ObjectNode findByKey(Connection c, String key) throws SQLException {
+    private static ObjectNode findByKey(Connection c, String key, Instant now) throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(
-                "SELECT transfer_id FROM transfers WHERE idempotency_key = ?")) {
+                "SELECT transfer_id FROM transfers WHERE idempotency_key = ? AND created_at > ? ORDER BY created_at DESC LIMIT 1")) {
             ps.setString(1, key);
+            ps.setObject(2, StandClock.msk(now.minus(java.time.Duration.ofHours(24))));
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? findById(c, rs.getObject(1, UUID.class)) : null;
             }

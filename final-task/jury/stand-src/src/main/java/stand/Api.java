@@ -88,6 +88,7 @@ final class Api {
             reply = route(ex, method, path, route);
         } catch (ApiError e) {
             reply = Reply.json(e.status, error(e.code, e.getMessage()));
+            if (e.status == 503) reply = new Reply(reply.status(), reply.contentType(), reply.body(), Map.of("Retry-After", "1"));
         } catch (tools.jackson.core.JacksonException e) {
             reply = Reply.json(400, error("VALIDATION_ERROR", "Некорректный JSON"));
         } catch (Exception e) {
@@ -395,11 +396,10 @@ final class Api {
         } catch (Exception e) {
             throw new ApiError(400, "VALIDATION_ERROR", "date в формате ГГГГ-ММ-ДД");
         }
-        // ДЕФЕКТ О5: в оборот попадают переводы во всех финальных статусах, включая FAILED
         String sql = """
                 SELECT COUNT(*), COALESCE(SUM(amount), 0), COALESCE(SUM(commission), 0)
                 FROM transfers
-                WHERE completed_at IS NOT NULL
+                WHERE status = 'COMPLETED' AND completed_at IS NOT NULL
                   AND CAST((completed_at AT TIME ZONE 'Europe/Moscow') AS DATE) = ?
                 """;
         try (Connection c = db.connection(); PreparedStatement ps = c.prepareStatement(sql)) {

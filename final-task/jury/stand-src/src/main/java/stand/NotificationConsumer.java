@@ -45,16 +45,23 @@ final class NotificationConsumer extends PausableConsumer {
             return;
         }
         try (Connection c = db.connection()) {
+            UUID transferId = uuidOrNull(e.path("transferId").asString(""));
+            try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM notifications WHERE transfer_id = ?")) {
+                ps.setObject(1, transferId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) { ch.basicAck(env.getDeliveryTag(), false); return; }
+                }
+            }
             String sender = clientOf(c, from);
-            String recipientName = nameOf(c, to);
             if (sender == null) {
                 mq.toDlq(body, Messaging.Q_NOTIFICATIONS, "Счёт отправителя не найден");
                 ch.basicAck(env.getDeliveryTag(), false);
                 return;
             }
-            // ДЕФЕКТ Р3: для TransferFailed используется шаблон успешного перевода
-            String text = "Перевод " + rub(amount) + " ₽ на счёт " + to + " получателю " + recipientName
-                    + " выполнен. Комиссия " + rub(commission) + " ₽.";
+            String text = "TransferFailed".equals(e.path("eventType").asString())
+                    ? "Перевод " + rub(amount) + " ₽ на счёт " + to + " не выполнен. Средства "
+                        + rub(amount.add(commission)) + " ₽ возвращены на счёт " + from + "."
+                    : "Перевод " + rub(amount) + " ₽ на счёт " + to + " выполнен. Комиссия " + rub(commission) + " ₽.";
             try (PreparedStatement ps = c.prepareStatement(
                     "INSERT INTO notifications(client_id, transfer_id, text, created_at) VALUES (?, ?, ?, ?)")) {
                 ps.setString(1, sender);
@@ -80,16 +87,6 @@ final class NotificationConsumer extends PausableConsumer {
             ps.setString(1, account);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next() ? rs.getString(1) : null;
-            }
-        }
-    }
-
-    private static String nameOf(Connection c, String account) throws Exception {
-        try (PreparedStatement ps = c.prepareStatement("SELECT cl.full_name FROM accounts a JOIN clients cl"
-                + " ON cl.client_id = a.client_id WHERE a.account_number = ?")) {
-            ps.setString(1, account);
-            try (ResultSet rs = ps.executeQuery()) {
-                return rs.next() ? rs.getString(1) : "";
             }
         }
     }

@@ -14,9 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HexFormat;
-import java.util.List;
 
 /** H2 в памяти. Стенд работает под администратором, участникам выдаётся пользователь только на чтение. */
 final class Db {
@@ -131,7 +129,8 @@ final class Db {
                       created_at      TIMESTAMP WITH TIME ZONE NOT NULL,
                       completed_at    TIMESTAMP WITH TIME ZONE
                     )""");
-            s.execute("CREATE UNIQUE INDEX transfers_idem ON transfers(idempotency_key)");
+            s.execute("CREATE INDEX transfers_idem ON transfers(idempotency_key, created_at)");
+            s.execute("CREATE INDEX transfers_usage ON transfers(client_id, transfer_type, created_at)");
             s.execute("""
                     CREATE TABLE postings (
                       posting_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -153,6 +152,7 @@ final class Db {
                       created_at      TIMESTAMP WITH TIME ZONE NOT NULL
                     )""");
             s.execute("CREATE INDEX notifications_client ON notifications(client_id)");
+            s.execute("CREATE UNIQUE INDEX notifications_transfer ON notifications(transfer_id)");
             s.execute("GRANT SELECT ON SCHEMA PUBLIC TO " + cfg.str("db.user").toUpperCase());
             seed(c);
         }
@@ -305,24 +305,6 @@ final class Db {
             }
         }
         return sb.toString();
-    }
-
-    /** Строки таблицы переводов — для отчётов и расчёта лимитов. */
-    record TransferRow(String clientId, String type, BigDecimal amount, String status, OffsetDateTime createdAt) {
-    }
-
-    List<TransferRow> allTransfers(Connection c) throws SQLException {
-        List<TransferRow> list = new ArrayList<>();
-        try (Statement s = c.createStatement(); ResultSet rs = s.executeQuery(
-                "SELECT client_id, transfer_type, amount, status, created_at, transfer_id, from_account, to_account,"
-                        + " idempotency_key FROM transfers")) {
-            while (rs.next()) {
-                list.add(new TransferRow(rs.getString(1), rs.getString(2), new BigDecimal(rs.getString(3)),
-                        rs.getString(4), OffsetDateTime.parse(rs.getString(5).replace(' ', 'T'),
-                        java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)));
-            }
-        }
-        return list;
     }
 
     long transferRows() {
