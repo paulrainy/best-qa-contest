@@ -1,0 +1,56 @@
+{
+  "java17-full": {
+    "tests": 61,
+    "failures": 2,
+    "errors": 0,
+    "skips": 0
+  },
+  "java17-control": {
+    "tests": 59,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "java21-full": {
+    "tests": 61,
+    "failures": 2,
+    "errors": 0,
+    "skips": 0
+  },
+  "java21-control": {
+    "tests": 59,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "mutation-failure": {
+    "tests": 1,
+    "failures": 1,
+    "errors": 0,
+    "skips": 0
+  },
+  "mutation-restored": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "original-after-mutation": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  },
+  "db-unavailable": {
+    "tests": 61,
+    "failures": 2,
+    "errors": 39,
+    "skips": 0
+  },
+  "healthy-after-db-control": {
+    "tests": 59,
+    "failures": 0,
+    "errors": 0,
+    "skips": 0
+  }
+}

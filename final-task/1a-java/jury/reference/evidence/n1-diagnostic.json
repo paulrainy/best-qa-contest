@@ -1,0 +1,14 @@
+{
+  "sent": 600,
+  "accepted": 600,
+  "http_503": 0,
+  "other_errors": 0,
+  "accepted_post_p95_ms": 5.184583947993815,
+  "within_2s_percent": 18.666666666666668,
+  "unfinished": 0,
+  "diagnostic_only": true,
+  "target_rps": 60.0,
+  "duration_s": 10.0,
+  "started_in_interval": 600,
+  "queue_after_arrivals": 303.0
+}

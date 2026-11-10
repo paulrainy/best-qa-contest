@@ -1,0 +1,33 @@
+Стенд «Переводы» запускается...
+  брокер запущен
+  БД запущена
+  подключение к брокеру установлено
+
+Стенд готов.
+  HTTP API:          http://localhost:18400/api/v1/health
+  Брокер (AMQP):     amqp://guest:guest@localhost:5672/
+  Консоль брокера:   http://localhost:15672/  (логин guest / guest)
+  БД (только чтение): jdbc:h2:tcp://localhost:19400/mem:stand  (логин qa / qa)
+  БД (протокол PostgreSQL): localhost:19402, база stand  (логин qa / qa)
+  Веб-консоль БД:    http://localhost:19401/
+  Метрики:           http://localhost:18400/metrics
+Остановить: Ctrl+C
+{"python": "3.11.14", "health": "UP", "AMQP": "publish/read", "PG": "SELECT only", "consoles": "H2+Qpid+Dojo", "history": 30000}
+{
+  "F10": {
+    "expected": "100.00",
+    "actual": "200.00",
+    "transferId": "d6e3c719-ffb3-4427-9ed4-2148acbb2b43"
+  },
+  "F16": {
+    "expected_balance": "900000.00",
+    "actual_balance": "899600.00",
+    "transferId": "e88252f2-d779-4bff-9089-29e423a3f114"
+  }
+}
+{
+  "F02": "COMPLETED, one debit/credit",
+  "F08": "150000 inclusive",
+  "F06": "BLOCKED accepts credit"
+}
+{"sent": 600, "accepted": 600, "http_503": 0, "other_errors": 0, "accepted_post_p95_ms": 5.184583947993815, "within_2s_percent": 18.666666666666668, "unfinished": 0, "diagnostic_only": true, "target_rps": 60.0, "duration_s": 10.0, "started_in_interval": 600, "queue_after_arrivals": 303.0}

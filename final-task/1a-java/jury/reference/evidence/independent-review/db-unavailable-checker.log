@@ -1,0 +1,39 @@
+reference.AsyncTest#processingOnPauseCompletesAfterResume: error/skip или несколько ошибок
+reference.EventsTest#createdEventAndPostingsMatchOwnTransfer: error/skip или несколько ошибок
+reference.IdempotencyTest#keyIsGlobalAcrossClients: error/skip или несколько ошибок
+reference.IdempotencyTest#expiredKeyCreatesNewOperation: error/skip или несколько ошибок
+reference.IdempotencyTest#sameBodyReturnsOriginalWithoutSecondDebit: error/skip или несколько ошибок
+reference.IdempotencyTest#differentBodyReturns409: error/skip или несколько ошибок
+reference.SupportTest#queueIsBoundBeforeActionAndDeletedOnClose: error/skip или несколько ошибок
+reference.TransferTest#insufficientFundsLeaveNoTransfer: error/skip или несколько ошибок
+reference.TransferTest#readinessAndReadOnlyConnections: error/skip или несколько ошибок
+reference.TransferTest#ownTransferCompletesWithExactBalances: error/skip или несколько ошибок
+reference.ValidationTest#amountBoundaries(String, int)[1]: error/skip или несколько ошибок
+reference.ValidationTest#amountBoundaries(String, int)[4]: error/skip или несколько ошибок
+reference.ValidationTest#amountBoundaries(String, int)[5]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[3]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[4]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[5]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[6]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[7]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[8]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[9]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[12]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[13]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[14]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[15]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[16]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[17]: error/skip или несколько ошибок
+reference.ValidationTest#accountStatusMatrix(boolean, String, String, boolean)[18]: error/skip или несколько ошибок
+reference.ValidationTest#selfTransferIsValidationError: error/skip или несколько ошибок
+reference.ValidationTest#invalidKeyIs400(boolean)[1]: error/skip или несколько ошибок
+reference.ValidationTest#invalidKeyIs400(boolean)[2]: error/skip или несколько ошибок
+reference.ValidationTest#unknownAccountIs404(boolean)[1]: error/skip или несколько ошибок
+reference.ValidationTest#unknownAccountIs404(boolean)[2]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[1]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[2]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[3]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[4]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[5]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[6]: error/skip или несколько ошибок
+reference.ValidationTest#invalidPayloadLeavesMoneyUntouched(String)[7]: error/skip или несколько ошибок

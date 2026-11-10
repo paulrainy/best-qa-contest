@@ -6,7 +6,7 @@
 
 | SHA-256 | Путь от корня репозитория |
 | --- | --- |
-| 5f66fab30fd97c1184eaf8bd42e41a85b96aeb45026b7a2b08d280f8b08ccdc4 | final-task/1a-java/participant/README.md |
+| 58f56dadd5ca3ef1e9bdc6065e9239ea013c79082f4d5a652921d34ddde7bc5b | final-task/1a-java/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1a-java/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1a-java/participant/stand/lib/amqp-client-5.37.0.jar |
 | 8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7 | final-task/1a-java/participant/stand/lib/bcpkix-jdk18on-1.86.jar |
@@ -59,7 +59,7 @@
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1a-java/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1a-java/participant/stand/stand.properties |
 | 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1a-java/participant/stand/transfer-stand.jar |
-| 9c6eb06e2387baac97f7c3babdaf83c5df7ac032bb98c901dc7073d72afa64c0 | final-task/1b-manual/participant/README.md |
+| dc96d55535d758f7d30fc26b3aa0c8cc6650be26f1370cc4b3a0f1e0fad7036a | final-task/1b-manual/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1b-manual/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1b-manual/participant/stand/lib/amqp-client-5.37.0.jar |
 | 8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7 | final-task/1b-manual/participant/stand/lib/bcpkix-jdk18on-1.86.jar |
@@ -112,7 +112,7 @@
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1b-manual/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1b-manual/participant/stand/stand.properties |
 | 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1b-manual/participant/stand/transfer-stand.jar |
-| 495c67ac578f00066b7ebdfc3e173fc807d1495e0dcaddd92114bf56254e80e5 | final-task/1c-load/participant/README.md |
+| ccfe255424e04f123f58a63eeb643b86be7153c158b837e053d1589c12e8f459 | final-task/1c-load/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1c-load/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1c-load/participant/stand/lib/amqp-client-5.37.0.jar |
 | 8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7 | final-task/1c-load/participant/stand/lib/bcpkix-jdk18on-1.86.jar |
@@ -165,7 +165,7 @@
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1c-load/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1c-load/participant/stand/stand.properties |
 | 73c7773c0c029702e781f3dfd3e625046e5e69866dd1def82f71c47511113ecf | final-task/1c-load/participant/stand/transfer-stand.jar |
-| c2e1fefdeaab94cb012e1853f4a6209d0615d48336feb2034c40a13b58ea2389 | final-task/1d-python/participant/README.md |
+| 9c636c4d993ffda5413915be1d0d6c5ee6a4866c248a0fd0e38cdc16770db432 | final-task/1d-python/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1d-python/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1d-python/participant/stand/lib/amqp-client-5.37.0.jar |
 | 8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7 | final-task/1d-python/participant/stand/lib/bcpkix-jdk18on-1.86.jar |

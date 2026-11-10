@@ -1,0 +1,30 @@
+[
+  {
+    "direction": "1a-java",
+    "archive_sha256": "586897db2761365dcbf44e94f23d5583eff59cbac02c46939f2230552d1a157d",
+    "file_count": 53,
+    "content_check": "passed",
+    "jury_sources_caches_runtime_data": "excluded"
+  },
+  {
+    "direction": "1b-manual",
+    "archive_sha256": "0c4222cc1a826bb9fdca348e819850212b1a8a30d90cc3fb73d11bd70166fc4c",
+    "file_count": 53,
+    "content_check": "passed",
+    "jury_sources_caches_runtime_data": "excluded"
+  },
+  {
+    "direction": "1c-load",
+    "archive_sha256": "654cd5c1e91ef2e5242d6b54c28b3c31638ab24e5846c2085e46dfc6564143a8",
+    "file_count": 53,
+    "content_check": "passed",
+    "jury_sources_caches_runtime_data": "excluded"
+  },
+  {
+    "direction": "1d-python",
+    "archive_sha256": "75f773710fb73ec508ac5040102bf0d9eb2b418bab929b8f83a33dd67e09818c",
+    "file_count": 53,
+    "content_check": "passed",
+    "jury_sources_caches_runtime_data": "excluded"
+  }
+]
