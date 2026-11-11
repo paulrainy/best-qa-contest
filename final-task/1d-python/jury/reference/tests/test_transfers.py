@@ -4,6 +4,7 @@ from support.amqp import Events
 from support.api import require
 from support.data import pair, unique_key
 from support.polling import wait_final
+from tests.checks import balances, completed, rejected
 
 
 def test_readiness_and_read_only_connections(api, db):
@@ -31,3 +32,18 @@ def test_own_transfer_completes_with_exact_balances(api, db, channel):
         (destination["accountNumber"], "CREDIT", "AMOUNT", Decimal("100.00")),
     }
     assert len(postings) == 2
+
+
+def test_other_transfer_within_free_threshold(api, db):
+    source, destination = pair(api, own=False)
+    final = completed(api, source, destination, "123.45")
+    assert final["transferType"] == "OTHER"
+    assert final["commission"] == Decimal("0.00")
+    balances(api, source, destination, "999876.55", "123.45")
+    assert len(db.postings(final["transferId"])) == 2
+
+
+def test_insufficient_funds_leave_no_transfer(api, db):
+    source, destination = pair(api, balance=Decimal("99.99"))
+    rejected(api.transfer(source["accountNumber"], destination["accountNumber"], Decimal("100.00"), unique_key()),
+             422, "INSUFFICIENT_FUNDS", api, db, source, destination)

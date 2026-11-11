@@ -4,12 +4,21 @@ from pathlib import Path
 import pytest
 
 from support.config import load_config
+from support.reporting import fresh_output
 
 
 def pytest_addoption(parser):
     parser.addoption("--stand-config", default=str(Path(__file__).parent / "config/stand.ini"))
     parser.addoption("--http-log", default=None, help="Новый файл JSONL запросов и ответов")
     parser.addoption("--order-seed", type=int, default=None, help="Перемешать полный набор без исключения тестов")
+
+
+def pytest_configure(config):
+    try:
+        fresh_output(config.getoption("xmlpath", default=None))
+        fresh_output(config.getoption("--http-log"))
+    except ValueError as exc:
+        raise pytest.UsageError(str(exc)) from exc
 
 
 def pytest_collection_modifyitems(config, items):
