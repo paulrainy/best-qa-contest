@@ -1,0 +1,2 @@
+$ uv run --locked --python 3.11 python ../../../jury/tools/check_reference_results.py python /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/duplicate
+tests.test_async#test_processing_on_pause_completes_after_resume: повторный результат

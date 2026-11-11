@@ -22,8 +22,9 @@ def test_threshold_crossing_charges_only_excess(global_stand):
 @pytest.mark.parametrize("amount,commission,source_balance,destination_balance", [
     ("10.00", "30.00", "899960.00", "100010.00"),
     ("3456.78", "34.57", "896508.65", "103456.78"),
+    ("3000.50", "30.01", "896969.49", "103000.50"),
     ("150000.00", "1500.00", "748500.00", "250000.00"),
-], ids=["minimum", "half-up", "maximum"])
+], ids=["minimum", "half-up", "half-up-tie", "maximum"])
 def test_minimum_half_up_and_maximum_after_threshold(global_stand, amount, commission,
                                                     source_balance, destination_balance):
     api = global_stand

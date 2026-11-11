@@ -1,0 +1,121 @@
+$ uv run --locked --python 3.11 pytest tests/test_transfers.py::test_readiness_and_read_only_connections --stand-config /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/bad-db.ini --junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/bad-db/results.xml
+============================= test session starts ==============================
+platform darwin -- Python 3.11.14, pytest-9.1.1, pluggy-1.7.0
+rootdir: /private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/jury/reference
+configfile: pyproject.toml
+collected 1 item
+
+tests/test_transfers.py E                                                [100%]
+
+==================================== ERRORS ====================================
+__________ ERROR at setup of test_readiness_and_read_only_connections __________
+
+self = <support.db.Db object at 0x10815f690>
+
+    def __enter__(self):
+        try:
+>           self.connection = self.connect(**self.config.database, sslmode="disable",
+                                           autocommit=True, prepare_threshold=None,
+                                           row_factory=dict_row)
+
+support/db.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+cls = <class 'psycopg.Connection'>
+conninfo = 'host=localhost port=60766 dbname=stand user=qa password=qa connect_timeout=3 sslmode=disable hostaddr=127.0.0.1'
+autocommit = True, prepare_threshold = None, context = None
+row_factory = <function dict_row at 0x1078d0ea0>, cursor_factory = None
+kwargs = {'host': 'localhost', 'port': 60766, 'dbname': 'stand', 'user': 'qa', ...}
+
+    @classmethod
+    def connect(
+        cls,
+        conninfo: str = "",
+        *,
+        autocommit: bool = False,
+        prepare_threshold: int | None = 5,
+        context: AdaptContext | None = None,
+        row_factory: RowFactory[Row] | None = None,
+        cursor_factory: type[Cursor[Row]] | None = None,
+        **kwargs: ConnParam,
+    ) -> Self:
+        """
+        Connect to a database server and return a new `Connection` instance.
+        """
+    
+        params = cls._get_connection_params(conninfo, **kwargs)
+        timeout = timeout_from_conninfo(params)
+        rv = None
+        attempts = conninfo_attempts(params)
+        conn_errors: list[tuple[e.Error, str]] = []
+        for attempt in attempts:
+            tdescr = (attempt.get("host"), attempt.get("port"), attempt.get("hostaddr"))
+            descr = "host: %r, port: %r, hostaddr: %r" % tdescr
+            logger.debug("connection attempt: %s", descr)
+            try:
+                conninfo = make_conninfo("", **attempt)
+                gen = cls._connect_gen(conninfo)
+                rv = waiting.wait_conn(gen, interval=_WAIT_INTERVAL, timeout=timeout)
+            except e._WaitTimeout:
+                tex = e.ConnectionTimeout("connection timeout expired")
+                logger.debug("connection failed: %s: %s", descr, str(tex))
+                conn_errors.append((tex, descr))
+            except e.Error as ex:
+                logger.debug("connection failed: %s: %s", descr, str(ex))
+                conn_errors.append((ex, descr))
+            except e._NO_TRACEBACK as ex:
+                raise ex.with_traceback(None)
+            else:
+                logger.debug("connection succeeded: %s", descr)
+                break
+    
+        if not rv:
+            last_ex = conn_errors[-1][0]
+            if len(conn_errors) == 1:
+                raise last_ex.with_traceback(None)
+    
+            # Create a new exception with the same type as the last one, containing
+            # all attempt errors while preserving backward compatibility.
+            lines = [str(last_ex)]
+            lines.append("Multiple connection attempts failed. All failures were:")
+            lines.extend((f"- {descr}: {error}" for error, descr in conn_errors))
+            new_ex = type(last_ex)("\n".join(lines), pgconn=last_ex.pgconn)
+>           raise new_ex.with_traceback(None)
+E           psycopg.OperationalError: connection failed: connection to server at "127.0.0.1", port 60766 failed: could not receive data from server: Connection refused
+E           Multiple connection attempts failed. All failures were:
+E           - host: 'localhost', port: 60766, hostaddr: '::1': connection failed: connection to server at "::1", port 60766 failed: could not receive data from server: Connection refused
+E           - host: 'localhost', port: 60766, hostaddr: '127.0.0.1': connection failed: connection to server at "127.0.0.1", port 60766 failed: could not receive data from server: Connection refused
+
+.venv/lib/python3.11/site-packages/psycopg/connection.py:134: OperationalError
+
+The above exception was the direct cause of the following exception:
+
+stand_config = StandConfig(http_url='http://localhost:18400', http_timeout_s=5.0, amqp={'host': 'localhost', 'port': 5672, 'virtual_h...database={'host': 'localhost', 'port': 60766, 'dbname': 'stand', 'user': 'qa', 'password': 'qa', 'connect_timeout': 3})
+
+    @pytest.fixture
+    def db(stand_config):
+>       with Db(stand_config) as connection:
+
+tests/conftest.py:17: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <support.db.Db object at 0x10815f690>
+
+    def __enter__(self):
+        try:
+            self.connection = self.connect(**self.config.database, sslmode="disable",
+                                           autocommit=True, prepare_threshold=None,
+                                           row_factory=dict_row)
+        except psycopg.Error as exc:
+            endpoint = self.config.database
+>           raise RuntimeError(f"БД недоступна {endpoint['host']}:{endpoint['port']}/{endpoint['dbname']}: {exc}") from exc
+E           RuntimeError: БД недоступна localhost:60766/stand: connection failed: connection to server at "127.0.0.1", port 60766 failed: could not receive data from server: Connection refused
+E           Multiple connection attempts failed. All failures were:
+E           - host: 'localhost', port: 60766, hostaddr: '::1': connection failed: connection to server at "::1", port 60766 failed: could not receive data from server: Connection refused
+E           - host: 'localhost', port: 60766, hostaddr: '127.0.0.1': connection failed: connection to server at "127.0.0.1", port 60766 failed: could not receive data from server: Connection refused
+
+support/db.py:20: RuntimeError
+- generated xml file: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/bad-db/results.xml -
+=========================== short test summary info ============================
+ERROR tests/test_transfers.py::test_readiness_and_read_only_connections - Run...
+=============================== 1 error in 0.02s ===============================

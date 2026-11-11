@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.091" timestamp="2026-11-11T13:56:50.085773+03:00" hostname="MBP-Paul.lan"><testcase classname="tests.test_commission" name="test_minimum_half_up_and_maximum_after_threshold[half-up-tie]" time="0.071"><failure message="AssertionError: assert Decimal('30.00') == Decimal('30.01')&#10; +  where Decimal('30.01') = Decimal('30.01')">global_stand = &lt;support.api.Api object at 0x108598c50&gt;, amount = '3000.50'
+commission = '30.01', source_balance = '896969.49'
+destination_balance = '103000.50'
+
+    @pytest.mark.parametrize("amount,commission,source_balance,destination_balance", [
+        ("10.00", "30.00", "899960.00", "100010.00"),
+        ("3456.78", "34.57", "896508.65", "103456.78"),
+        ("3000.50", "30.01", "896969.49", "103000.50"),
+        ("150000.00", "1500.00", "748500.00", "250000.00"),
+    ], ids=["minimum", "half-up", "half-up-tie", "maximum"])
+    def test_minimum_half_up_and_maximum_after_threshold(global_stand, amount, commission,
+                                                        source_balance, destination_balance):
+        api = global_stand
+        source, destination = pair(api, own=False)
+        exhaust_threshold(api, source, destination)
+        final = completed(api, source, destination, amount)
+&gt;       assert final["commission"] == Decimal(commission)
+E       AssertionError: assert Decimal('30.00') == Decimal('30.01')
+E        +  where Decimal('30.01') = Decimal('30.01')
+
+tests/test_commission.py:34: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,19 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.11.14, pytest-9.1.1, pluggy-1.7.0
+rootdir: /private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/jury/reference
+configfile: pyproject.toml
+collected 63 items
+
+tests/test_async.py ..                                                   [  3%]
+tests/test_commission.py ....                                            [  9%]
+tests/test_events.py .                                                   [ 11%]
+tests/test_idempotency.py ....                                           [ 17%]
+tests/test_limits.py ......                                              [ 26%]
+tests/test_notifications.py ...                                          [ 31%]
+tests/test_support.py ...                                                [ 36%]
+tests/test_transfers.py ....                                             [ 42%]
+tests/test_turnover.py .                                                 [ 44%]
+tests/test_validation.py ...................................             [100%]
+
+- generated xml file: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full/results.xml -
+============================== 63 passed in 1.47s ==============================

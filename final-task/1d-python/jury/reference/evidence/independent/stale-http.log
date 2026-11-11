@@ -1,0 +1,3 @@
+$ uv run --locked --python 3.11 pytest tests --http-log /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full-http.jsonl
+ERROR: Результат уже существует: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full-http.jsonl; выберите новый путь для прогона
+

@@ -1,0 +1,2 @@
+$ uv run --locked --python /Users/paul/.local/bin/python3.13 python /Users/paul/Documents/work/best-qa-contest/final-task/jury/tools/check_reference_results.py python /Users/paul/Documents/work/best-qa-contest/final-task/1d-python/jury/reference/evidence/final/java21/python313/full
+python: полный состав подтверждён; все проверки успешны, без ошибок и skip

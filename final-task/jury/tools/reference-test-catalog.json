@@ -68,6 +68,7 @@
     "tests": [
       "tests.test_async#test_failed_transfer_refunds_amount_and_commission",
       "tests.test_async#test_processing_on_pause_completes_after_resume",
+      "tests.test_commission#test_minimum_half_up_and_maximum_after_threshold[half-up-tie]",
       "tests.test_commission#test_minimum_half_up_and_maximum_after_threshold[half-up]",
       "tests.test_commission#test_minimum_half_up_and_maximum_after_threshold[maximum]",
       "tests.test_commission#test_minimum_half_up_and_maximum_after_threshold[minimum]",

@@ -1,0 +1,18 @@
+{
+  "date": "2026-11-11T13:53:26+0300",
+  "owned_pid": 21102,
+  "verified_cwd": "p21102\nfcwd\nn/private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/participant/stand\n",
+  "verified_command": "21102 /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/bin/java -jar transfer-stand.jar\n",
+  "signal": "SIGTERM",
+  "process_exited": true,
+  "ports_not_listening": {
+    "18400": true,
+    "5672": true,
+    "15672": true,
+    "19400": true,
+    "19401": true,
+    "19402": true
+  },
+  "main_head": "d47e46108a0dab6d33ef225965aa50fbd5424d76",
+  "main_status": ""
+}

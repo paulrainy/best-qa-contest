@@ -1,0 +1,4 @@
+$ uv run --locked --python 3.11 python -c import sys,platform;print(sys.version);print(sys.executable);print(platform.platform())
+3.11.14 (main, Feb 12 2026, 00:41:29) [Clang 21.1.4 ]
+/private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/jury/reference/.venv/bin/python3
+macOS-27.2-arm64-arm-64bit

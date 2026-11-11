@@ -1,0 +1,3 @@
+$ uv run --locked --python 3.11 pytest tests --junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full/results.xml
+ERROR: Результат уже существует: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full/results.xml; выберите новый путь для прогона
+

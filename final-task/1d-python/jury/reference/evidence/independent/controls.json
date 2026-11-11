@@ -1,0 +1,223 @@
+{
+  "python-version": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "-c",
+      "import sys,platform;print(sys.version);print(sys.executable);print(platform.platform())"
+    ],
+    "exit": 0,
+    "seconds": 0.032955169677734375
+  },
+  "uv-version": {
+    "command": [
+      "uv",
+      "--version"
+    ],
+    "exit": 0,
+    "seconds": 0.006776094436645508
+  },
+  "java-version": {
+    "command": [
+      "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home/bin/java",
+      "-version"
+    ],
+    "exit": 0,
+    "seconds": 0.020627260208129883
+  },
+  "bad-db": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "pytest",
+      "tests/test_transfers.py::test_readiness_and_read_only_connections",
+      "--stand-config",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/bad-db.ini",
+      "--junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/bad-db/results.xml"
+    ],
+    "exit": 1,
+    "seconds": 0.19527888298034668
+  },
+  "stale-xml": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "pytest",
+      "tests",
+      "--junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full/results.xml"
+    ],
+    "exit": 4,
+    "seconds": 0.13931488990783691
+  },
+  "stale-http": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "pytest",
+      "tests",
+      "--http-log",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/full-http.jsonl"
+    ],
+    "exit": 4,
+    "seconds": 0.13762474060058594
+  },
+  "checker-missing": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/missing"
+    ],
+    "exit": 1,
+    "seconds": 0.029562950134277344
+  },
+  "checker-failure": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/failure"
+    ],
+    "exit": 1,
+    "seconds": 0.028909921646118164
+  },
+  "checker-error": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/error"
+    ],
+    "exit": 1,
+    "seconds": 0.033151865005493164
+  },
+  "checker-skipped": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/skipped"
+    ],
+    "exit": 1,
+    "seconds": 0.028883934020996094
+  },
+  "checker-duplicate": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/duplicate"
+    ],
+    "exit": 1,
+    "seconds": 0.028484106063842773
+  },
+  "checker-empty": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/synthetic-xml-controls/empty"
+    ],
+    "exit": 1,
+    "seconds": 0.029163837432861328
+  },
+  "default_config_unchanged": "8ea5de33cf442108437ca9499758f545a3d6749c76b3551a4005122b5e9b341b",
+  "before_recovery_state": {
+    "clock": {
+      "now": "2026-11-11T13:51:09.260985+03:00",
+      "shifted": false
+    },
+    "consumers": {
+      "accounting": "RUNNING",
+      "notifications": "RUNNING"
+    }
+  },
+  "recovery": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "pytest",
+      "tests",
+      "--junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery/results.xml",
+      "--http-log",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery-http.jsonl",
+      "--order-seed",
+      "20261111"
+    ],
+    "exit": 0,
+    "seconds": 1.07228684425354
+  },
+  "recovery-check": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--python",
+      "3.11",
+      "python",
+      "../../../jury/tools/check_reference_results.py",
+      "python",
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery"
+    ],
+    "exit": 0,
+    "seconds": 0.030952930450439453
+  },
+  "final_state": {
+    "clock": {
+      "now": "2026-11-11T13:51:10.366213+03:00",
+      "shifted": false
+    },
+    "consumers": {
+      "accounting": "RUNNING",
+      "notifications": "RUNNING"
+    }
+  },
+  "stale_xml_unchanged_sha256": "05319dfb67e85f3610278e60ec216f35b46ef136ad64394e710e1fa1e4ff6681",
+  "stale_http_unchanged_sha256": "515a02a852e51ffbb3dfda9b8dfcb3ae80119fba94e0798aeb96d3b9edfc0b46"
+}

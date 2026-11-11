@@ -1,0 +1,12 @@
+{
+  "date": "2026-11-11T13:51:08+0300",
+  "platform": "macOS-27.2-arm64-arm-64bit",
+  "clone": "/tmp/final-python-independent.73EapA/repo",
+  "local_origin": "/Users/paul/Documents/work/best-qa-contest",
+  "head": "d47e46108a0dab6d33ef225965aa50fbd5424d76",
+  "lock_sha256": "7fb0af5ec8fd629a9f563744135b9907ff67593ede2375210ba4acd2f4b3747c",
+  "jar_sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+  "python": "3.11.14 (main, Feb 12 2026, 00:41:29) [Clang 21.1.4 ]\n/private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/jury/reference/.venv/bin/python3\nmacOS-27.2-arm64-arm-64bit\n",
+  "uv": "uv 0.10.6 (a91bcf268 2026-02-24)\n",
+  "java": "openjdk version \"21.0.13.0.3\" 2026-10-24\nOpenJDK Runtime Environment Homebrew (build 21.0.13.0.3)\nOpenJDK 64-Bit Server VM Homebrew (build 21.0.13.0.3, mixed mode, sharing)\n"
+}

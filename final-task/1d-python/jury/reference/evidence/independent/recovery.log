@@ -1,0 +1,51 @@
+$ uv run --locked --python 3.11 pytest tests --junitxml=/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery/results.xml --http-log /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery-http.jsonl --order-seed 20261111
+============================= test session starts ==============================
+platform darwin -- Python 3.11.14, pytest-9.1.1, pluggy-1.7.0
+rootdir: /private/tmp/final-python-independent.73EapA/repo/final-task/1d-python/jury/reference
+configfile: pyproject.toml
+collected 63 items
+
+tests/test_validation.py ....                                            [  6%]
+tests/test_async.py ..                                                   [  9%]
+tests/test_validation.py ..                                              [ 12%]
+tests/test_notifications.py .                                            [ 14%]
+tests/test_validation.py .                                               [ 15%]
+tests/test_turnover.py .                                                 [ 17%]
+tests/test_transfers.py .                                                [ 19%]
+tests/test_validation.py .                                               [ 20%]
+tests/test_support.py .                                                  [ 22%]
+tests/test_validation.py ...                                             [ 26%]
+tests/test_events.py .                                                   [ 28%]
+tests/test_validation.py .                                               [ 30%]
+tests/test_transfers.py .                                                [ 31%]
+tests/test_limits.py ..                                                  [ 34%]
+tests/test_validation.py .                                               [ 36%]
+tests/test_idempotency.py .                                              [ 38%]
+tests/test_validation.py ..                                              [ 41%]
+tests/test_limits.py .                                                   [ 42%]
+tests/test_validation.py ..                                              [ 46%]
+tests/test_transfers.py .                                                [ 47%]
+tests/test_validation.py ...                                             [ 52%]
+tests/test_commission.py ..                                              [ 55%]
+tests/test_validation.py ..                                              [ 58%]
+tests/test_limits.py .                                                   [ 60%]
+tests/test_validation.py ....                                            [ 66%]
+tests/test_transfers.py .                                                [ 68%]
+tests/test_notifications.py .                                            [ 69%]
+tests/test_idempotency.py .                                              [ 71%]
+tests/test_limits.py .                                                   [ 73%]
+tests/test_validation.py ..                                              [ 76%]
+tests/test_commission.py ..                                              [ 79%]
+tests/test_validation.py .                                               [ 80%]
+tests/test_limits.py .                                                   [ 82%]
+tests/test_idempotency.py .                                              [ 84%]
+tests/test_validation.py ...                                             [ 88%]
+tests/test_support.py .                                                  [ 90%]
+tests/test_validation.py .                                               [ 92%]
+tests/test_idempotency.py .                                              [ 93%]
+tests/test_support.py .                                                  [ 95%]
+tests/test_notifications.py .                                            [ 96%]
+tests/test_validation.py ..                                              [100%]
+
+- generated xml file: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/independent/recovery/results.xml -
+============================== 63 passed in 0.92s ==============================

@@ -1,0 +1,30 @@
+[
+  {
+    "transfer_after_threshold": "10.00",
+    "unrounded_capped_fee": "30.00",
+    "HALF_UP": "30.00",
+    "HALF_EVEN": "30.00",
+    "in_current_F11_parameters": true
+  },
+  {
+    "transfer_after_threshold": "3456.78",
+    "unrounded_capped_fee": "34.5678",
+    "HALF_UP": "34.57",
+    "HALF_EVEN": "34.57",
+    "in_current_F11_parameters": true
+  },
+  {
+    "transfer_after_threshold": "150000.00",
+    "unrounded_capped_fee": "1500.00",
+    "HALF_UP": "1500.00",
+    "HALF_EVEN": "1500.00",
+    "in_current_F11_parameters": true
+  },
+  {
+    "transfer_after_threshold": "3000.50",
+    "unrounded_capped_fee": "30.0050",
+    "HALF_UP": "30.01",
+    "HALF_EVEN": "30.00",
+    "in_current_F11_parameters": false
+  }
+]

@@ -1,0 +1,3 @@
+$ uv sync --locked --python /opt/homebrew/bin/python3.12
+Resolved 17 packages in 2ms
+Audited 14 packages in 0.31ms

@@ -1,0 +1,610 @@
+{
+  "author_matrix": [
+    {
+      "java": "17",
+      "python": "311",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.11 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.11.14 (main, Feb 12 2026, 00:41:29) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python311/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "9bdf41b4bed52423e9b7fc88e7522197b11161828f432d1a1098e81c9bd1219b"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "131a72e42ba47256b159a7d98c069e20e8e098f68e75b417ed20b0eba8fc708a"
+      },
+      "sync_sha256": "edfa190e33d5259189e5979ca85333a21ca002109493aaf91704b9994080f3ac"
+    },
+    {
+      "java": "17",
+      "python": "312",
+      "version": "$ uv run --locked --python /opt/homebrew/bin/python3.12 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.12.16 (main, Oct 25 2026, 18:24:37) [Clang 21.0.0 (clang-2100.3.34.2)]\nmacOS-27.2-arm64-arm-64bit\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python312/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "5ee267ab60790323888c2a95f31c76c8cdc0304a33d062b67e30181313e11321"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "44ebfd4b6ee8bfa1dc6c36ecedb9c024175c086dc837ffd9c704027a1beb33b6"
+      },
+      "sync_sha256": "82d73d3ed0d18b6352c95a3b02264324dd0d90403e3ee09c39dcefa7d386a5d5"
+    },
+    {
+      "java": "17",
+      "python": "313",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.13 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.13.12 (main, Feb 12 2026, 01:06:02) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python313/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "2867887587285a28755a0436a7b3f4055d6d8176c8ebc25bc36826ef31ea2465"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "4ebff0fa659ceb8aeca16d3938e157c740ac6698b66d895cd961e5db02b78b16"
+      },
+      "sync_sha256": "542bc184a772a7ac9ba3c9e95cd6f1d091b3d246321a7c70557263aa08ab6984"
+    },
+    {
+      "java": "17",
+      "python": "314",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.14 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.14.3 (main, Feb 12 2026, 00:29:58) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python314/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "4fe3789d3984c99ab5ed9e4804828225e765e6f06f4f3d7b8e97b3cb7ecccba6"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "5819537ed5d904e0f24efc056b2d06cf11fbdd67bd8c3f4671baa4e224f4ea08"
+      },
+      "sync_sha256": "bcab83f0488bde253fc530b930c8abf873ce3cec32f157623dcd81110508bc33"
+    },
+    {
+      "java": "17",
+      "python": "315",
+      "version": "$ uv run --locked --python /Users/paul/.local/share/uv/python/cpython-3.15-macos-aarch64-none/bin/python3.15 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.15.2 (main, Oct 26 2026, 13:59:33) [Clang 23.1.3 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python315/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "07fb2b782966c4e9649380e18d1ebf6c633fce0dc2bf4073074e50704a99edad"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "e29a727f75c36d4fea27a314c8b7e0540af928c421e3889760c703b8c6d05af0"
+      },
+      "sync_sha256": "a536fc4109e000b721cb16b49503fc95e07bd6734ad7bf51933e84ece90cc06e"
+    },
+    {
+      "java": "21",
+      "python": "311",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.11 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.11.14 (main, Feb 12 2026, 00:41:29) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python311/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "33722dc435332eba1572409191083af8eed34e9381affd03ef2809d665295555"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "02d7a2802d61b8fec833a6a348209aae77cfc888d3aeb511b58dcc2d8a8b047c"
+      },
+      "sync_sha256": "fb3bcc0c86ae2e1b7abea9edaeb2da65057f54077a2a9bce1fd044b8bae4cb51"
+    },
+    {
+      "java": "21",
+      "python": "312",
+      "version": "$ uv run --locked --python /opt/homebrew/bin/python3.12 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.12.16 (main, Oct 25 2026, 18:24:37) [Clang 21.0.0 (clang-2100.3.34.2)]\nmacOS-27.2-arm64-arm-64bit\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python312/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "b15ac90cfe3e75fdd719ba27b599bf8be7a559f576683c7fb0410c55395a82db"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "6406900ff12700740fe9d45e7f0184331d2b4fc65e91c9dc67dc2d2a08243abe"
+      },
+      "sync_sha256": "48df47be0077398de94b2b74e3172fb5db9617a31e01a6739a57df3b948a0f90"
+    },
+    {
+      "java": "21",
+      "python": "313",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.13 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.13.12 (main, Feb 12 2026, 01:06:02) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python313/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "4b3bb9419043467f97498de05e955b7bcb001f86450a5f550adb0fc45c80da49"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "e2645373f2bf930683c62b0b1665e6382c92ce27e45ca4e66c708633d49c904d"
+      },
+      "sync_sha256": "3cb258c9ba5eaa462bcb95c7be6e38d9ac03482df15a9039165abaea6b9ba36d"
+    },
+    {
+      "java": "21",
+      "python": "314",
+      "version": "$ uv run --locked --python /Users/paul/.local/bin/python3.14 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.14.3 (main, Feb 12 2026, 00:29:58) [Clang 21.1.4 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python314/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "d32b971c0af3e350292c023507add23bcf4b73fe9beaae01786a70aa31c68318"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "657af76c4695e9dc3c5e7fe78c586155fb0f3129740dad4382f48fe728ccdee9"
+      },
+      "sync_sha256": "05cacbc99fb7979fd26f76d682dc1f90e5ea2e9e55d5ee8396f9f35059fb02db"
+    },
+    {
+      "java": "21",
+      "python": "315",
+      "version": "$ uv run --locked --python /Users/paul/.local/share/uv/python/cpython-3.15-macos-aarch64-none/bin/python3.15 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'\n3.15.2 (main, Oct 26 2026, 13:59:33) [Clang 23.1.3 ]\nmacOS-27.2-arm64-arm-64bit-Mach-O\n/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python315/bin/python3\n",
+      "full": {
+        "cases": 63,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "bbfcd87488e781b98fee01341214db7e9537c77816bb6969ec28eadb4c21e0f3"
+      },
+      "unit": {
+        "cases": 11,
+        "failure": 0,
+        "error": 0,
+        "skipped": 0,
+        "sha256": "76e4c6a6a2d795b5c937dbb13867b662028750fb53cc11ccbb06493c3daffd44"
+      },
+      "sync_sha256": "7fad937fc1ca17c7ddaea02ca0bd2266bce62d1d3db77451f8c8451c0f3edfce"
+    }
+  ],
+  "other_full": [
+    {
+      "path": "evidence/repeatability/first",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "563d61f680fb9a3610f74f21f58a76e471c75d442ec431d6b2f4a26bec4d97a0"
+    },
+    {
+      "path": "evidence/repeatability/second",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "2f6ce648f58c9768921e8e3a631359e963bc2baabe533d392a2f70b676de3c2a"
+    },
+    {
+      "path": "evidence/repeatability/random",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "3d6d406b2a44d32e4544ec8bfde59a758311dad93ac539475ab5dcc263d37798"
+    },
+    {
+      "path": "evidence/author-sql/full",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "89572b1a4e02199435b42babed6ed423cdb492ff443cde0b2cf9debcf39a5be9"
+    }
+  ],
+  "independent": [
+    {
+      "path": "full",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "05319dfb67e85f3610278e60ec216f35b46ef136ad64394e710e1fa1e4ff6681"
+    },
+    {
+      "path": "recovery",
+      "cases": 63,
+      "failure": 0,
+      "error": 0,
+      "skipped": 0,
+      "sha256": "debef4fa06fda4880a7d2f8010310b6156416f01edb4e7e0cff88a0c093e4efc"
+    }
+  ],
+  "distribution": [
+    {
+      "path": "final-task/1d-python/participant/README.md",
+      "sha256": "220faba4c0d983bf7d03547aaef42432d1054a2dbd32f1d49754871e774f7ab3",
+      "lfs": false
+    },
+    {
+      "path": "final-task/1d-python/participant/spec.md",
+      "sha256": "36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913",
+      "lfs": false
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/amqp-client-5.37.0.jar",
+      "sha256": "b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/bcpkix-jdk18on-1.86.jar",
+      "sha256": "8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/bcprov-jdk18on-1.86.jar",
+      "sha256": "2af190b300cbb0b35e248ccf5f4a06b6072030aeb3da7a98ec73abe5b4cb371f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/bcutil-jdk18on-1.86.jar",
+      "sha256": "1c268e15f785aafb1e4670d8d6e5f856f69475e96c162dadcd1ff9b350e9139f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/caffeine-3.2.4.jar",
+      "sha256": "9d9d2cfd681fd9272ded3d27c9930db12f89f732345975aa113ebc223bbf1224",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/dgrid-1.3.3.jar",
+      "sha256": "c2d7b0f05cc6155e5dc562f7bc8073255deaffcda4f123e24f02a6bf519cc24f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/dojo-1.17.3-distribution.zip",
+      "sha256": "f0863ff6491ea0236668ece2824c81b05d0c20734462ce1d26e31d07d18dc7ad",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/dstore-1.1.2.jar",
+      "sha256": "2c0b9b793432fc7a4d665dd04e00628c0a2e9878c16b357fbdc415669cba2174",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/h2-2.5.252.jar",
+      "sha256": "90b11dc413da82070ef15fc943282c1408e6ffd34fa68998335fea8603b5ff20",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jackson-annotations-2.22.jar",
+      "sha256": "21ddb598807d3a51a876704eb979d9296e1c6a6f47ab1826ff88c6d6a127a2d0",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jackson-core-3.2.2.jar",
+      "sha256": "93d9090b8c505b2f942ad85dd5821e8c401bfbafafff11708a3fbe2ef9da18ca",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jackson-databind-3.2.2.jar",
+      "sha256": "d27509f990d990fc779a01f3f612005ff6c67dc3bb0a720f5f4d9b2f5c713401",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jakarta.servlet-api-6.1.0.jar",
+      "sha256": "8a31f465f3593bf2351531a5c952014eb839da96a605b5825b93dd54714c48c4",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-ee11-servlet-12.1.13.jar",
+      "sha256": "c6fb3047015c4ba543e869056e68451574417af0ab3fc0a28a9c73993499f45e",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-http-12.1.13.jar",
+      "sha256": "3bb84bfdd0992453986a8f7422dbf55cf779a0a780ff8a68041bb6119fb997fd",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-io-12.1.13.jar",
+      "sha256": "946338a5db4e906ba0698dcdae350394736062cf915b5f16ebf787bcee7fffae",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-rewrite-12.1.13.jar",
+      "sha256": "5c0379d381dbb77ec556a17bf364b4c52550802fee98ec2a8bb626e87e65e406",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-security-12.1.13.jar",
+      "sha256": "64b15214158097af40db345a31bb71cfe0d4a6c7c19cb59cd4c0a97245999ee8",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-server-12.1.13.jar",
+      "sha256": "978265f1ac637c504b537f5d56e07d4a47e7c4bb0752d9dd66b79f5be754abfa",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-session-12.1.13.jar",
+      "sha256": "30ebd5d63895f97aad0d626a567b40552d4c2bd9978adedc46e7a23b4652f595",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/jetty-util-12.1.13.jar",
+      "sha256": "3e408e60fe71a337979004fc4e47bfd3c08a931cf33b46b6a5dc4dbdd088c2fd",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-buffer-4.2.18.Final.jar",
+      "sha256": "fdf236d2b76aa9710684401fdad7dff9dec56e43da5d39172c9a55ba5f14b360",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-codec-4.2.18.Final.jar",
+      "sha256": "439645eb5061f8f50fbf27afacce394e4cecc4d373e1f7a384837e4661d5f430",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-codec-base-4.2.18.Final.jar",
+      "sha256": "7e4612bead7ba88ac6f7908fa722f90ad6835ea96505c9e40b2f93686c1f61f3",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-codec-compression-4.2.18.Final.jar",
+      "sha256": "9d8a4b9a6a2a166ec5a4bbe51a78b4f6a726457c51d81495743c7e7ccb9f4765",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-codec-marshalling-4.2.18.Final.jar",
+      "sha256": "eccf83cbbd1319db879424c4559d465dc43251fe1a8ff759c4320b5adbcf26b7",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-codec-protobuf-4.2.18.Final.jar",
+      "sha256": "1bcaedd0da94f8579477f0848e910c24aced8b1ed7c3e1bff16d56fd0229b516",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-common-4.2.18.Final.jar",
+      "sha256": "5d97cae5669685872339698efe13f74fe3cdb2dccdb36963b2352bd95acf7070",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-handler-4.2.18.Final.jar",
+      "sha256": "6d5a08d9dd6d7d0211202e22dbb1629b23a62550335c7e80892da1d4cb115540",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-resolver-4.2.18.Final.jar",
+      "sha256": "68373ec544cf769ba17bf2ef455166d98f2c260dff536edf35ef57067a9c155f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-transport-4.2.18.Final.jar",
+      "sha256": "eac4f12068db4489e60c6520fad663e5d872f0436a7c641aa9e08db649947863",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/netty-transport-native-unix-common-4.2.18.Final.jar",
+      "sha256": "cada7023d09136af128511ca94421d69dc84d0f1f64c9e1f127a1271bb62932a",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-core-10.1.1.jar",
+      "sha256": "76a1a164e93cca257c80dc163864a67ad1f26af7d8866b19d8fc902f6ecbfc62",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-access-control-10.1.1.jar",
+      "sha256": "8ee1c357fb0e4f62d31cb2af557d07b7b9d9affacd9079c0808199a49d142ece",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-amqp-0-8-protocol-10.1.1.jar",
+      "sha256": "54327d8781d85390148736e625ef974bf584bd5c474e4657fd61fd212eb4b435",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-connection-limits-10.1.1.jar",
+      "sha256": "6613dd1bffe494bc526efaf058324bb9d423a0a029a2db95b07550b9a9356feb",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-management-http-10.1.1.jar",
+      "sha256": "d8e0fe9af8752d214d52a956b3949cf544b0e792509c2a19992c0eccca813a83",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-memory-store-10.1.1.jar",
+      "sha256": "1519da537b4007fe95489a6ca1e2f8dccdf499e86fd23d8309aeabb53c33555c",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-prometheus-exporter-10.1.1.jar",
+      "sha256": "72a5b4d3f02099e9b0940550dae8ebd050c3000e4950a023eef113f0d5152354",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/qpid-broker-plugins-query-engine-10.1.1.jar",
+      "sha256": "fc2dd944076934dc9781c1f1a00e5c2231714fdf7824caa58737aad0f11482cd",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/simpleclient-0.16.0.jar",
+      "sha256": "22c374f237f7bc4fdb1f0ec2da379c0ba00e69ad2ffe8b6ade543d73062d377f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/simpleclient_common-0.16.0.jar",
+      "sha256": "eba6ec26ce7e40cbb8725e05fb83247a9f4f44945b9e7522e3375dde67b9f059",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/simpleclient_tracer_common-0.16.0.jar",
+      "sha256": "e84a784ac8e24f182ee62da80b6b5c8140774b75bfa4bf9cc3d3b8390db625f6",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/simpleclient_tracer_otel-0.16.0.jar",
+      "sha256": "a2a84c59bef3796bb7f9c6f2ae8b7de8b905313ef28180ac3de7ff61dd68df3f",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/simpleclient_tracer_otel_agent-0.16.0.jar",
+      "sha256": "7ad2bb40df74a772d9f5445a3d03579b49d6b37a47d5e90f6cf3f59ecf41ad06",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/slf4j-api-2.0.19.jar",
+      "sha256": "e91ff6d720609e7a194ffe758c3ed5c84e798617ae07b0a0f6a4fe229741b4bb",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/lib/slf4j-nop-2.0.19.jar",
+      "sha256": "d0226062f9b3a2793f62002f892a8e624eb07f396130fc949e01b1d5f4888cba",
+      "lfs": true
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/run.cmd",
+      "sha256": "28b758bbd5ffafeb8fc7bbf3baf0be75af4241d1ac2c2d01f364f5ef0dce1b91",
+      "lfs": false
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/run.sh",
+      "sha256": "0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9",
+      "lfs": false
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/stand.properties",
+      "sha256": "a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a",
+      "lfs": false
+    },
+    {
+      "path": "final-task/1d-python/participant/stand/transfer-stand.jar",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "lfs": true
+    }
+  ],
+  "independent_helpers": {
+    "cases": 11,
+    "failure": 0,
+    "error": 0,
+    "skipped": 0,
+    "sha256": "504e48375c1612902a60c0e01bc4d78c74687fa45804f3dcf6c3b1c4e3e8ec71"
+  },
+  "author_sql": {
+    "accounts": 125,
+    "transfers": 47,
+    "decimal_recomputed_violations": 0,
+    "sha256": "d79ec10b977d633056a8348da91fb482167ea83b170319175411711120449d8b"
+  },
+  "project": {
+    "requires_python": ">=3.11",
+    "lock_sha256": "7fb0af5ec8fd629a9f563744135b9907ff67593ede2375210ba4acd2f4b3747c",
+    "packages": [
+      {
+        "name": "certifi",
+        "version": "2026.10.23"
+      },
+      {
+        "name": "charset-normalizer",
+        "version": "3.5.2"
+      },
+      {
+        "name": "colorama",
+        "version": "0.4.6"
+      },
+      {
+        "name": "final-transfer-python-reference",
+        "version": "1.0.0"
+      },
+      {
+        "name": "idna",
+        "version": "3.20"
+      },
+      {
+        "name": "iniconfig",
+        "version": "2.3.1"
+      },
+      {
+        "name": "packaging",
+        "version": "26.3"
+      },
+      {
+        "name": "pika",
+        "version": "1.4.4"
+      },
+      {
+        "name": "pluggy",
+        "version": "1.7.0"
+      },
+      {
+        "name": "psycopg",
+        "version": "3.3.8"
+      },
+      {
+        "name": "psycopg-binary",
+        "version": "3.3.8"
+      },
+      {
+        "name": "pygments",
+        "version": "2.21.0"
+      },
+      {
+        "name": "pytest",
+        "version": "9.1.1"
+      },
+      {
+        "name": "requests",
+        "version": "2.34.2"
+      },
+      {
+        "name": "typing-extensions",
+        "version": "4.16.0"
+      },
+      {
+        "name": "tzdata",
+        "version": "2026.6"
+      },
+      {
+        "name": "urllib3",
+        "version": "2.8.0"
+      }
+    ]
+  }
+}

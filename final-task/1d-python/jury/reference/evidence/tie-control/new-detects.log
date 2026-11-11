@@ -1,0 +1,28 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_minimum_half_up_and_maximum_after_threshold[half-up-tie] _________
+
+global_stand = <support.api.Api object at 0x108598c50>, amount = '3000.50'
+commission = '30.01', source_balance = '896969.49'
+destination_balance = '103000.50'
+
+    @pytest.mark.parametrize("amount,commission,source_balance,destination_balance", [
+        ("10.00", "30.00", "899960.00", "100010.00"),
+        ("3456.78", "34.57", "896508.65", "103456.78"),
+        ("3000.50", "30.01", "896969.49", "103000.50"),
+        ("150000.00", "1500.00", "748500.00", "250000.00"),
+    ], ids=["minimum", "half-up", "half-up-tie", "maximum"])
+    def test_minimum_half_up_and_maximum_after_threshold(global_stand, amount, commission,
+                                                        source_balance, destination_balance):
+        api = global_stand
+        source, destination = pair(api, own=False)
+        exhaust_threshold(api, source, destination)
+        final = completed(api, source, destination, amount)
+>       assert final["commission"] == Decimal(commission)
+E       AssertionError: assert Decimal('30.00') == Decimal('30.01')
+E        +  where Decimal('30.01') = Decimal('30.01')
+
+tests/test_commission.py:34: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_commission.py::test_minimum_half_up_and_maximum_after_threshold[half-up-tie]
+1 failed in 0.09s
