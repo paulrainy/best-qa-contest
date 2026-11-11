@@ -1,0 +1,22 @@
+$ uv sync --locked --python /opt/homebrew/bin/python3.12
+Using CPython 3.12.16 interpreter at: /opt/homebrew/opt/python@3.12/bin/python3.12
+Creating virtual environment at: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python312
+Resolved 17 packages in 0.67ms
+Downloading psycopg-binary (4.6MiB)
+ Downloaded psycopg-binary
+Prepared 2 packages in 4.31s
+Installed 14 packages in 22ms
+ + certifi==2026.10.23
+ + charset-normalizer==3.5.2
+ + idna==3.20
+ + iniconfig==2.3.1
+ + packaging==26.3
+ + pika==1.4.4
+ + pluggy==1.7.0
+ + psycopg==3.3.8
+ + psycopg-binary==3.3.8
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + requests==2.34.2
+ + typing-extensions==4.16.0
+ + urllib3==2.8.0

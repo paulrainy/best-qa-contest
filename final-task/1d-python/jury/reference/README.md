@@ -23,7 +23,7 @@ uv run --locked --python 3.11 pytest --collect-only -q
 ```bash
 curl -f -X POST http://localhost:18400/api/test/reset
 uv run --locked --python 3.11 pytest tests_support -q
-uv run --locked --python 3.11 pytest tests --junitxml=build/full/full.xml
+uv run --locked --python 3.11 pytest tests --junitxml=build/full/full.xml &&
 uv run --locked --python 3.11 python ../../../jury/tools/check_reference_results.py python build/full
 ```
 

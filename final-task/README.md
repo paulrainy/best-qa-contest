@@ -7,7 +7,7 @@
 | Java | [1a-java/participant](1a-java/participant/README.md) | [Проект Java](1a-java/jury/reference/README.md) |
 | Ручное | [1b-manual/participant](1b-manual/participant/README.md) | [Исполненный ручной проект](1b-manual/jury/reference/README.md) |
 | Нагрузка | [1c-load/participant](1c-load/participant/README.md) | Ожидает исполнения отдельного плана |
-| Python | [1d-python/participant](1d-python/participant/README.md) | Ожидает исполнения отдельного плана |
+| Python | [1d-python/participant](1d-python/participant/README.md) | [Проект Python](1d-python/jury/reference/README.md), [результаты и ограничения](1d-python/jury/reference/report.md) |
 
 Намеренно внедрённых дефектов в стенде больше нет. Оценивается построение тестирования и обоснованность результатов; обязательного числа находок нет. Полный Java-эталон должен проходить целиком.
 

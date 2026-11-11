@@ -1,0 +1,21 @@
+$ uv sync --locked --python /Users/paul/.local/share/uv/python/cpython-3.15-macos-aarch64-none/bin/python3.15
+Using CPython 3.15.2 interpreter at: /Users/paul/.local/share/uv/python/cpython-3.15-macos-aarch64-none/bin/python3.15
+Creating virtual environment at: /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python315
+Resolved 17 packages in 0.83ms
+Downloading psycopg-binary (4.6MiB)
+ Downloaded psycopg-binary
+Prepared 2 packages in 4.37s
+Installed 13 packages in 24ms
+ + certifi==2026.10.23
+ + charset-normalizer==3.5.2
+ + idna==3.20
+ + iniconfig==2.3.1
+ + packaging==26.3
+ + pika==1.4.4
+ + pluggy==1.7.0
+ + psycopg==3.3.8
+ + psycopg-binary==3.3.8
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + requests==2.34.2
+ + urllib3==2.8.0

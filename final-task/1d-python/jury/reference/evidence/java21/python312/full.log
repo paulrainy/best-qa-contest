@@ -1,0 +1,3 @@
+$ uv run --locked --python /opt/homebrew/bin/python3.12 pytest tests -q --junitxml=/Users/paul/Documents/work/best-qa-contest/final-task/1d-python/jury/reference/evidence/java21/python312/full/results.xml
+...............................................................          [100%]
+63 passed in 1.32s

@@ -1,0 +1,60 @@
+{
+  "database_unavailable": {
+    "pytest_exit": 1,
+    "diagnostic": "БД недоступна",
+    "port": "60523"
+  },
+  "stale_report": {
+    "pytest_exit": 4,
+    "original_report_unchanged": true
+  },
+  "exact_xml_negative_controls": {
+    "missing": {
+      "rejected": true,
+      "errors": [
+        "tests.test_async#test_processing_on_pause_completes_after_resume: результат отсутствует"
+      ]
+    },
+    "failure": {
+      "rejected": true,
+      "errors": [
+        "tests.test_async#test_processing_on_pause_completes_after_resume: failure: controlled wrong commission"
+      ]
+    },
+    "error": {
+      "rejected": true,
+      "errors": [
+        "tests.test_async#test_processing_on_pause_completes_after_resume: error: controlled timeout"
+      ]
+    },
+    "skip": {
+      "rejected": true,
+      "errors": [
+        "tests.test_async#test_processing_on_pause_completes_after_resume: skipped: "
+      ]
+    },
+    "duplicate": {
+      "rejected": true,
+      "errors": [
+        "tests.test_async#test_processing_on_pause_completes_after_resume: повторный результат"
+      ]
+    },
+    "empty": {
+      "rejected": true,
+      "errors": [
+        "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/xml-controls/empty: XML-отчётов нет"
+      ]
+    }
+  },
+  "exact_full_report_accepted": true,
+  "final_control": {
+    "status": "COMPLETED",
+    "transfer_id": "ff049165-1f04-4f90-bb88-5d3dba9053b6",
+    "balances": [
+      "999900.00",
+      "100.00"
+    ],
+    "clock_shifted": false,
+    "consumers": "RUNNING"
+  }
+}

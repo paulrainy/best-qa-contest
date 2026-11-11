@@ -1,0 +1,4 @@
+$ uv run --locked --python /Users/paul/.local/bin/python3.14 python -c 'import sys,platform;print(sys.version);print(platform.platform());print(sys.executable)'
+3.14.3 (main, Feb 12 2026, 00:29:58) [Clang 21.1.4 ]
+macOS-27.2-arm64-arm-64bit-Mach-O
+/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-python-reference/envs/python314/bin/python3
