@@ -165,7 +165,7 @@
 | 0208f707558e4fa137495332e1be7cc8d5112584fd850652819eef55ef7880e9 | final-task/1c-load/participant/stand/run.sh |
 | a8d34a3f62f02e2041145f1d1db24ff92e09c3272843512963c1e93f1542426a | final-task/1c-load/participant/stand/stand.properties |
 | 2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed | final-task/1c-load/participant/stand/transfer-stand.jar |
-| 9c636c4d993ffda5413915be1d0d6c5ee6a4866c248a0fd0e38cdc16770db432 | final-task/1d-python/participant/README.md |
+| 220faba4c0d983bf7d03547aaef42432d1054a2dbd32f1d49754871e774f7ab3 | final-task/1d-python/participant/README.md |
 | 36aa8a486ce9ac767abc8945c3358cc65d6fadbb49fb0c6f40748d6a7f221913 | final-task/1d-python/participant/spec.md |
 | b27134820890c5e56ed57d27cc50b70742fa2c31b36a6e9e28e14a43f34ff96f | final-task/1d-python/participant/stand/lib/amqp-client-5.37.0.jar |
 | 8d8b41a4b149bdae8d331f059a578870954d1e3ff29f8269a9eb3ee19a7e4ef7 | final-task/1d-python/participant/stand/lib/bcpkix-jdk18on-1.86.jar |
