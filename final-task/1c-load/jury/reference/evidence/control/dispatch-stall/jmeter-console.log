@@ -1,0 +1,14 @@
+WARNING: package sun.awt.X11 not in java.desktop
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+Creating summariser <summary>
+Created the tree successfully using /Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/slow-dispatch-control.jmx
+Starting standalone test @ 2026 Nov 11 16:46:19 MSK (1794404779319)
+Waiting for possible Shutdown/StopTestNow/HeapDump/ThreadDump message on port 4445
+summary +     46 in 00:00:41 =    1.1/s Avg:     7 Min:     2 Max:    15 Err:     0 (0.00%) Active: 15 Started: 60 Finished: 45
+summary +     14 in 00:00:24 =    0.6/s Avg:     7 Min:     5 Max:    10 Err:     0 (0.00%) Active: 0 Started: 60 Finished: 60
+summary =     60 in 00:01:05 =    0.9/s Avg:     7 Min:     2 Max:    15 Err:     0 (0.00%)
+Tidying up ...    @ 2026 Nov 11 16:47:24 MSK (1794404844341)
+... end of run

@@ -1,0 +1,116 @@
+{
+  "startedAtMs": 1794404777722,
+  "python": "3.11.14 (main, Feb 12 2026, 00:41:29) [Clang 21.1.4 ]",
+  "executable": "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/.venv/bin/python",
+  "platform": "macOS-27.2-arm64-arm-64bit",
+  "machine": "arm64",
+  "cpuCount": 14,
+  "java": {
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home/bin/java",
+      "-version"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "openjdk version \"17.0.21\" 2026-10-20\nOpenJDK Runtime Environment Temurin-17.0.21+9 (build 17.0.21+9)\nOpenJDK 64-Bit Server VM Temurin-17.0.21+9 (build 17.0.21+9, mixed mode, sharing)\n"
+  },
+  "jmeter": {
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/slow-dispatch-jmeter",
+      "-v"
+    ],
+    "exit": 0,
+    "stdout": "WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\n    _    ____   _    ____ _   _ _____       _ __  __ _____ _____ _____ ____\n   / \\  |  _ \\ / \\  / ___| | | | ____|     | |  \\/  | ____|_   _| ____|  _ \\\n  / _ \\ | |_) / _ \\| |   | |_| |  _|    _  | | |\\/| |  _|   | | |  _| | |_) |\n / ___ \\|  __/ ___ \\ |___|  _  | |___  | |_| | |  | | |___  | | | |___|  _ <\n/_/   \\_\\_| /_/   \\_\\____|_| |_|_____|  \\___/|_|  |_|_____| |_| |_____|_| \\_\\ 5.6.3\n\nCopyright (c) 1999-2024 The Apache Software Foundation\n\n",
+    "stderr": "WARNING: package sun.awt.X11 not in java.desktop\n"
+  },
+  "colocated": true,
+  "baseUrl": "http://localhost:18400",
+  "standPid": 27232,
+  "standJarSha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+  "hashes": {
+    "tools/__init__.py": "7b2badfeb61a6be3be1b7ae6114b5301543143a384fe1373c6e41b2a983bb5d7",
+    "tools/analyse.py": "665047b4162d11b36d4c2f3a169aff74c679dd58437c958ca6ba30b4b99db8aa",
+    "tools/collect_metrics.py": "6170ccf0352ecc1d0840f642cca1cb379fdd7062db18923d06c036f4bc78c43b",
+    "tools/collect_transfers.py": "599a25a54e0a4e3b8298c490a2df1c3268b561b26c0f911fb0f2d596cda4933d",
+    "tools/common.py": "073e99119488b759b886e726c065c3d92a0b2c6b10afd2d7c3aac35faf0317eb",
+    "tools/plot.py": "1a0f0c2652499daaf97a6ae5567f4d4cff92f11257e86727537128e088ccc040",
+    "tools/prepare_data.py": "1352e6fb5165920e745cff6a8d56c05f20ada55f5b23e3b1808ce1bdbd5a050a",
+    "tools/run.py": "d21c88ef7da30b9dacd11583fb9d01cb8222c10269761cdc788777feb3820a9b"
+  },
+  "jmxSha256": "a57fa1c6799416e16e7f1124f5b857ba65af3aec9a533a837cb32f185a503f6e",
+  "profileSha256": "033c87d98f1a2210e14a6b0e247d56f20922a6e824786623678d2149b31acc33",
+  "requirementsSha256": "fab427fccbaf4807683e17bfc2c9cd61590946cc3ddc68079a4c81980c81b058",
+  "packages": {
+    "kiwisolver": "1.5.1",
+    "packaging": "26.3",
+    "contourpy": "1.3.3",
+    "numpy": "2.4.6",
+    "pillow": "13.0.0",
+    "matplotlib": "3.11.2",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "tzdata": "2026.6",
+    "python-dateutil": "4.0.0",
+    "pyparsing": "3.3.3"
+  },
+  "environment": {
+    "JAVA_HOME": "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+    "HEAP": "-Xms256m -Xmx1g",
+    "JVM_ARGS": null,
+    "JAVA_TOOL_OPTIONS": null
+  },
+  "hardware": {
+    "command": [
+      "sysctl",
+      "hw.model",
+      "hw.memsize",
+      "machdep.cpu.brand_string"
+    ],
+    "exit": 0,
+    "stdout": "hw.model: Mac16,6\nhw.memsize: 38654705664\nmachdep.cpu.brand_string: Apple M4 Max\n",
+    "stderr": ""
+  },
+  "standCommand": {
+    "command": [
+      "ps",
+      "-p",
+      "27232",
+      "-o",
+      "command="
+    ],
+    "exit": 0,
+    "stdout": "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home/bin/java -jar transfer-stand.jar\n",
+    "stderr": ""
+  },
+  "command": [
+    "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/slow-dispatch-jmeter",
+    "-n",
+    "-t",
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/transfers.jmx",
+    "-q",
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/profiles/smoke.properties",
+    "-Jaccounts.file=/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/build/dispatch-underdelivery-control/accounts.csv",
+    "-Jhttp.protocol=http",
+    "-Jhttp.host=localhost",
+    "-Jhttp.port=18400",
+    "-l",
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/build/dispatch-underdelivery-control/samples.jtl",
+    "-j",
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/build/dispatch-underdelivery-control/jmeter.log",
+    "-e",
+    "-o",
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/build/dispatch-underdelivery-control/html"
+  ],
+  "jmeterLauncherPid": 27582,
+  "jmeterExit": 0,
+  "postRunClock": {
+    "now": "2026-11-11T16:47:25.014842+03:00",
+    "shifted": false
+  },
+  "postRunConsumers": {
+    "accounting": "RUNNING",
+    "notifications": "RUNNING"
+  },
+  "plotExit": 0,
+  "finishedAtMs": 1794404845572
+}

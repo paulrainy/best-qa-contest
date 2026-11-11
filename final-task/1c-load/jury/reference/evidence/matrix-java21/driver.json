@@ -1,0 +1,30 @@
+{
+  "startedAtMs": 1794409108612,
+  "javaHome": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+  "standCommand": [
+    "bash",
+    "final-task/1c-load/participant/stand/run.sh"
+  ],
+  "standEnvironment": {
+    "JAVA_HOME": "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "JAVA_TOOL_OPTIONS": "-Xms256m -Xmx1g"
+  },
+  "standPid": 33338,
+  "command": [
+    "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python311/bin/python",
+    "tools/run.py",
+    "--profile",
+    "smoke",
+    "--jmeter",
+    "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+    "--java-home",
+    "/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home",
+    "--stand-pid",
+    "33338",
+    "--output",
+    "build/matrix-java21/python311"
+  ],
+  "runnerExit": 0,
+  "standExit": 143,
+  "finishedAtMs": 1794409178988
+}

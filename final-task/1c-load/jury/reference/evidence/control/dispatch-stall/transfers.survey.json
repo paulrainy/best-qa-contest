@@ -1,0 +1,8 @@
+{
+  "requests": 60,
+  "startedAtMs": 1794404844992,
+  "finishedAtMs": 1794404845012,
+  "drain_s": 120,
+  "accepted": 60,
+  "remaining": 0
+}

@@ -1,0 +1,30 @@
+WARNING: package sun.awt.X11 not in java.desktop
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+Creating summariser <summary>
+Created the tree successfully using /Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/transfers.jmx
+Starting standalone test @ 2026 Nov 11 17:33:05 MSK (1794407585138)
+Waiting for possible Shutdown/StopTestNow/HeapDump/ThreadDump message on port 4445
+summary +      1 in 00:00:00 =    2.5/s Avg:    21 Min:    21 Max:    21 Err:     0 (0.00%) Active: 3 Started: 3 Finished: 0
+summary +    255 in 00:00:24 =   10.4/s Avg:     4 Min:     1 Max:    22 Err:     0 (0.00%) Active: 1 Started: 256 Finished: 255
+summary =    256 in 00:00:25 =   10.3/s Avg:     4 Min:     1 Max:    22 Err:     0 (0.00%)
+summary +    291 in 00:00:30 =    9.7/s Avg:     3 Min:     0 Max:    13 Err:     0 (0.00%) Active: 1 Started: 547 Finished: 546
+summary =    547 in 00:00:55 =   10.0/s Avg:     3 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +    573 in 00:00:30 =   19.2/s Avg:     2 Min:     0 Max:    14 Err:     0 (0.00%) Active: 1 Started: 1120 Finished: 1119
+summary =   1120 in 00:01:25 =   13.2/s Avg:     3 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +    576 in 00:00:30 =   19.2/s Avg:     2 Min:     0 Max:     9 Err:     0 (0.00%) Active: 1 Started: 1696 Finished: 1695
+summary =   1696 in 00:01:55 =   14.8/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +    990 in 00:00:30 =   33.1/s Avg:     2 Min:     0 Max:     8 Err:     0 (0.00%) Active: 1 Started: 2686 Finished: 2685
+summary =   2686 in 00:02:25 =   18.6/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +   1028 in 00:00:30 =   34.3/s Avg:     1 Min:     0 Max:    10 Err:     0 (0.00%) Active: 1 Started: 3714 Finished: 3713
+summary =   3714 in 00:02:55 =   21.3/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +   1455 in 00:00:30 =   48.4/s Avg:     1 Min:     0 Max:    14 Err:     0 (0.00%) Active: 2 Started: 5170 Finished: 5168
+summary =   5169 in 00:03:25 =   25.2/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +   1483 in 00:00:30 =   49.6/s Avg:     1 Min:     0 Max:    13 Err:     0 (0.00%) Active: 1 Started: 6652 Finished: 6651
+summary =   6652 in 00:03:55 =   28.3/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+summary +    248 in 00:00:40 =    6.2/s Avg:     1 Min:     0 Max:     4 Err:     0 (0.00%) Active: 0 Started: 6900 Finished: 6900
+summary =   6900 in 00:04:35 =   25.1/s Avg:     2 Min:     0 Max:    22 Err:     0 (0.00%)
+Tidying up ...    @ 2026 Nov 11 17:37:40 MSK (1794407860149)
+... end of run

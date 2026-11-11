@@ -1,0 +1,48 @@
+Using CPython 3.12.12
+Creating virtual environment at: .superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python312
+Activate with: source .superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python312/bin/activate
+Using Python 3.12.12 environment at: .superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python312
+Resolved 11 packages in 267ms
+Downloading fonttools (3.0MiB)
+Downloading matplotlib (8.9MiB)
+Downloading numpy (5.2MiB)
+Downloading pillow (4.6MiB)
+ Downloaded fonttools
+ Downloaded pillow
+ Downloaded numpy
+ Downloaded matplotlib
+Prepared 6 packages in 4.93s
+Installed 11 packages in 36ms
+ + contourpy==1.4.0
+ + cycler==0.12.1
+ + fonttools==4.68.0
+ + kiwisolver==1.5.1
+ + matplotlib==3.11.2
+ + numpy==2.5.4
+ + packaging==26.3
+ + pillow==13.0.0
+ + pyparsing==3.3.3
+ + python-dateutil==4.0.0
+ + tzdata==2026.6
+test_counter_reset_starts_new_segment_not_negative_rate (test_analysis.AnalysisTests.test_counter_reset_starts_new_segment_not_negative_rate) ... ok
+test_duplicate_and_missing_accepted_ids_invalidate_evidence (test_analysis.AnalysisTests.test_duplicate_and_missing_accepted_ids_invalidate_evidence) ... ok
+test_full_population_nearest_rank_excludes_errors_get_and_warmup (test_analysis.AnalysisTests.test_full_population_nearest_rank_excludes_errors_get_and_warmup) ... ok
+test_generator_underdelivery_is_not_service_capacity (test_analysis.AnalysisTests.test_generator_underdelivery_is_not_service_capacity) ... ok
+test_metric_gaps_and_missing_resource_evidence_are_visible (test_analysis.AnalysisTests.test_metric_gaps_and_missing_resource_evidence_are_visible) ... ok
+test_missing_or_immature_final_data_does_not_prove_slo (test_analysis.AnalysisTests.test_missing_or_immature_final_data_does_not_prove_slo) ... ok
+test_response_categories_are_separate (test_analysis.AnalysisTests.test_response_categories_are_separate) ... ok
+test_slo_exact_two_seconds_is_inclusive (test_analysis.AnalysisTests.test_slo_exact_two_seconds_is_inclusive) ... ok
+test_step_half_open_boundaries_and_late_completion (test_analysis.AnalysisTests.test_step_half_open_boundaries_and_late_completion) ... ok
+test_unfinished_stays_in_denominator (test_analysis.AnalysisTests.test_unfinished_stays_in_denominator) ... ok
+test_absent_metric_is_a_gap_not_zero (test_collectors.CollectorTests.test_absent_metric_is_a_gap_not_zero) ... ok
+test_drain_deadline_does_not_issue_the_whole_unvisited_backlog (test_collectors.CollectorTests.test_drain_deadline_does_not_issue_the_whole_unvisited_backlog) ... ok
+test_fetch_failure_is_retained_and_not_a_product_result (test_collectors.CollectorTests.test_fetch_failure_is_retained_and_not_a_product_result) ... ok
+test_real_local_process_resources_are_readable (test_collectors.CollectorTests.test_real_local_process_resources_are_readable) ... ok
+test_terminal_and_unfinished_are_both_saved (test_collectors.CollectorTests.test_terminal_and_unfinished_are_both_saved) ... ok
+test_rejects_insufficient_pairs_or_daily_budget (test_data.DataTests.test_rejects_insufficient_pairs_or_daily_budget) ... ok
+test_ring_pairs_different_active_clients_and_budget (test_data.DataTests.test_ring_pairs_different_active_clients_and_budget) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.091s
+
+OK

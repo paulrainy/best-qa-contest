@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import os, sys
+from pathlib import Path
+import xml.etree.ElementTree as E
+real = '/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter'
+args = sys.argv[1:]
+if '-t' in args:
+    index = args.index('-t') + 1
+    tree = E.parse(args[index])
+    script = tree.find(".//JSR223PreProcessor/stringProp[@name='script']")
+    script.text += '\nThread.sleep(20000) // контроль: задержка dispatch в генераторе, не в продукте\n'
+    target = Path(__file__).with_name('slow-dispatch-control.jmx')
+    tree.write(target, encoding='utf-8', xml_declaration=True)
+    args[index] = str(target)
+os.execv(real, [real, *args])

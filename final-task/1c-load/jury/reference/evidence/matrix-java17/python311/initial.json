@@ -1,0 +1,24 @@
+{
+  "health": {
+    "status": "UP",
+    "time": "2026-11-11T17:52:06.468909+03:00",
+    "clockShifted": false
+  },
+  "consumers": {
+    "accounting": "RUNNING",
+    "notifications": "RUNNING"
+  },
+  "metrics": {
+    "accountingQueue": 0.0,
+    "notificationQueue": 0.0,
+    "dlqQueue": 0.0,
+    "accountingProcessed": 27900.0,
+    "finalized": 27900.0,
+    "dbTransfers": 30000.0,
+    "heapUsed": 176803376.0,
+    "heapMax": 1073741824.0,
+    "standCpu": 0.03313279325553981,
+    "standThreads": 149.0,
+    "httpRequests": 56059.0
+  }
+}

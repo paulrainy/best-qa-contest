@@ -1,0 +1,112 @@
+[
+  {
+    "python": "3.11",
+    "java": 17,
+    "startedAtMs": 1794408725451,
+    "finishedAtMs": 1794408795192,
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python311/bin/python",
+      "tools/run.py",
+      "--profile",
+      "smoke",
+      "--jmeter",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+      "--java-home",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+      "--stand-pid",
+      "30416",
+      "--output",
+      "build/matrix-java17/python311"
+    ],
+    "exit": 0,
+    "installLog": "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/python311-install.log"
+  },
+  {
+    "python": "3.12",
+    "java": 17,
+    "startedAtMs": 1794408795192,
+    "finishedAtMs": 1794408870236,
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python312/bin/python",
+      "tools/run.py",
+      "--profile",
+      "smoke",
+      "--jmeter",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+      "--java-home",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+      "--stand-pid",
+      "30416",
+      "--output",
+      "build/matrix-java17/python312"
+    ],
+    "exit": 0,
+    "installLog": "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/python312-install.log"
+  },
+  {
+    "python": "3.13",
+    "java": 17,
+    "startedAtMs": 1794408870236,
+    "finishedAtMs": 1794408945015,
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python313/bin/python",
+      "tools/run.py",
+      "--profile",
+      "smoke",
+      "--jmeter",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+      "--java-home",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+      "--stand-pid",
+      "30416",
+      "--output",
+      "build/matrix-java17/python313"
+    ],
+    "exit": 0,
+    "installLog": "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/python313-install.log"
+  },
+  {
+    "python": "3.14",
+    "java": 17,
+    "startedAtMs": 1794408945016,
+    "finishedAtMs": 1794409020515,
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python314/bin/python",
+      "tools/run.py",
+      "--profile",
+      "smoke",
+      "--jmeter",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+      "--java-home",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+      "--stand-pid",
+      "30416",
+      "--output",
+      "build/matrix-java17/python314"
+    ],
+    "exit": 0,
+    "installLog": "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/python314-install.log"
+  },
+  {
+    "python": "3.15",
+    "java": 17,
+    "startedAtMs": 1794409020516,
+    "finishedAtMs": 1794409090956,
+    "command": [
+      "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/matrix-envs/python315/bin/python",
+      "tools/run.py",
+      "--profile",
+      "smoke",
+      "--jmeter",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/apache-jmeter-5.6.3/bin/jmeter",
+      "--java-home",
+      "/Users/paul/Documents/work/best-qa-contest/review-tasks/1c-load-review/participant/1-scripts/tools/java/macos-aarch64/Contents/Home",
+      "--stand-pid",
+      "30416",
+      "--output",
+      "build/matrix-java17/python315"
+    ],
+    "exit": 0,
+    "installLog": "/Users/paul/Documents/work/best-qa-contest/.superpowers/sdd/2026-11-10-final-load-reference/python315-install.log"
+  }
+]

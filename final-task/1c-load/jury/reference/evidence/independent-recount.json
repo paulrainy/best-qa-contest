@@ -1,0 +1,202 @@
+[
+  {
+    "run": "control/dispatch-stall",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 28,
+        "accepted": 28,
+        "p95_ms": 15,
+        "within_2s": 28
+      }
+    ]
+  },
+  {
+    "run": "control/restored-smoke",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 12,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "main-java17/confirmation",
+    "all_posts": 9000,
+    "unique_keys": 9000,
+    "unique_ids": 9000,
+    "intervals": [
+      {
+        "start_s": 30.0,
+        "end_s": 180.0,
+        "posts": 7440,
+        "accepted": 7440,
+        "p95_ms": 3,
+        "within_2s": 7440
+      }
+    ]
+  },
+  {
+    "run": "main-java17/stability",
+    "all_posts": 12000,
+    "unique_keys": 12000,
+    "unique_ids": 12000,
+    "intervals": [
+      {
+        "start_s": 60.0,
+        "end_s": 600.0,
+        "posts": 10777,
+        "accepted": 10777,
+        "p95_ms": 3,
+        "within_2s": 10777
+      }
+    ]
+  },
+  {
+    "run": "main-java17/steps",
+    "all_posts": 6900,
+    "unique_keys": 6900,
+    "unique_ids": 6900,
+    "intervals": [
+      {
+        "start_s": 15.0,
+        "end_s": 60.0,
+        "posts": 438,
+        "accepted": 438,
+        "p95_ms": 5,
+        "within_2s": 438
+      },
+      {
+        "start_s": 75.0,
+        "end_s": 120.0,
+        "posts": 894,
+        "accepted": 894,
+        "p95_ms": 3,
+        "within_2s": 894
+      },
+      {
+        "start_s": 135.0,
+        "end_s": 180.0,
+        "posts": 1572,
+        "accepted": 1572,
+        "p95_ms": 3,
+        "within_2s": 1572
+      },
+      {
+        "start_s": 195.0,
+        "end_s": 240.0,
+        "posts": 2203,
+        "accepted": 2203,
+        "p95_ms": 3,
+        "within_2s": 2203
+      }
+    ]
+  },
+  {
+    "run": "matrix-java17/python311",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 6,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "matrix-java17/python312",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 9,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "matrix-java17/python313",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 7,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "matrix-java17/python314",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 7,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "matrix-java17/python315",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 8,
+        "within_2s": 60
+      }
+    ]
+  },
+  {
+    "run": "matrix-java21/python311",
+    "all_posts": 60,
+    "unique_keys": 60,
+    "unique_ids": 60,
+    "intervals": [
+      {
+        "start_s": 0.0,
+        "end_s": 30.0,
+        "posts": 60,
+        "accepted": 60,
+        "p95_ms": 15,
+        "within_2s": 60
+      }
+    ]
+  }
+]

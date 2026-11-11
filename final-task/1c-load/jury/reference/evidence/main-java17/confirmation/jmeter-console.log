@@ -1,0 +1,24 @@
+WARNING: package sun.awt.X11 not in java.desktop
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+Creating summariser <summary>
+Created the tree successfully using /Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/transfers.jmx
+Starting standalone test @ 2026 Nov 11 17:37:44 MSK (1794407864253)
+Waiting for possible Shutdown/StopTestNow/HeapDump/ThreadDump message on port 4445
+summary +    850 in 00:00:16 =   54.0/s Avg:     2 Min:     0 Max:    21 Err:     0 (0.00%) Active: 2 Started: 853 Finished: 851
+summary +   1513 in 00:00:30 =   50.4/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%) Active: 1 Started: 2363 Finished: 2362
+summary =   2363 in 00:00:46 =   51.7/s Avg:     2 Min:     0 Max:    24 Err:     0 (0.00%)
+summary +   1504 in 00:00:30 =   50.2/s Avg:     1 Min:     0 Max:    10 Err:     0 (0.00%) Active: 1 Started: 3868 Finished: 3867
+summary =   3867 in 00:01:16 =   51.1/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%)
+summary +   1475 in 00:00:30 =   49.1/s Avg:     1 Min:     0 Max:    15 Err:     0 (0.00%) Active: 2 Started: 5343 Finished: 5341
+summary =   5342 in 00:01:46 =   50.5/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%)
+summary +   1496 in 00:00:30 =   49.9/s Avg:     1 Min:     0 Max:    17 Err:     0 (0.00%) Active: 1 Started: 6839 Finished: 6838
+summary =   6838 in 00:02:16 =   50.4/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%)
+summary +   1450 in 00:00:30 =   48.2/s Avg:     1 Min:     0 Max:    15 Err:     0 (0.00%) Active: 1 Started: 8288 Finished: 8287
+summary =   8288 in 00:02:46 =   50.0/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%)
+summary +    712 in 00:00:49 =   14.5/s Avg:     1 Min:     0 Max:    14 Err:     0 (0.00%) Active: 0 Started: 9000 Finished: 9000
+summary =   9000 in 00:03:35 =   41.9/s Avg:     1 Min:     0 Max:    24 Err:     0 (0.00%)
+Tidying up ...    @ 2026 Nov 11 17:41:19 MSK (1794408079273)
+... end of run

@@ -1,0 +1,172 @@
+{
+  "origin_ms": 1794408802068,
+  "data_complete": true,
+  "issues": [],
+  "load_valid": true,
+  "nft_verdict": "PASS",
+  "measured": {
+    "posts": 60,
+    "duration_s": 30.0,
+    "target_rps": 2.0,
+    "actual_post_rps": 2.0,
+    "expected_posts": 60.0,
+    "tolerance_posts": 23.237900077244504,
+    "load_valid": true,
+    "accepted": 60,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 60
+    },
+    "accepted_post_p95_ms": 9,
+    "within_2s_percent": 100.0,
+    "within_2s": 60,
+    "completed": 60,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 4.9169921875
+  },
+  "intervals": [
+    {
+      "start_s": 0.0,
+      "end_s": 30.0,
+      "posts": 60,
+      "duration_s": 30.0,
+      "target_rps": 2.0,
+      "actual_post_rps": 2.0,
+      "expected_posts": 60.0,
+      "tolerance_posts": 23.237900077244504,
+      "load_valid": true,
+      "accepted": 60,
+      "accepted_percent": 100.0,
+      "categories": {
+        "accepted": 60
+      },
+      "accepted_post_p95_ms": 9,
+      "within_2s_percent": 100.0,
+      "within_2s": 60,
+      "completed": 60,
+      "failed": 0,
+      "unfinished": 0,
+      "unknown_status": 0,
+      "finalization_p95_ms": 4.9169921875
+    }
+  ],
+  "all_posts": {
+    "posts": 60,
+    "duration_s": 30.0,
+    "target_rps": 2.0,
+    "actual_post_rps": 2.0,
+    "expected_posts": 60.0,
+    "tolerance_posts": 23.237900077244504,
+    "load_valid": true,
+    "accepted": 60,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 60
+    },
+    "accepted_post_p95_ms": 9,
+    "within_2s_percent": 100.0,
+    "within_2s": 60,
+    "completed": 60,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 4.9169921875
+  },
+  "excluded": {
+    "service_samples": 0,
+    "outside_measurement_posts": 0
+  },
+  "metrics": {
+    "samples": 14,
+    "errors": 0,
+    "complete": true,
+    "coverage": true,
+    "max_gap_ms": 5090,
+    "generator_resource_samples": 13,
+    "accounting_rates": [
+      {
+        "start": 1794408801.659,
+        "end": 1794408806.705,
+        "rate": 2.3781212823876707,
+        "reset": false
+      },
+      {
+        "start": 1794408806.705,
+        "end": 1794408811.793,
+        "rate": 3.144654051506191,
+        "reset": false
+      },
+      {
+        "start": 1794408811.793,
+        "end": 1794408816.879,
+        "rate": 1.37632718192144,
+        "reset": false
+      },
+      {
+        "start": 1794408816.879,
+        "end": 1794408821.966,
+        "rate": 1.5726360906290533,
+        "reset": false
+      },
+      {
+        "start": 1794408821.966,
+        "end": 1794408827.054,
+        "rate": 1.5723270994307663,
+        "reset": false
+      },
+      {
+        "start": 1794408827.054,
+        "end": 1794408832.14,
+        "rate": 1.7695634366607036,
+        "reset": false
+      },
+      {
+        "start": 1794408832.14,
+        "end": 1794408837.23,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408837.23,
+        "end": 1794408842.272,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408842.272,
+        "end": 1794408847.359,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408847.359,
+        "end": 1794408852.436,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408852.436,
+        "end": 1794408857.518,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408857.518,
+        "end": 1794408862.599,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408862.599,
+        "end": 1794408867.682,
+        "rate": 0.0,
+        "reset": false
+      }
+    ],
+    "max_accounting_queue": 0.0
+  },
+  "nft_confirmation_profile": false,
+  "profile": "smoke"
+}

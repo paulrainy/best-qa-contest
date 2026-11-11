@@ -1,0 +1,346 @@
+{
+  "origin_ms": 1794407864257,
+  "data_complete": true,
+  "issues": [],
+  "load_valid": true,
+  "nft_verdict": "PASS",
+  "measured": {
+    "posts": 7440,
+    "duration_s": 150.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 49.6,
+    "expected_posts": 7500.0,
+    "tolerance_posts": 375.0,
+    "load_valid": true,
+    "accepted": 7440,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 7440
+    },
+    "accepted_post_p95_ms": 3,
+    "within_2s_percent": 100.0,
+    "within_2s": 7440,
+    "completed": 7440,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 1.44189453125
+  },
+  "intervals": [
+    {
+      "start_s": 30.0,
+      "end_s": 180.0,
+      "posts": 7440,
+      "duration_s": 150.0,
+      "target_rps": 50.0,
+      "actual_post_rps": 49.6,
+      "expected_posts": 7500.0,
+      "tolerance_posts": 375.0,
+      "load_valid": true,
+      "accepted": 7440,
+      "accepted_percent": 100.0,
+      "categories": {
+        "accepted": 7440
+      },
+      "accepted_post_p95_ms": 3,
+      "within_2s_percent": 100.0,
+      "within_2s": 7440,
+      "completed": 7440,
+      "failed": 0,
+      "unfinished": 0,
+      "unknown_status": 0,
+      "finalization_p95_ms": 1.44189453125
+    }
+  ],
+  "all_posts": {
+    "posts": 9000,
+    "duration_s": 180.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 50.0,
+    "expected_posts": 9000.0,
+    "tolerance_posts": 450.0,
+    "load_valid": true,
+    "accepted": 9000,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 9000
+    },
+    "accepted_post_p95_ms": 3,
+    "within_2s_percent": 100.0,
+    "within_2s": 9000,
+    "completed": 9000,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 1.552001953125
+  },
+  "excluded": {
+    "service_samples": 0,
+    "outside_measurement_posts": 1560
+  },
+  "metrics": {
+    "samples": 43,
+    "errors": 0,
+    "complete": true,
+    "coverage": true,
+    "max_gap_ms": 5101,
+    "generator_resource_samples": 43,
+    "accounting_rates": [
+      {
+        "start": 1794407863.835,
+        "end": 1794407868.878,
+        "rate": 48.97878263747304,
+        "reset": false
+      },
+      {
+        "start": 1794407868.878,
+        "end": 1794407873.939,
+        "rate": 57.498519552962094,
+        "reset": false
+      },
+      {
+        "start": 1794407873.939,
+        "end": 1794407879.028,
+        "rate": 49.71506952461614,
+        "reset": false
+      },
+      {
+        "start": 1794407879.028,
+        "end": 1794407884.095,
+        "rate": 47.957372055986916,
+        "reset": false
+      },
+      {
+        "start": 1794407884.095,
+        "end": 1794407889.183,
+        "rate": 50.90408745875647,
+        "reset": false
+      },
+      {
+        "start": 1794407889.183,
+        "end": 1794407894.278,
+        "rate": 52.99313022254257,
+        "reset": false
+      },
+      {
+        "start": 1794407894.278,
+        "end": 1794407899.357,
+        "rate": 52.1756251622434,
+        "reset": false
+      },
+      {
+        "start": 1794407899.357,
+        "end": 1794407904.449,
+        "rate": 48.900237880134725,
+        "reset": false
+      },
+      {
+        "start": 1794407904.449,
+        "end": 1794407909.534,
+        "rate": 49.36086491977039,
+        "reset": false
+      },
+      {
+        "start": 1794407909.534,
+        "end": 1794407914.627,
+        "rate": 50.26506799048816,
+        "reset": false
+      },
+      {
+        "start": 1794407914.627,
+        "end": 1794407919.714,
+        "rate": 52.29015246416176,
+        "reset": false
+      },
+      {
+        "start": 1794407919.714,
+        "end": 1794407924.807,
+        "rate": 50.461418274576005,
+        "reset": false
+      },
+      {
+        "start": 1794407924.807,
+        "end": 1794407929.895,
+        "rate": 51.88679184985215,
+        "reset": false
+      },
+      {
+        "start": 1794407929.895,
+        "end": 1794407934.978,
+        "rate": 50.56069305462703,
+        "reset": false
+      },
+      {
+        "start": 1794407934.978,
+        "end": 1794407940.068,
+        "rate": 47.15127560025272,
+        "reset": false
+      },
+      {
+        "start": 1794407940.068,
+        "end": 1794407945.15,
+        "rate": 45.45454530100768,
+        "reset": false
+      },
+      {
+        "start": 1794407945.15,
+        "end": 1794407950.239,
+        "rate": 47.94655151113294,
+        "reset": false
+      },
+      {
+        "start": 1794407950.239,
+        "end": 1794407955.324,
+        "rate": 53.0973472239707,
+        "reset": false
+      },
+      {
+        "start": 1794407955.324,
+        "end": 1794407960.398,
+        "rate": 48.87662477864405,
+        "reset": false
+      },
+      {
+        "start": 1794407960.398,
+        "end": 1794407965.485,
+        "rate": 49.734618697116254,
+        "reset": false
+      },
+      {
+        "start": 1794407965.485,
+        "end": 1794407970.56,
+        "rate": 52.216748277854464,
+        "reset": false
+      },
+      {
+        "start": 1794407970.56,
+        "end": 1794407975.62,
+        "rate": 49.802372104686675,
+        "reset": false
+      },
+      {
+        "start": 1794407975.62,
+        "end": 1794407980.666,
+        "rate": 52.91319853312568,
+        "reset": false
+      },
+      {
+        "start": 1794407980.666,
+        "end": 1794407985.755,
+        "rate": 49.125562771359824,
+        "reset": false
+      },
+      {
+        "start": 1794407985.755,
+        "end": 1794407990.827,
+        "rate": 51.65615357579232,
+        "reset": false
+      },
+      {
+        "start": 1794407990.827,
+        "end": 1794407995.873,
+        "rate": 46.37336500655958,
+        "reset": false
+      },
+      {
+        "start": 1794407995.873,
+        "end": 1794408000.947,
+        "rate": 47.89120895649397,
+        "reset": false
+      },
+      {
+        "start": 1794408000.947,
+        "end": 1794408006.03,
+        "rate": 44.658666628016874,
+        "reset": false
+      },
+      {
+        "start": 1794408006.03,
+        "end": 1794408011.117,
+        "rate": 53.86278610404508,
+        "reset": false
+      },
+      {
+        "start": 1794408011.117,
+        "end": 1794408016.218,
+        "rate": 45.87335967451306,
+        "reset": false
+      },
+      {
+        "start": 1794408016.218,
+        "end": 1794408021.315,
+        "rate": 49.63704020812066,
+        "reset": false
+      },
+      {
+        "start": 1794408021.315,
+        "end": 1794408026.399,
+        "rate": 47.60031590931484,
+        "reset": false
+      },
+      {
+        "start": 1794408026.399,
+        "end": 1794408031.486,
+        "rate": 46.589344184885704,
+        "reset": false
+      },
+      {
+        "start": 1794408031.486,
+        "end": 1794408036.571,
+        "rate": 49.36086491977039,
+        "reset": false
+      },
+      {
+        "start": 1794408036.571,
+        "end": 1794408041.657,
+        "rate": 50.72748756224736,
+        "reset": false
+      },
+      {
+        "start": 1794408041.657,
+        "end": 1794408046.737,
+        "rate": 26.968504342034173,
+        "reset": false
+      },
+      {
+        "start": 1794408046.737,
+        "end": 1794408051.821,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408051.821,
+        "end": 1794408056.909,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408056.909,
+        "end": 1794408061.99,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408061.99,
+        "end": 1794408067.08,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408067.08,
+        "end": 1794408072.169,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794408072.169,
+        "end": 1794408077.245,
+        "rate": 0.0,
+        "reset": false
+      }
+    ],
+    "max_accounting_queue": 1.0
+  },
+  "nft_confirmation_profile": true,
+  "profile": "confirmation"
+}

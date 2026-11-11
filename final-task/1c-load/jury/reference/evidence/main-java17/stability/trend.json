@@ -1,0 +1,44 @@
+{
+  "metric_samples": 107,
+  "metric_errors": 0,
+  "maxima": {
+    "accountingQueue": 0.0,
+    "notificationQueue": 1.0,
+    "dlqQueue": 0.0,
+    "standCpu": 0.009257898092467147,
+    "standThreads": 149.0,
+    "generatorCpuPercent": 32.3,
+    "generatorRssKiB": 380512.0,
+    "generatorThreads": 43.0
+  },
+  "heapMiB": {
+    "start": 245.8351593017578,
+    "end": 181.93038940429688,
+    "min": 84.69857788085938,
+    "max": 258.43482971191406,
+    "falls": 19
+  },
+  "blocks": [
+    {
+      "start_s": 60,
+      "end_s": 240,
+      "posts": 3612,
+      "rps": 20.066666666666666,
+      "p95_ms": 3
+    },
+    {
+      "start_s": 240,
+      "end_s": 420,
+      "posts": 3600,
+      "rps": 20.0,
+      "p95_ms": 3
+    },
+    {
+      "start_s": 420,
+      "end_s": 600,
+      "posts": 3565,
+      "rps": 19.805555555555557,
+      "p95_ms": 3
+    }
+  ]
+}

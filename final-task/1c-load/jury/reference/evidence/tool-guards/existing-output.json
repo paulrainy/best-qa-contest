@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/.venv/bin/python",
+    "tools/run.py",
+    "--profile",
+    "smoke",
+    "--jmeter",
+    "unused",
+    "--output",
+    "build/main-java17/steps"
+  ],
+  "exit": 1,
+  "stdout": "",
+  "stderr": "Прогон не выполнен: [Errno 17] File exists: '/Users/paul/Documents/work/best-qa-contest/final-task/1c-load/jury/reference/build/main-java17/steps'\n",
+  "before": "21251620650857f496b15592b9083da3b2d27c6c8764e2c6593e4b328534ace5",
+  "after": "21251620650857f496b15592b9083da3b2d27c6c8764e2c6593e4b328534ace5"
+}

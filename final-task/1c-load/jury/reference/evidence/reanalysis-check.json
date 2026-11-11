@@ -1,0 +1,123 @@
+[
+  {
+    "run": "control/dispatch-stall",
+    "equal": true,
+    "summarySha256": "1f52ea3ecca7108f3061389ec304134905ef748d56640bef1d70dc629d99bb08",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": false,
+    "metricsComplete": true,
+    "verdict": "UNPROVEN"
+  },
+  {
+    "run": "control/restored-smoke",
+    "equal": true,
+    "summarySha256": "70f0a8540d1d3141ef63064dd1c62cffc37436a75f751aafae4340d9ce951e06",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "main-java17/confirmation",
+    "equal": true,
+    "summarySha256": "f8ab82d594016cca81ef4dfeeaafd6621e4bd30bc34fa8b723552660db484a3c",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "main-java17/stability",
+    "equal": true,
+    "summarySha256": "bc4179db9ceb9ecbc089e9aefcc35a6a6a8bf83f7fae9ef0c05c8bdd58602a90",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "main-java17/steps",
+    "equal": true,
+    "summarySha256": "77c7e4f24a26c2185dcc48af726890ad7fb344ad40b6edc640690daa866252ee",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java17/python311",
+    "equal": true,
+    "summarySha256": "6455c215a8bf43a397038339559c50cbe898b3120dca0041cb4f4946d35ca961",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java17/python312",
+    "equal": true,
+    "summarySha256": "93c351bd029d3ea3033492068f765b86cf0fe30b785f60b250e58615eb93e107",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java17/python313",
+    "equal": true,
+    "summarySha256": "bab42c8e4d4bd9b82284af061ee1cdec76c526c0707f0f7faae9621e2686a162",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java17/python314",
+    "equal": true,
+    "summarySha256": "3bd0badf6b7ce1665442ad8e92756a337952e81f5003b3f8b73743a35c2dc6a3",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java17/python315",
+    "equal": true,
+    "summarySha256": "6142cf2b8523aa65b567b1db0e988af8e480cd0a8704d7e6821d6fc4bc8d7e18",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  },
+  {
+    "run": "matrix-java21/python311",
+    "equal": true,
+    "summarySha256": "02c56d5cf69ee8b109d6833b904230d9fbff606f76dd1ed5f3d49513693d70f5",
+    "jmeterExit": 0,
+    "plotExit": 0,
+    "dataComplete": true,
+    "loadValid": true,
+    "metricsComplete": true,
+    "verdict": "PASS"
+  }
+]
