@@ -1,0 +1,21 @@
+[project]
+name = "final-transfer-python-reference"
+version = "1.0.0"
+description = "Эталон автоматизации сервиса переводов для жюри"
+requires-python = ">=3.11"
+dependencies = [
+    "pytest==9.1.1",
+    "requests==2.34.2",
+    "pika==1.4.4",
+    "psycopg[binary]==3.3.8",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "tests_support"]
+pythonpath = ["."]
+addopts = "--strict-markers --import-mode=importlib"
+junit_family = "xunit2"
+markers = ["global_state: последовательный сценарий с часами или потребителями на выделенном стенде"]
