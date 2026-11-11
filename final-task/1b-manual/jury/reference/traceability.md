@@ -16,7 +16,7 @@
 | 5 | F10 | [M10](test-cases.md#m10) | PASS | [HTTP/проводки](evidence/current-build/M10.jsonl), [повтор](evidence/current-build/R-M10.jsonl) |
 | 5 | F11 | [M11](test-cases.md#m11) | PASS | [минимум](evidence/current-build/M11-min.jsonl), [округление](evidence/current-build/M11-round.jsonl), [месяц](evidence/current-build/M11-month.jsonl) |
 | 6 | F12 | [M12](test-cases.md#m12) | PASS | [HTTP](evidence/current-build/M12.jsonl), [SQL1 строка/2 проводки](evidence/current-build/M12-sql.txt) |
-| 6 | F13 | [M13](test-cases.md#m13) | PASS | [HTTP](evidence/current-build/M13.jsonl) |
+| 6 | F13 | [M13](test-cases.md#m13) | PASS | [HTTP](evidence/current-build/M13.jsonl), [уточнение TTL и повтор](evidence/m13-ttl-recheck/README.md) |
 | 3.4,8,12 | F14 | [M14](test-cases.md#m14) | PASS | [продукт](evidence/current-build/M14.jsonl), [своя очередь/событие/очистка](evidence/current-build/M14-broker.jsonl), [SQL](evidence/current-build/M14-postings.txt) |
 | 3.4 | F15 | [M15](test-cases.md#m15) | PASS | [HTTP](evidence/current-build/M15.jsonl), [C01](evidence/current-build/C01-M15.jsonl) |
 | 3.4 | F16 | [M16](test-cases.md#m16) | PASS | [HTTP](evidence/current-build/M16.jsonl), [REFUND](evidence/current-build/M16-refund.txt), [C01](evidence/current-build/C01-M16.jsonl) |

@@ -1,0 +1,14 @@
+Стенд «Переводы» запускается...
+  брокер запущен
+  БД запущена
+  подключение к брокеру установлено
+
+Стенд готов.
+  HTTP API:          http://localhost:18400/api/v1/health
+  Брокер (AMQP):     amqp://guest:guest@localhost:5672/
+  Консоль брокера:   http://localhost:15672/  (логин guest / guest)
+  БД (только чтение): jdbc:h2:tcp://localhost:19400/mem:stand  (логин qa / qa)
+  БД (протокол PostgreSQL): localhost:19402, база stand  (логин qa / qa)
+  Веб-консоль БД:    http://localhost:19401/
+  Метрики:           http://localhost:18400/metrics
+Остановить: Ctrl+C

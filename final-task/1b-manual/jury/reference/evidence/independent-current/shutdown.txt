@@ -1,0 +1,1 @@
+После FINAL.jsonl собственный Java PID99411 (слушатель18400, запущенный штатным run.sh этой сессии) остановлен SIGTERM. Последующая ps -p99411 и lsof -iTCP:18400 -sTCP:LISTEN не дали строк. git status --short пуст, HEAD90008b1179fbfe92852765cf2332cbcb2c6fa74b.
