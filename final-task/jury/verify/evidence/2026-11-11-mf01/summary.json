@@ -1,0 +1,200 @@
+{
+  "runtime": [
+    {
+      "direction": "1a-java",
+      "java": "17",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1a-java",
+      "java": "21",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1b-manual",
+      "java": "17",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1b-manual",
+      "java": "21",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1c-load",
+      "java": "17",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1c-load",
+      "java": "21",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1d-python",
+      "java": "17",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    },
+    {
+      "direction": "1d-python",
+      "java": "21",
+      "sha256": "2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed",
+      "probe": {
+        "python": "3.11.14",
+        "health": "UP",
+        "AMQP": "publish/read",
+        "PG": "SELECT only",
+        "consoles": "H2+Qpid+Dojo",
+        "history": 30000
+      },
+      "unknown_client": {
+        "http": 404,
+        "code": "CLIENT_NOT_FOUND"
+      },
+      "existing_client_empty": {
+        "clientId": "C02006",
+        "http": 200,
+        "body": []
+      }
+    }
+  ],
+  "references": [
+    {
+      "run": "java17-full",
+      "maven_exit": 0,
+      "checker_exit": 0,
+      "xml": "java17-full"
+    },
+    {
+      "run": "java21-full",
+      "maven_exit": 0,
+      "checker_exit": 0,
+      "xml": "java21-full"
+    },
+    {
+      "run": "java21-random",
+      "maven_exit": 0,
+      "checker_exit": 0,
+      "xml": "java21-random"
+    }
+  ]
+}

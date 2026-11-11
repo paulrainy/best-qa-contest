@@ -93,6 +93,22 @@ class StandRegressionTest {
         assertEquals(0, new BigDecimal(expected).compareTo(actual));
     }
     @Test
+    void notificationsForUnknownClientReturn404() throws Exception {
+        String clientId = "ABSENT_" + UUID.randomUUID();
+        var response = request("GET", "/api/v1/clients/" + clientId + "/notifications", "");
+        assertEquals(404, response.statusCode());
+        assertEquals("CLIENT_NOT_FOUND", json(response).path("code").asString());
+    }
+    @Test
+    void existingClientWithoutNotificationsReturnsEmptyArray() throws Exception {
+        JsonNode a = account(null, "ACTIVE");
+        var response = request("GET", "/api/v1/clients/" + a.get("clientId").asString()
+                + "/notifications", "");
+        assertEquals(200, response.statusCode());
+        assertTrue(json(response).isArray());
+        assertEquals(0, json(response).size());
+    }
+    @Test
     void dailyBoundaryIsInclusive() throws Exception {
         JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
         assertEquals("COMPLETED", done(create(a, b, "150000")).get("status").asString());

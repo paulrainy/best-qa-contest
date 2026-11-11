@@ -370,6 +370,14 @@ final class Api {
         try (Connection c = db.connection(); PreparedStatement ps = c.prepareStatement(
                 "SELECT notification_id, transfer_id, text, created_at FROM notifications WHERE client_id = ?"
                         + " ORDER BY notification_id DESC LIMIT 100")) {
+            try (PreparedStatement client = c.prepareStatement("SELECT 1 FROM clients WHERE client_id = ?")) {
+                client.setString(1, clientId);
+                try (ResultSet rs = client.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new ApiError(404, "CLIENT_NOT_FOUND", "Клиент " + clientId + " не найден");
+                    }
+                }
+            }
             ps.setString(1, clientId);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {

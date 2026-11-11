@@ -1,0 +1,9 @@
+CLIENT_ROWS
+0
+(1 row, 2 ms)
+TRANSFER_ID                          | STATUS
+acc9f7d2-91b2-4a3b-b0e2-42d337ee41f6 | COMPLETED
+(1 row, 0 ms)
+NOTIFICATION_ID | TRANSFER_ID
+1               | acc9f7d2-91b2-4a3b-b0e2-42d337ee41f6
+(1 row, 0 ms)

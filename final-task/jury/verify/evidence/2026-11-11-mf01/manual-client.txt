@@ -1,0 +1,3 @@
+CLIENT_ROWS
+0
+(1 row, 2 ms)

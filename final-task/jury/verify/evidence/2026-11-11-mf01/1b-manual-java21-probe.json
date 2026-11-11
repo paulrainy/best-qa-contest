@@ -1,0 +1,1 @@
+{"python": "3.11.14", "health": "UP", "AMQP": "publish/read", "PG": "SELECT only", "consoles": "H2+Qpid+Dojo", "history": 30000}
