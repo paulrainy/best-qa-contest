@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Новые OTHER: независимая подача" enabled="true">
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="Параметры">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Независимые arrivals" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <stringProp name="OpenModelThreadGroup.schedule">${__P(load.schedule,rate(2/sec) random_arrivals(30 sec) rate(2/sec) pause(35 sec))}</stringProp>
+        <stringProp name="OpenModelThreadGroup.random_seed">${__P(load.seed,20261111)}</stringProp>
+      </OpenModelThreadGroup>
+      <hashTree>
+        <CSVDataSet guiclass="TestBeanGUI" testclass="CSVDataSet" testname="Общие2000 пар, по кругу" enabled="true">
+          <stringProp name="filename">${__P(accounts.file,test-data/accounts.csv)}</stringProp>
+          <stringProp name="fileEncoding">UTF-8</stringProp>
+          <stringProp name="variableNames"/>
+          <stringProp name="delimiter">,</stringProp>
+          <stringProp name="shareMode">shareMode.all</stringProp>
+          <boolProp name="ignoreFirstLine">false</boolProp>
+          <boolProp name="quotedData">false</boolProp>
+          <boolProp name="recycle">true</boolProp>
+          <boolProp name="stopThread">false</boolProp>
+        </CSVDataSet>
+        <hashTree/>
+        <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON и уникальный ключ" enabled="true">
+          <collectionProp name="HeaderManager.headers">
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Content-Type</stringProp>
+              <stringProp name="Header.value">application/json</stringProp>
+            </elementProp>
+            <elementProp name="" elementType="Header">
+              <stringProp name="Header.name">Idempotency-Key</stringProp>
+              <stringProp name="Header.value">${idempotencyKey}</stringProp>
+            </elementProp>
+          </collectionProp>
+        </HeaderManager>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST transfer" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{"fromAccount":"${fromAccount}","toAccount":"${toAccount}","amount":100.00}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${__P(http.host,localhost)}</stringProp>
+          <stringProp name="HTTPSampler.port">${__P(http.port,18400)}</stringProp>
+          <stringProp name="HTTPSampler.protocol">${__P(http.protocol,http)}</stringProp>
+          <stringProp name="HTTPSampler.path">/api/v1/transfers</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+          <stringProp name="HTTPSampler.connect_timeout">3000</stringProp>
+          <stringProp name="HTTPSampler.response_timeout">30000</stringProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="Уникальный ключ и точка начала" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"/>
+            <stringProp name="parameters"/>
+            <stringProp name="script"><![CDATA[
+vars.put('idempotencyKey', java.util.UUID.randomUUID().toString())
+vars.put('originMs', Long.toString(org.apache.jmeter.threads.JMeterContextService.getTestStartTime()))
+['transferId','createdAt','apiStatus','retryAfter'].each { vars.put(it, '') }
+vars.put('category', 'not_classified')
+if (vars.get('fromClient') == vars.get('toClient') || vars.get('fromAccount') == vars.get('toAccount')) {
+    throw new IllegalStateException('Нужны разные клиенты и счета OTHER')
+}
+            ]]></stringProp>
+          </JSR223PreProcessor>
+          <hashTree/>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="Принятие: код и тело" enabled="true">
+            <stringProp name="scriptLanguage">groovy</stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="filename"/>
+            <stringProp name="parameters"/>
+            <stringProp name="script"><![CDATA[
+def code = prev.getResponseCode()
+def category = code == '503' ? 'overload_503' : code == '200' ? 'application_rejection' : code.contains('Timeout') ? 'timeout' : 'http_or_transport_error'
+try {
+    def body = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
+    ['transferId','createdAt','status'].each { key ->
+        vars.put(key == 'status' ? 'apiStatus' : key, body[key]?.toString() ?: '')
+    }
+    if (code == '202') {
+        java.util.UUID.fromString(vars.get('transferId'))
+        java.time.OffsetDateTime.parse(vars.get('createdAt'))
+        category = vars.get('apiStatus') == 'PROCESSING' ? 'accepted' : 'invalid_202'
+    }
+} catch (Exception ignored) {
+    if (code == '202') category = 'invalid_202'
+}
+def retry = prev.getResponseHeaders().readLines().find { it.toLowerCase().startsWith('retry-after:') }
+vars.put('retryAfter', retry ? retry.substring(retry.indexOf(':') + 1).trim() : '')
+vars.put('category', category)
+prev.setSuccessful(category == 'accepted')
+            ]]></stringProp>
+          </JSR223PostProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
