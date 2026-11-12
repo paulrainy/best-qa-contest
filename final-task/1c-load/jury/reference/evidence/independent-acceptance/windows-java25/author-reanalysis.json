@@ -1,0 +1,50 @@
+{
+  "note": "Авторские summary пересчитаны на Windows/CPython 3.11.18 кодом analyse.py после правок 12.11.2026",
+  "analyseSha256": "6c18e81552a52f18de48016e7adfbb7b1801dc5cca302f80470d2314b44fd9f2",
+  "runs": [
+    {
+      "run": "control/dispatch-stall",
+      "equal": true
+    },
+    {
+      "run": "control/restored-smoke",
+      "equal": true
+    },
+    {
+      "run": "main-java17/confirmation",
+      "equal": true
+    },
+    {
+      "run": "main-java17/stability",
+      "equal": true
+    },
+    {
+      "run": "main-java17/steps",
+      "equal": true
+    },
+    {
+      "run": "matrix-java17/python311",
+      "equal": true
+    },
+    {
+      "run": "matrix-java17/python312",
+      "equal": true
+    },
+    {
+      "run": "matrix-java17/python313",
+      "equal": true
+    },
+    {
+      "run": "matrix-java17/python314",
+      "equal": true
+    },
+    {
+      "run": "matrix-java17/python315",
+      "equal": true
+    },
+    {
+      "run": "matrix-java21/python311",
+      "equal": true
+    }
+  ]
+}

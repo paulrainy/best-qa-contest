@@ -7,10 +7,10 @@ import time
 
 try:
     from .analyse import classify
-    from .common import api, read_jtl
+    from .common import api, read_jtl, utf8_output
 except ImportError:
     from analyse import classify
-    from common import api, read_jtl
+    from common import api, read_jtl, utf8_output
 
 
 def collect(rows, base, output, *, drain_s=120, fetch=None):
@@ -74,4 +74,5 @@ if __name__ == '__main__':
     parser.add_argument('--base-url', default='http://localhost:18400')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    utf8_output()
     print(f'Сохранено {len(collect(read_jtl(args.jtl), args.base_url, args.output))} статусов')

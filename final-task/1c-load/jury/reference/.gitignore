@@ -1,2 +1,4 @@
 .venv*/
 jmeter.log
+# Отобранный в доказательства INFO-лог JMeter хранится вместе с прогоном.
+!evidence/**/jmeter.log

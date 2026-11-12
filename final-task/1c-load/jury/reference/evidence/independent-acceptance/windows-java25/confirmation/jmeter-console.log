@@ -1,0 +1,23 @@
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+Creating summariser <summary>
+Created the tree successfully using C:\paul\best-qa-contest\final-task\1c-load\jury\reference\transfers.jmx
+Starting standalone test @ 2026 Nov 12 03:57:16 CST (1794477436201)
+Waiting for possible Shutdown/StopTestNow/HeapDump/ThreadDump message on port 4445
+summary +    731 in 00:00:13 =   56.0/s Avg:   995 Min:     2 Max:  3337 Err:     0 (0.00%) Active: 3 Started: 733 Finished: 730
+summary +   1529 in 00:00:30 =   51.0/s Avg:     2 Min:     1 Max:    20 Err:     0 (0.00%) Active: 1 Started: 2260 Finished: 2259
+summary =   2260 in 00:00:43 =   52.5/s Avg:   324 Min:     1 Max:  3337 Err:     0 (0.00%)
+summary +   1514 in 00:00:30 =   50.5/s Avg:     2 Min:     1 Max:    46 Err:     0 (0.00%) Active: 2 Started: 3775 Finished: 3773
+summary =   3774 in 00:01:13 =   51.7/s Avg:   195 Min:     1 Max:  3337 Err:     0 (0.00%)
+summary +   1480 in 00:00:30 =   49.3/s Avg:     3 Min:     1 Max:    32 Err:     0 (0.00%) Active: 1 Started: 5254 Finished: 5253
+summary =   5254 in 00:01:43 =   51.0/s Avg:   141 Min:     1 Max:  3337 Err:     0 (0.00%)
+summary +   1497 in 00:00:30 =   49.8/s Avg:     2 Min:     1 Max:    57 Err:     0 (0.00%) Active: 1 Started: 6751 Finished: 6750
+summary =   6751 in 00:02:13 =   50.7/s Avg:   110 Min:     1 Max:  3337 Err:     0 (0.00%)
+summary +   1445 in 00:00:30 =   48.2/s Avg:     2 Min:     0 Max:    49 Err:     0 (0.00%) Active: 2 Started: 8197 Finished: 8195
+summary =   8196 in 00:02:43 =   50.3/s Avg:    91 Min:     0 Max:  3337 Err:     0 (0.00%)
+summary +    804 in 00:00:51 =   15.7/s Avg:     3 Min:     1 Max:    22 Err:     0 (0.00%) Active: 0 Started: 9000 Finished: 9000
+summary =   9000 in 00:03:34 =   42.0/s Avg:    83 Min:     0 Max:  3337 Err:     0 (0.00%)
+Tidying up ...    @ 2026 Nov 12 04:00:51 CST (1794477651267)
+... end of run

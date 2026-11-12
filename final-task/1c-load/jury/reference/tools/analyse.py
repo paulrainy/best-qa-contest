@@ -7,9 +7,9 @@ from pathlib import Path
 from uuid import UUID
 
 try:
-    from .common import properties, read_jtl, read_jsonl, windows, write_json
+    from .common import properties, read_jtl, read_jsonl, utf8_output, windows, write_json
 except ImportError:
-    from common import properties, read_jtl, read_jsonl, windows, write_json
+    from common import properties, read_jtl, read_jsonl, utf8_output, windows, write_json
 
 
 def timestamp(value):
@@ -175,6 +175,7 @@ if __name__ == '__main__':
     for name in ('jtl', 'metrics', 'transfers', 'profile', 'output'):
         parser.add_argument('--' + name, type=Path, required=True)
     args = parser.parse_args()
+    utf8_output()
     summary = analyse(args.jtl, args.metrics, args.transfers, args.profile)
     write_json(args.output, summary)
     print(summary['nft_verdict'], summary['measured'])

@@ -18,6 +18,18 @@ class CollectorTests(unittest.TestCase):
         self.assertGreater(result['generatorRssKiB'], 0)
         self.assertGreaterEqual(result['generatorThreads'], 1)
 
+    @unittest.skipUnless(os.name == 'nt', 'интервальный CPU через WinAPI считается только в Windows')
+    def test_windows_cpu_is_share_since_previous_sample(self):
+        generator_stats(os.getpid())
+        deadline = time.perf_counter() + .3
+        while time.perf_counter() < deadline:
+            pass
+        busy = generator_stats(os.getpid())
+        self.assertGreater(busy['generatorCpuPercent'], 20)
+        time.sleep(.3)
+        idle = generator_stats(os.getpid())
+        self.assertLess(idle['generatorCpuPercent'], busy['generatorCpuPercent'])
+
     def test_absent_metric_is_a_gap_not_zero(self):
         values = parse_metrics('stand_db_transfers_rows 30000\n# comment\njvm_memory_heap_used_bytes 123\n')
         self.assertEqual(values['dbTransfers'], 30000)

@@ -1,0 +1,15 @@
+$ java -version
+openjdk version "25.0.5" 2026-10-20 LTS
+OpenJDK Runtime Environment Temurin-25.0.5+8 (build 25.0.5+8-LTS)
+OpenJDK 64-Bit Server VM Temurin-25.0.5+8 (build 25.0.5+8-LTS, mixed mode, sharing)
+
+$ java -cp groovy-3.0.20.jar;groovy-json-3.0.20.jar;groovy-jsr223-3.0.20.jar groovy.ui.GroovyMain -e "println(java.util.UUID.randomUUID())"   (из lib/ JMeter 5.6.3)
+Caught: BUG! exception in phase 'semantic analysis' in source unit 'script_from_command_line' Unsupported class file major version 69
+BUG! exception in phase 'semantic analysis' in source unit 'script_from_command_line' Unsupported class file major version 69
+Caused by: java.lang.IllegalArgumentException: Unsupported class file major version 69
+	at groovyjarjarasm.asm.ClassReader.<init>(ClassReader.java:199)
+	at groovyjarjarasm.asm.ClassReader.<init>(ClassReader.java:180)
+	at groovyjarjarasm.asm.ClassReader.<init>(ClassReader.java:166)
+
+$ тот же вызов на JRE 17.0.21 из комплекта
+55e994db-07f6-48f9-81a7-db6b07ad8ad7

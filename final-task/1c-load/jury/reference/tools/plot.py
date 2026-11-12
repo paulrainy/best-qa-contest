@@ -78,7 +78,7 @@ def plot(summary_path, metrics_path, output):
     axes[0].set_ylabel('МиБ')
     axes[0].legend()
     axes[1].plot(x, [v * 100 for v in series('standCpu')], label='CPU стенда')
-    axes[1].plot(x, [float(r['generatorCpuPercent']) if r.get('generatorCpuPercent') else float('nan') for r in metrics], label='CPU генератора (ps)')
+    axes[1].plot(x, [float(r['generatorCpuPercent']) if r.get('generatorCpuPercent') else float('nan') for r in metrics], label='CPU генератора (ps или WinAPI)')
     axes[1].set_ylabel('% CPU, разные базы')
     axes[1].legend()
     axes[2].plot(x, series('standThreads'), label='Потоки стенда')

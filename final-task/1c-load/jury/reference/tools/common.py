@@ -1,9 +1,18 @@
 import csv
 import json
+import os
 from pathlib import Path
+import sys
 from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def utf8_output():
+    """Windows-каналы (Git Bash, перенаправление) иначе получают cp1252 и падают на кириллице."""
+    if os.name == 'nt':
+        for stream in (sys.stdout, sys.stderr):
+            stream.reconfigure(encoding='utf-8')
 
 
 def properties(path):

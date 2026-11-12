@@ -1,0 +1,358 @@
+{
+  "origin_ms": 1794477436227,
+  "data_complete": true,
+  "issues": [],
+  "load_valid": true,
+  "nft_verdict": "PASS",
+  "measured": {
+    "posts": 7440,
+    "duration_s": 150.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 49.6,
+    "expected_posts": 7500.0,
+    "tolerance_posts": 375.0,
+    "load_valid": true,
+    "accepted": 7440,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 7440
+    },
+    "accepted_post_p95_ms": 5,
+    "within_2s_percent": 100.0,
+    "within_2s": 7440,
+    "completed": 7440,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 3.0
+  },
+  "intervals": [
+    {
+      "start_s": 30.0,
+      "end_s": 180.0,
+      "posts": 7440,
+      "duration_s": 150.0,
+      "target_rps": 50.0,
+      "actual_post_rps": 49.6,
+      "expected_posts": 7500.0,
+      "tolerance_posts": 375.0,
+      "load_valid": true,
+      "accepted": 7440,
+      "accepted_percent": 100.0,
+      "categories": {
+        "accepted": 7440
+      },
+      "accepted_post_p95_ms": 5,
+      "within_2s_percent": 100.0,
+      "within_2s": 7440,
+      "completed": 7440,
+      "failed": 0,
+      "unfinished": 0,
+      "unknown_status": 0,
+      "finalization_p95_ms": 3.0
+    }
+  ],
+  "all_posts": {
+    "posts": 9000,
+    "duration_s": 180.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 50.0,
+    "expected_posts": 9000.0,
+    "tolerance_posts": 450.0,
+    "load_valid": true,
+    "accepted": 9000,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 9000
+    },
+    "accepted_post_p95_ms": 710,
+    "within_2s_percent": 96.85555555555555,
+    "within_2s": 8717,
+    "completed": 9000,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 1314.64990234375
+  },
+  "excluded": {
+    "service_samples": 0,
+    "outside_measurement_posts": 1560
+  },
+  "metrics": {
+    "samples": 45,
+    "errors": 0,
+    "complete": true,
+    "coverage": true,
+    "max_gap_ms": 5454,
+    "generator_resource_samples": 44,
+    "accounting_rates": [
+      {
+        "start": 1794477433.226,
+        "end": 1794477438.316,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477438.316,
+        "end": 1794477443.41,
+        "rate": 10.404397123719068,
+        "reset": false
+      },
+      {
+        "start": 1794477443.41,
+        "end": 1794477448.864,
+        "rate": 87.45874593575883,
+        "reset": false
+      },
+      {
+        "start": 1794477448.864,
+        "end": 1794477454.227,
+        "rate": 78.68730311461893,
+        "reset": false
+      },
+      {
+        "start": 1794477454.227,
+        "end": 1794477459.289,
+        "rate": 47.01698899567799,
+        "reset": false
+      },
+      {
+        "start": 1794477459.289,
+        "end": 1794477464.385,
+        "rate": 52.39403498792679,
+        "reset": false
+      },
+      {
+        "start": 1794477464.385,
+        "end": 1794477469.441,
+        "rate": 55.97310132916943,
+        "reset": false
+      },
+      {
+        "start": 1794477469.441,
+        "end": 1794477474.5,
+        "rate": 48.03320799902578,
+        "reset": false
+      },
+      {
+        "start": 1794477474.5,
+        "end": 1794477479.561,
+        "rate": 48.60699362092521,
+        "reset": false
+      },
+      {
+        "start": 1794477479.561,
+        "end": 1794477484.629,
+        "rate": 52.486189504576714,
+        "reset": false
+      },
+      {
+        "start": 1794477484.629,
+        "end": 1794477489.681,
+        "rate": 48.495644849573544,
+        "reset": false
+      },
+      {
+        "start": 1794477489.681,
+        "end": 1794477494.72,
+        "rate": 54.574319929815324,
+        "reset": false
+      },
+      {
+        "start": 1794477494.72,
+        "end": 1794477499.778,
+        "rate": 49.228943392793425,
+        "reset": false
+      },
+      {
+        "start": 1794477499.778,
+        "end": 1794477504.815,
+        "rate": 52.41215070458915,
+        "reset": false
+      },
+      {
+        "start": 1794477504.815,
+        "end": 1794477509.874,
+        "rate": 46.25420029535816,
+        "reset": false
+      },
+      {
+        "start": 1794477509.874,
+        "end": 1794477514.962,
+        "rate": 47.36635387035183,
+        "reset": false
+      },
+      {
+        "start": 1794477514.962,
+        "end": 1794477520.047,
+        "rate": 48.37758075802198,
+        "reset": false
+      },
+      {
+        "start": 1794477520.047,
+        "end": 1794477525.093,
+        "rate": 47.760602421285725,
+        "reset": false
+      },
+      {
+        "start": 1794477525.093,
+        "end": 1794477530.174,
+        "rate": 50.38378183100304,
+        "reset": false
+      },
+      {
+        "start": 1794477530.174,
+        "end": 1794477535.25,
+        "rate": 52.40346755306774,
+        "reset": false
+      },
+      {
+        "start": 1794477535.25,
+        "end": 1794477540.311,
+        "rate": 50.58288767055632,
+        "reset": false
+      },
+      {
+        "start": 1794477540.311,
+        "end": 1794477545.375,
+        "rate": 48.183255378836726,
+        "reset": false
+      },
+      {
+        "start": 1794477545.375,
+        "end": 1794477550.427,
+        "rate": 52.45447300055914,
+        "reset": false
+      },
+      {
+        "start": 1794477550.427,
+        "end": 1794477555.468,
+        "rate": 54.15592263262548,
+        "reset": false
+      },
+      {
+        "start": 1794477555.468,
+        "end": 1794477560.53,
+        "rate": 48.99249273499219,
+        "reset": false
+      },
+      {
+        "start": 1794477560.53,
+        "end": 1794477565.563,
+        "rate": 49.076097829211385,
+        "reset": false
+      },
+      {
+        "start": 1794477565.563,
+        "end": 1794477570.599,
+        "rate": 45.67116747224466,
+        "reset": false
+      },
+      {
+        "start": 1794477570.599,
+        "end": 1794477575.642,
+        "rate": 46.79754130543982,
+        "reset": false
+      },
+      {
+        "start": 1794477575.642,
+        "end": 1794477580.693,
+        "rate": 48.505245350224186,
+        "reset": false
+      },
+      {
+        "start": 1794477580.693,
+        "end": 1794477585.727,
+        "rate": 51.45013987318253,
+        "reset": false
+      },
+      {
+        "start": 1794477585.727,
+        "end": 1794477590.781,
+        "rate": 46.893550583894374,
+        "reset": false
+      },
+      {
+        "start": 1794477590.781,
+        "end": 1794477595.84,
+        "rate": 47.0448703858771,
+        "reset": false
+      },
+      {
+        "start": 1794477595.84,
+        "end": 1794477600.907,
+        "rate": 48.352080661985845,
+        "reset": false
+      },
+      {
+        "start": 1794477600.907,
+        "end": 1794477605.976,
+        "rate": 47.74117177487134,
+        "reset": false
+      },
+      {
+        "start": 1794477605.976,
+        "end": 1794477611.039,
+        "rate": 49.97037365413936,
+        "reset": false
+      },
+      {
+        "start": 1794477611.039,
+        "end": 1794477616.07,
+        "rate": 51.87835524634384,
+        "reset": false
+      },
+      {
+        "start": 1794477616.07,
+        "end": 1794477621.141,
+        "rate": 1.7747978355298308,
+        "reset": false
+      },
+      {
+        "start": 1794477621.141,
+        "end": 1794477626.198,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477626.198,
+        "end": 1794477631.282,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477631.282,
+        "end": 1794477636.362,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477636.362,
+        "end": 1794477641.433,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477641.433,
+        "end": 1794477646.524,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477646.524,
+        "end": 1794477651.591,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794477651.591,
+        "end": 1794477656.641,
+        "rate": 0.0,
+        "reset": false
+      }
+    ],
+    "max_accounting_queue": 185.0
+  },
+  "nft_confirmation_profile": true,
+  "profile": "confirmation"
+}

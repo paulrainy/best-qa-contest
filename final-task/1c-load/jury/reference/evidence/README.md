@@ -10,9 +10,9 @@
 - `raw-cli` — пробный низкоуровневый запуск и дополнительный HTML, 60 строк JTL. Без статусов и метрик он не доказывает SLO.
 - `tool-guards` — отрицательные проверки отказа от перезаписи/ошибки процесса.
 - `independent-recount.json` — отдельный пересчёт количества, ключей, ID, p95 и SLO по каждой измерительной когорте; не усредняет p95.
-- `independent-acceptance` — повтор другим исполнителем по README; подробности приёмки в отчёте.
+- `independent-acceptance/windows-java25` — независимый повтор smoke, confirmation и raw CLI на Windows 11 12.11.2026 (стенд на Java 25, генератор на Java 17), отдельный пересчёт и неудавшийся генератор на Java 25. Заключение — в его [README](independent-acceptance/windows-java25/README.md). Файлы созданы на Windows и сохраняют CRLF там, где их так записали Python и JMeter.
 
-В каждой полной записи: samples.jtl, metrics.csv и исходный Prometheus в metrics.jsonl, transfers.jsonl с ответами API и временем наблюдения, transfers.survey.json с deadline опроса, profile.properties, accounts.csv, initial/reset/environment JSON, консоль JMeter, результат построения и четыре PNG. Полные INFO-логи/HTML основных запусков не отбираются: это вспомогательная диагностика, первичные измерения сохраняются полностью. Для raw CLI его HTML и INFO-лог сохранены отдельно.
+В каждой полной записи: samples.jtl, metrics.csv и исходный Prometheus в metrics.jsonl, transfers.jsonl с ответами API и временем наблюдения, transfers.survey.json с deadline опроса, profile.properties, accounts.csv, initial/reset/environment JSON, консоль JMeter, результат построения и четыре PNG. Полные INFO-логи/HTML основных запусков не отбираются: это вспомогательная диагностика, первичные измерения сохраняются полностью. Для raw CLI на Mac сохранены HTML и JTL; его INFO-лог был указан в первой версии SHA256SUMS, но правило `jmeter.log` в `.gitignore` не пустило файл в Git. 12.11.2026 строка удалена из SHA256SUMS, а для отобранных логов добавлено исключение `!evidence/**/jmeter.log`; исходный лог остался только на машине автора.
 
 В SHA256SUMS включаются все файлы evidence, кроме самого SHA256SUMS. Проверка из каталога эталона на macOS/Linux:
 

@@ -17,22 +17,42 @@ try:
     from .analyse import analyse
     from .collect_metrics import MetricsCollector, parse_metrics
     from .collect_transfers import collect
-    from .common import ROOT, api, properties, read_jtl, request, write_json
+    from .common import ROOT, api, properties, read_jtl, request, utf8_output, write_json
     from .prepare_data import prepare
 except ImportError:
     from analyse import analyse
     from collect_metrics import MetricsCollector, parse_metrics
     from collect_transfers import collect
-    from common import ROOT, api, properties, read_jtl, request, write_json
+    from common import ROOT, api, properties, read_jtl, request, utf8_output, write_json
     from prepare_data import prepare
 
 
 def capture(command, env=None):
     try:
-        result = subprocess.run(command, capture_output=True, text=True, timeout=20, env=env)
+        result = subprocess.run(command, capture_output=True, text=True, timeout=20, env=env,
+                                stdin=subprocess.DEVNULL, encoding='utf-8', errors='replace')
         return dict(command=command, exit=result.returncode, stdout=result.stdout, stderr=result.stderr)
     except (OSError, subprocess.SubprocessError) as exc:
         return dict(command=command, error=str(exc))
+
+
+def powershell(script):
+    return capture(['powershell', '-NoProfile', '-NonInteractive', '-Command',
+                    '[Console]::OutputEncoding=[Text.Encoding]::UTF8; ' + script])
+
+
+def stop_tree(process):
+    """jmeter.bat — это cmd.exe; без /T его дочерний java.exe переживёт остановку."""
+    if os.name == 'nt':
+        subprocess.run(['taskkill', '/T', '/F', '/PID', str(process.pid)], capture_output=True)
+    else:
+        os.killpg(process.pid, signal.SIGTERM)
+    try:
+        process.wait(timeout=10)
+    except subprocess.TimeoutExpired:
+        if os.name != 'nt':
+            os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
 
 
 def digest(path):
@@ -50,6 +70,9 @@ def run(args):
         env['JAVA_HOME'] = str(args.java_home.resolve())
     env.setdefault('HEAP', '-Xms256m -Xmx1g')
     java = str(Path(env['JAVA_HOME']) / 'bin/java') if env.get('JAVA_HOME') else 'java'
+    if env.get('JAVA_HOME'):
+        # jmeter.bat вызывает java.exe из PATH, а не из JAVA_HOME: записанная JVM должна совпадать с исполняемой.
+        env['PATH'] = str(Path(env['JAVA_HOME']) / 'bin') + os.pathsep + env.get('PATH', '')
     url = urlsplit(args.base_url)
     if url.scheme not in ('http', 'https') or not url.hostname or url.path not in ('', '/'):
         raise ValueError('Нужен HTTP(S) base-url без пути')
@@ -68,8 +91,15 @@ def run(args):
                     environment={k: env.get(k) for k in ('JAVA_HOME', 'HEAP', 'JVM_ARGS', 'JAVA_TOOL_OPTIONS')})
     if platform.system() == 'Darwin':
         metadata['hardware'] = capture(['sysctl', 'hw.model', 'hw.memsize', 'machdep.cpu.brand_string'])
+    elif platform.system() == 'Windows':
+        metadata['hardware'] = powershell(
+            '$c=Get-CimInstance Win32_Processor; $s=Get-CimInstance Win32_ComputerSystem; $o=Get-CimInstance Win32_OperatingSystem; '
+            '"cpu=$($c.Name); logical=$($s.NumberOfLogicalProcessors); ramBytes=$($s.TotalPhysicalMemory); '
+            'model=$($s.Manufacturer) $($s.Model); os=$($o.Caption) $($o.Version) $($o.OSArchitecture)"')
+        metadata['javaOnPath'] = capture(['where', 'java'], env)
     if args.stand_pid:
-        metadata['standCommand'] = capture(['ps', '-p', str(args.stand_pid), '-o', 'command='])
+        metadata['standCommand'] = (powershell(f'(Get-CimInstance Win32_Process -Filter "ProcessId={args.stand_pid}").CommandLine')
+                                    if os.name == 'nt' else capture(['ps', '-p', str(args.stand_pid), '-o', 'command=']))
     write_json(output / 'environment.json', metadata)
     process = None
     collector = None
@@ -100,7 +130,8 @@ def run(args):
         metadata['command'] = command
         write_json(output / 'environment.json', metadata)
         with (output / 'jmeter-console.log').open('x', encoding='utf-8') as log:
-            process = subprocess.Popen(command, stdout=log, stderr=subprocess.STDOUT, env=env,
+            # stdin закрыт: при ошибке jmeter.bat выполняет pause и иначе ждал бы клавишу до таймаута.
+            process = subprocess.Popen(command, stdin=subprocess.DEVNULL, stdout=log, stderr=subprocess.STDOUT, env=env,
                                        cwd=ROOT, start_new_session=os.name != 'nt')
             metadata['jmeterLauncherPid'] = process.pid
             code = process.wait(timeout=float(settings['load.duration']) + 180)
@@ -109,8 +140,11 @@ def run(args):
             raise RuntimeError(f'JMeter завершился с кодом {code}; см. jmeter-console.log')
         rows = read_jtl(output / 'samples.jtl')
         keys = [r['idempotencyKey'] for r in rows if r['label'] == 'POST transfer']
-        if not keys or len(set(keys)) != len(keys) or len(keys) > 100000:
-            raise RuntimeError('Нет запросов, повторный ключ или превышен бюджет данных')
+        if not keys:
+            raise RuntimeError('JMeter не отправил ни одного POST; см. jmeter.log. '
+                               'Groovy 3.0.20 из JMeter 5.6.3 не исполняет JSR223 на Java 25+')
+        if len(set(keys)) != len(keys) or len(keys) > 100000:
+            raise RuntimeError('Повторный ключ или превышен бюджет данных')
         collect(rows, args.base_url, output / 'transfers.jsonl')
         collector.close()
         collector = None
@@ -131,18 +165,7 @@ def run(args):
         raise
     finally:
         if process and process.poll() is None:
-            if os.name != 'nt':
-                os.killpg(process.pid, signal.SIGTERM)
-            else:
-                process.terminate()
-            try:
-                process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                if os.name != 'nt':
-                    os.killpg(process.pid, signal.SIGKILL)
-                else:
-                    process.kill()
-                process.wait()
+            stop_tree(process)
         if collector:
             collector.close()
         metadata['finishedAtMs'] = int(time.time() * 1000)
@@ -158,6 +181,7 @@ if __name__ == '__main__':
     parser.add_argument('--java-home', type=Path)
     parser.add_argument('--stand-pid', type=int)
     args = parser.parse_args()
+    utf8_output()
     try:
         sys.exit(run(args))
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as exc:

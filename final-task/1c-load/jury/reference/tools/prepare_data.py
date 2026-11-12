@@ -7,9 +7,9 @@ from decimal import Decimal
 from pathlib import Path
 
 try:
-    from .common import request
+    from .common import request, utf8_output
 except ImportError:
-    from common import request
+    from common import request, utf8_output
 
 
 def select_pairs(accounts, count=2000, max_requests=100000):
@@ -48,4 +48,5 @@ if __name__ == '__main__':
     parser.add_argument('--base-url', default='http://localhost:18400')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    utf8_output()
     print(f'Подготовлено {len(prepare(args.base_url, args.output))} пар OTHER')

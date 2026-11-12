@@ -1,0 +1,130 @@
+{
+  "runs": [
+    {
+      "run": "smoke",
+      "all_posts": 60,
+      "unique_keys": 60,
+      "accepted_ids": 60,
+      "statuses": {
+        "COMPLETED": 60
+      },
+      "windows": [
+        {
+          "start_s": 0.0,
+          "end_s": 30.0,
+          "posts": 60,
+          "accepted": 60,
+          "p95_ms": 124,
+          "within_2s": 60,
+          "unfinished": 0
+        }
+      ],
+      "reanalysis_equal": true,
+      "verdict": "PASS",
+      "metrics_complete": true,
+      "segments": [
+        {
+          "start_s": 0,
+          "end_s": 10,
+          "posts": 28,
+          "p95_ms": 172,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        },
+        {
+          "start_s": 10,
+          "end_s": 20,
+          "posts": 15,
+          "p95_ms": 37,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        },
+        {
+          "start_s": 20,
+          "end_s": 30,
+          "posts": 17,
+          "p95_ms": 13,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        }
+      ]
+    },
+    {
+      "run": "confirmation",
+      "all_posts": 9000,
+      "unique_keys": 9000,
+      "accepted_ids": 9000,
+      "statuses": {
+        "COMPLETED": 9000
+      },
+      "windows": [
+        {
+          "start_s": 30.0,
+          "end_s": 180.0,
+          "posts": 7440,
+          "accepted": 7440,
+          "p95_ms": 5,
+          "within_2s": 7440,
+          "unfinished": 0
+        }
+      ],
+      "reanalysis_equal": true,
+      "verdict": "PASS",
+      "metrics_complete": true,
+      "segments": [
+        {
+          "start_s": 0,
+          "end_s": 10,
+          "posts": 533,
+          "p95_ms": 2401,
+          "over_500ms": 489,
+          "finalization_over_2s": 250
+        },
+        {
+          "start_s": 10,
+          "end_s": 20,
+          "posts": 505,
+          "p95_ms": 78,
+          "over_500ms": 0,
+          "finalization_over_2s": 33
+        },
+        {
+          "start_s": 20,
+          "end_s": 30,
+          "posts": 522,
+          "p95_ms": 6,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        },
+        {
+          "start_s": 30,
+          "end_s": 60,
+          "posts": 1524,
+          "p95_ms": 5,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        },
+        {
+          "start_s": 60,
+          "end_s": 180,
+          "posts": 5916,
+          "p95_ms": 5,
+          "over_500ms": 0,
+          "finalization_over_2s": 0
+        }
+      ]
+    }
+  ],
+  "raw_cli": {
+    "posts": 60,
+    "unique_keys": 60,
+    "accepted": 60
+  },
+  "generator_java25_posts": 0,
+  "same_seed_against_mac_confirmation": {
+    "mac_posts": 9000,
+    "windows_posts": 9000,
+    "seconds_with_equal_counts": 115,
+    "seconds_total": 180
+  }
+}
