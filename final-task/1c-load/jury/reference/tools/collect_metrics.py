@@ -117,6 +117,18 @@ def _windows_generator_stats(parent_pid):
                 generatorRssKiB=memory.WorkingSetSize // 1024, generatorThreads=processes[pid])
 
 
+def java_child(ps_lines, parent_pid):
+    """Дочерний java по выводу `ps -axo pid=,ppid=,comm=`; иначе сам parent_pid.
+
+    macOS печатает в comm полный путь, Linux — только имя процесса.
+    """
+    for line in ps_lines:
+        parts = line.split(None, 2)
+        if len(parts) == 3 and int(parts[1]) == parent_pid and parts[2].strip().rsplit('/', 1)[-1] == 'java':
+            return int(parts[0])
+    return parent_pid
+
+
 def generator_stats(parent_pid):
     if not parent_pid:
         return {}
@@ -127,8 +139,7 @@ def generator_stats(parent_pid):
             return dict(generatorError=str(exc))
     try:
         lines = subprocess.check_output(['ps', '-axo', 'pid=,ppid=,comm='], text=True).splitlines()
-        children = [line.split(None, 2) for line in lines]
-        pid = next((int(p) for p, parent, command in children if int(parent) == parent_pid and command.endswith('/java')), parent_pid)
+        pid = java_child(lines, parent_pid)
         result = subprocess.check_output(['ps', '-p', str(pid), '-o', '%cpu=,rss='], text=True, stderr=subprocess.PIPE).split()
         if platform.system() == 'Darwin':
             threads = len(subprocess.check_output(['ps', '-M', '-p', str(pid)], text=True, stderr=subprocess.PIPE).splitlines()) - 1

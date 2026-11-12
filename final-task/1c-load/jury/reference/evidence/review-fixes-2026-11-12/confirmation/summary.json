@@ -1,0 +1,364 @@
+{
+  "origin_ms": 1794493861460,
+  "data_complete": true,
+  "issues": [],
+  "load_valid": true,
+  "nft_verdict": "PASS",
+  "measured": {
+    "posts": 7440,
+    "duration_s": 150.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 49.6,
+    "expected_posts": 7500.0,
+    "tolerance_posts": 375.0,
+    "load_valid": true,
+    "accepted": 7440,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 7440
+    },
+    "accepted_post_p95_ms": 3,
+    "within_2s_percent": 100.0,
+    "within_2s": 7440,
+    "completed": 7440,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 2.006103515625
+  },
+  "intervals": [
+    {
+      "start_s": 30.0,
+      "end_s": 180.0,
+      "posts": 7440,
+      "duration_s": 150.0,
+      "target_rps": 50.0,
+      "actual_post_rps": 49.6,
+      "expected_posts": 7500.0,
+      "tolerance_posts": 375.0,
+      "load_valid": true,
+      "accepted": 7440,
+      "accepted_percent": 100.0,
+      "categories": {
+        "accepted": 7440
+      },
+      "accepted_post_p95_ms": 3,
+      "within_2s_percent": 100.0,
+      "within_2s": 7440,
+      "completed": 7440,
+      "failed": 0,
+      "unfinished": 0,
+      "unknown_status": 0,
+      "finalization_p95_ms": 2.006103515625
+    }
+  ],
+  "all_posts": {
+    "posts": 9000,
+    "duration_s": 180.0,
+    "target_rps": 50.0,
+    "actual_post_rps": 50.0,
+    "expected_posts": 9000.0,
+    "tolerance_posts": 450.0,
+    "load_valid": true,
+    "accepted": 9000,
+    "accepted_percent": 100.0,
+    "categories": {
+      "accepted": 9000
+    },
+    "accepted_post_p95_ms": 8,
+    "within_2s_percent": 100.0,
+    "within_2s": 9000,
+    "completed": 9000,
+    "failed": 0,
+    "unfinished": 0,
+    "unknown_status": 0,
+    "finalization_p95_ms": 4.10107421875
+  },
+  "excluded": {
+    "service_samples": 0,
+    "outside_measurement_posts": 1560
+  },
+  "metrics": {
+    "samples": 46,
+    "errors": 0,
+    "complete": true,
+    "coverage": true,
+    "max_gap_ms": 5293,
+    "generator_resource_samples": 44,
+    "accounting_rates": [
+      {
+        "start": 1794493858.234,
+        "end": 1794493863.305,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794493863.305,
+        "end": 1794493868.374,
+        "rate": 68.65259412254225,
+        "reset": false
+      },
+      {
+        "start": 1794493868.374,
+        "end": 1794493873.667,
+        "rate": 58.190062535216065,
+        "reset": false
+      },
+      {
+        "start": 1794493873.667,
+        "end": 1794493878.731,
+        "rate": 51.34281310859651,
+        "reset": false
+      },
+      {
+        "start": 1794493878.731,
+        "end": 1794493883.819,
+        "rate": 46.97326989437373,
+        "reset": false
+      },
+      {
+        "start": 1794493883.819,
+        "end": 1794493888.862,
+        "rate": 53.539559968087936,
+        "reset": false
+      },
+      {
+        "start": 1794493888.862,
+        "end": 1794493893.91,
+        "rate": 55.07131431120246,
+        "reset": false
+      },
+      {
+        "start": 1794493893.91,
+        "end": 1794493898.969,
+        "rate": 47.44020543113657,
+        "reset": false
+      },
+      {
+        "start": 1794493898.969,
+        "end": 1794493904.047,
+        "rate": 46.868847569156294,
+        "reset": false
+      },
+      {
+        "start": 1794493904.047,
+        "end": 1794493909.103,
+        "rate": 53.995253225665216,
+        "reset": false
+      },
+      {
+        "start": 1794493909.103,
+        "end": 1794493914.161,
+        "rate": 49.03123679282237,
+        "reset": false
+      },
+      {
+        "start": 1794493914.161,
+        "end": 1794493919.211,
+        "rate": 54.257426254890234,
+        "reset": false
+      },
+      {
+        "start": 1794493919.211,
+        "end": 1794493924.242,
+        "rate": 48.300535354190195,
+        "reset": false
+      },
+      {
+        "start": 1794493924.242,
+        "end": 1794493929.279,
+        "rate": 51.618027209065076,
+        "reset": false
+      },
+      {
+        "start": 1794493929.279,
+        "end": 1794493934.325,
+        "rate": 48.15695596835034,
+        "reset": false
+      },
+      {
+        "start": 1794493934.325,
+        "end": 1794493939.368,
+        "rate": 47.19413063853677,
+        "reset": false
+      },
+      {
+        "start": 1794493939.368,
+        "end": 1794493944.435,
+        "rate": 46.97059485318883,
+        "reset": false
+      },
+      {
+        "start": 1794493944.435,
+        "end": 1794493949.482,
+        "rate": 48.54368768763889,
+        "reset": false
+      },
+      {
+        "start": 1794493949.482,
+        "end": 1794493954.53,
+        "rate": 53.288432551769375,
+        "reset": false
+      },
+      {
+        "start": 1794493954.53,
+        "end": 1794493959.574,
+        "rate": 50.356860530186395,
+        "reset": false
+      },
+      {
+        "start": 1794493959.574,
+        "end": 1794493964.615,
+        "rate": 50.38682673297929,
+        "reset": false
+      },
+      {
+        "start": 1794493964.615,
+        "end": 1794493969.656,
+        "rate": 48.79984237225593,
+        "reset": false
+      },
+      {
+        "start": 1794493969.656,
+        "end": 1794493974.694,
+        "rate": 50.416831007324625,
+        "reset": false
+      },
+      {
+        "start": 1794493974.694,
+        "end": 1794493979.753,
+        "rate": 56.137576426844944,
+        "reset": false
+      },
+      {
+        "start": 1794493979.753,
+        "end": 1794493984.79,
+        "rate": 47.250347983682644,
+        "reset": false
+      },
+      {
+        "start": 1794493984.79,
+        "end": 1794493989.843,
+        "rate": 49.87136380995628,
+        "reset": false
+      },
+      {
+        "start": 1794493989.843,
+        "end": 1794493994.893,
+        "rate": 47.72277272784141,
+        "reset": false
+      },
+      {
+        "start": 1794493994.893,
+        "end": 1794493999.929,
+        "rate": 44.87688629881432,
+        "reset": false
+      },
+      {
+        "start": 1794493999.929,
+        "end": 1794494004.976,
+        "rate": 49.53437519146825,
+        "reset": false
+      },
+      {
+        "start": 1794494004.976,
+        "end": 1794494010.032,
+        "rate": 52.215189932511414,
+        "reset": false
+      },
+      {
+        "start": 1794494010.032,
+        "end": 1794494015.08,
+        "rate": 45.36450206079995,
+        "reset": false
+      },
+      {
+        "start": 1794494015.08,
+        "end": 1794494020.113,
+        "rate": 48.480031863674405,
+        "reset": false
+      },
+      {
+        "start": 1794494020.113,
+        "end": 1794494025.155,
+        "rate": 48.19516012181194,
+        "reset": false
+      },
+      {
+        "start": 1794494025.155,
+        "end": 1794494030.213,
+        "rate": 47.84499719299602,
+        "reset": false
+      },
+      {
+        "start": 1794494030.213,
+        "end": 1794494035.255,
+        "rate": 50.17850004452025,
+        "reset": false
+      },
+      {
+        "start": 1794494035.255,
+        "end": 1794494040.298,
+        "rate": 51.16002396950625,
+        "reset": false
+      },
+      {
+        "start": 1794494040.298,
+        "end": 1794494045.342,
+        "rate": 11.102299959411175,
+        "reset": false
+      },
+      {
+        "start": 1794494045.342,
+        "end": 1794494050.388,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494050.388,
+        "end": 1794494055.423,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494055.423,
+        "end": 1794494060.46,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494060.46,
+        "end": 1794494065.501,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494065.501,
+        "end": 1794494070.534,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494070.534,
+        "end": 1794494075.568,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494075.568,
+        "end": 1794494080.602,
+        "rate": 0.0,
+        "reset": false
+      },
+      {
+        "start": 1794494080.602,
+        "end": 1794494085.649,
+        "rate": 0.0,
+        "reset": false
+      }
+    ],
+    "max_accounting_queue": 1.0
+  },
+  "nft_confirmation_profile": true,
+  "profile": "confirmation"
+}

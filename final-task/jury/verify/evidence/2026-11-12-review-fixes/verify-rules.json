@@ -1,0 +1,12 @@
+{
+  "F10": {
+    "expected": "100.00",
+    "actual": "100.00",
+    "transferId": "e8186dfc-71ba-4b2d-a0ca-9e0c54ce73f0"
+  },
+  "F16": {
+    "expected_balance": "900000.00",
+    "actual_balance": "900000.00",
+    "transferId": "35da9049-15c6-49e0-82ac-06c54395662f"
+  }
+}

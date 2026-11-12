@@ -9,6 +9,7 @@ import tools.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
@@ -61,9 +62,22 @@ final class Api {
     }
 
     void start() throws IOException {
-        HttpServer server = HttpServer.create(new InetSocketAddress(cfg.integer("http.port")), 256);
+        // Только локальные подключения, как у брокера и H2. Оба loopback-адреса: клиент, который сначала
+        // пробует ::1 для localhost, не ждёт отказа соединения.
+        java.util.concurrent.ExecutorService executor = Executors.newFixedThreadPool(32);
+        int port = cfg.integer("http.port");
+        listen(new InetSocketAddress(InetAddress.getByName("127.0.0.1"), port), executor);
+        try {
+            listen(new InetSocketAddress(InetAddress.getByName("::1"), port), executor);
+        } catch (IOException e) {
+            System.out.println("  IPv6 loopback для HTTP недоступен: " + e.getMessage());
+        }
+    }
+
+    private void listen(InetSocketAddress address, java.util.concurrent.Executor executor) throws IOException {
+        HttpServer server = HttpServer.create(address, 256);
         server.createContext("/", this::dispatch);
-        server.setExecutor(Executors.newFixedThreadPool(32));
+        server.setExecutor(executor);
         server.start();
     }
 
@@ -179,6 +193,7 @@ final class Api {
             db.linkPgReplica();
             clock.reset();
             accounting.clearAttempts();
+            notifications.clearAttempts();
             accounting.start();
             notifications.start();
             ObjectNode n = Messaging.JSON.createObjectNode();
@@ -404,14 +419,15 @@ final class Api {
         } catch (Exception e) {
             throw new ApiError(400, "VALIDATION_ERROR", "date в формате ГГГГ-ММ-ДД");
         }
+        // Границы суток МСК считаются здесь: CAST(... AS DATE) в H2 берёт часовой пояс JVM, а не МСК.
         String sql = """
                 SELECT COUNT(*), COALESCE(SUM(amount), 0), COALESCE(SUM(commission), 0)
                 FROM transfers
-                WHERE status = 'COMPLETED' AND completed_at IS NOT NULL
-                  AND CAST((completed_at AT TIME ZONE 'Europe/Moscow') AS DATE) = ?
+                WHERE status = 'COMPLETED' AND completed_at >= ? AND completed_at < ?
                 """;
         try (Connection c = db.connection(); PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setObject(1, day);
+            ps.setObject(1, day.atStartOfDay(StandClock.MSK).toOffsetDateTime());
+            ps.setObject(2, day.plusDays(1).atStartOfDay(StandClock.MSK).toOffsetDateTime());
             try (ResultSet rs = ps.executeQuery()) {
                 rs.next();
                 ObjectNode n = Messaging.JSON.createObjectNode();

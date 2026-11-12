@@ -57,11 +57,14 @@ class AnalysisTests(unittest.TestCase):
             self.assertIsNone(summary['measured']['within_2s_percent'])
 
     def test_response_categories_are_separate(self):
-        rows = [row(1), row(2, code='200', status='REJECTED'), row(3, code='503'),
-                row(4, code='Non HTTP response code: SocketTimeoutException'), dict(row(5), transferId='')]
+        rows = [row(1), row(2, code='422', status=''), row(3, code='503'),
+                row(4, code='Non HTTP response code: SocketTimeoutException'), dict(row(5), transferId=''),
+                row(6, code='200'), row(7, code='409', status='')]
         summary = self.summary(rows, [final(rows[0])])
+        # 422 — прикладной отказ по ТЗ; 200 означает повтор по ключу и при уникальных ключах неожидан.
         self.assertEqual(summary['measured']['categories'],
-                         dict(accepted=1, application_rejection=1, overload_503=1, timeout=1, invalid_202=1))
+                         dict(accepted=1, application_rejection=1, overload_503=1, timeout=1, invalid_202=1,
+                              http_or_transport_error=2))
         self.assertEqual(summary['measured']['accepted'], 1)
 
     def test_step_half_open_boundaries_and_late_completion(self):

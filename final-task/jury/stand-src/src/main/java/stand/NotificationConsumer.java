@@ -28,58 +28,61 @@ final class NotificationConsumer extends PausableConsumer {
 
     @Override
     protected void handle(Channel ch, Envelope env, AMQP.BasicProperties props, byte[] body) throws Exception {
+        long tag = env.getDeliveryTag();
         JsonNode e;
+        UUID transferId;
         String from;
         String to;
         BigDecimal amount;
         BigDecimal commission;
         try {
             e = Messaging.JSON.readTree(body);
+            // Без transferId нельзя отсечь повторную доставку, поэтому такое сообщение некорректно.
+            transferId = UUID.fromString(e.get("transferId").asString());
             from = e.get("fromAccount").asString();
             to = e.get("toAccount").asString();
             amount = e.get("amount").decimalValue();
             commission = e.get("commission").decimalValue();
         } catch (Exception ex) {
-            mq.toDlq(body, Messaging.Q_NOTIFICATIONS, "Некорректное сообщение: " + ex.getMessage());
-            ch.basicAck(env.getDeliveryTag(), false);
+            retryOrDlq(ch, tag, body, "Некорректное сообщение: " + ex.getMessage());
             return;
         }
+        String error = null;
         try (Connection c = db.connection()) {
-            UUID transferId = uuidOrNull(e.path("transferId").asString(""));
+            boolean duplicate;
             try (PreparedStatement ps = c.prepareStatement("SELECT 1 FROM notifications WHERE transfer_id = ?")) {
                 ps.setObject(1, transferId);
                 try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) { ch.basicAck(env.getDeliveryTag(), false); return; }
+                    duplicate = rs.next();
                 }
             }
-            String sender = clientOf(c, from);
-            if (sender == null) {
-                mq.toDlq(body, Messaging.Q_NOTIFICATIONS, "Счёт отправителя не найден");
-                ch.basicAck(env.getDeliveryTag(), false);
-                return;
+            String sender = duplicate ? null : clientOf(c, from);
+            if (!duplicate && sender == null) {
+                error = "Счёт отправителя не найден";
+            } else if (!duplicate) {
+                String text = "TransferFailed".equals(e.path("eventType").asString())
+                        ? "Перевод " + rub(amount) + " ₽ на счёт " + to + " не выполнен. Средства "
+                            + rub(amount.add(commission)) + " ₽ возвращены на счёт " + from + "."
+                        : "Перевод " + rub(amount) + " ₽ на счёт " + to + " выполнен. Комиссия " + rub(commission) + " ₽.";
+                try (PreparedStatement ps = c.prepareStatement(
+                        "INSERT INTO notifications(client_id, transfer_id, text, created_at) VALUES (?, ?, ?, ?)")) {
+                    ps.setString(1, sender);
+                    ps.setObject(2, transferId);
+                    ps.setString(3, text);
+                    ps.setObject(4, clock.nowMsk());
+                    ps.executeUpdate();
+                }
             }
-            String text = "TransferFailed".equals(e.path("eventType").asString())
-                    ? "Перевод " + rub(amount) + " ₽ на счёт " + to + " не выполнен. Средства "
-                        + rub(amount.add(commission)) + " ₽ возвращены на счёт " + from + "."
-                    : "Перевод " + rub(amount) + " ₽ на счёт " + to + " выполнен. Комиссия " + rub(commission) + " ₽.";
-            try (PreparedStatement ps = c.prepareStatement(
-                    "INSERT INTO notifications(client_id, transfer_id, text, created_at) VALUES (?, ?, ?, ?)")) {
-                ps.setString(1, sender);
-                ps.setObject(2, uuidOrNull(e.path("transferId").asString("")));
-                ps.setString(3, text);
-                ps.setObject(4, clock.nowMsk());
-                ps.executeUpdate();
-            }
+        } catch (Exception ex) {
+            // Сбой БД, включая гонку за уникальный индекс: повтор, после третьего подряд — DLQ.
+            error = "Ошибка обработки: " + ex.getMessage();
         }
-        ch.basicAck(env.getDeliveryTag(), false);
-    }
-
-    private static UUID uuidOrNull(String s) {
-        try {
-            return UUID.fromString(s);
-        } catch (Exception e) {
-            return null;
+        if (error != null) {
+            retryOrDlq(ch, tag, body, error);
+            return;
         }
+        forgetAttempts(body);
+        ch.basicAck(tag, false);
     }
 
     private static String clientOf(Connection c, String account) throws Exception {

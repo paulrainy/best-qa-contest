@@ -1,0 +1,23 @@
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release
+Creating summariser <summary>
+Created the tree successfully using C:\paul\best-qa-contest\final-task\1c-load\jury\reference\transfers.jmx
+Starting standalone test @ 2026 Nov 12 08:31:01 CST (1794493861437)
+Waiting for possible Shutdown/StopTestNow/HeapDump/ThreadDump message on port 4445
+summary +   1486 in 00:00:28 =   53.3/s Avg:   122 Min:     1 Max:  1157 Err:     0 (0.00%) Active: 1 Started: 1486 Finished: 1485
+summary +   1530 in 00:00:30 =   51.1/s Avg:     2 Min:     1 Max:    17 Err:     0 (0.00%) Active: 1 Started: 3016 Finished: 3015
+summary =   3016 in 00:00:58 =   52.1/s Avg:    61 Min:     1 Max:  1157 Err:     0 (0.00%)
+summary +   1459 in 00:00:30 =   48.6/s Avg:     1 Min:     1 Max:     5 Err:     0 (0.00%) Active: 1 Started: 4475 Finished: 4474
+summary =   4475 in 00:01:28 =   50.9/s Avg:    41 Min:     1 Max:  1157 Err:     0 (0.00%)
+summary +   1540 in 00:00:30 =   51.3/s Avg:     1 Min:     1 Max:    40 Err:     0 (0.00%) Active: 1 Started: 6015 Finished: 6014
+summary =   6015 in 00:01:58 =   51.0/s Avg:    31 Min:     1 Max:  1157 Err:     0 (0.00%)
+summary +   1458 in 00:00:30 =   48.6/s Avg:     1 Min:     1 Max:     6 Err:     0 (0.00%) Active: 1 Started: 7473 Finished: 7472
+summary =   7473 in 00:02:28 =   50.5/s Avg:    25 Min:     1 Max:  1157 Err:     0 (0.00%)
+summary +   1451 in 00:00:30 =   48.4/s Avg:     1 Min:     1 Max:    37 Err:     0 (0.00%) Active: 2 Started: 8925 Finished: 8923
+summary =   8924 in 00:02:58 =   50.2/s Avg:    21 Min:     1 Max:  1157 Err:     0 (0.00%)
+summary +     76 in 00:00:36 =    2.1/s Avg:     1 Min:     1 Max:     4 Err:     0 (0.00%) Active: 0 Started: 9000 Finished: 9000
+summary =   9000 in 00:03:34 =   42.0/s Avg:    21 Min:     1 Max:  1157 Err:     0 (0.00%)
+Tidying up ...    @ 2026 Nov 12 08:34:36 CST (1794494076475)
+... end of run

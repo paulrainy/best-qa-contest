@@ -52,6 +52,12 @@ class ResultChecks(unittest.TestCase):
         self.write(lambda s: SubElement(s[2], 'skipped'))
         self.assertTrue(self.check())
 
+    def test_failure_passed_on_rerun_rejected(self):
+        for tag in ('flakyFailure', 'flakyError', 'rerunFailure', 'rerunError'):
+            with self.subTest(tag=tag):
+                self.write(lambda s: SubElement(s[1], tag, type='java.lang.AssertionError', message='first attempt'))
+                self.assertTrue(self.check())
+
     def test_infrastructure_error_rejected(self):
         self.write(lambda s: SubElement(s[1], 'error', type='java.sql.SQLException', message='unavailable'))
         self.assertTrue(self.check())

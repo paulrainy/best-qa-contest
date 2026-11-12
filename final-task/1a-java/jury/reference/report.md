@@ -1,21 +1,41 @@
 # Отчёт Java-эталона после исправления MF01
 
-11.11.2026, ТЗ2.0/F01–F18, macOS27.2/ARM64. Исправлено дополнительное расхождение MF01: неизвестный клиент уведомлений получает404 CLIENT_NOT_FOUND; существующий клиент без уведомлений —200[]. Намеренные дефекты не внедрялись, шкала оценки не разрабатывалась.
+11.11.2026, ТЗ2.0/F01–F18, macOS27.2/ARM64. Исправлено дополнительное расхождение MF01: неизвестный клиент уведомлений получает 404 CLIENT_NOT_FOUND; существующий клиент без уведомлений —200[]. Намеренные дефекты не внедрялись, шкала оценки не разрабатывалась.
 
-## Текущая сборка и результаты
+## Обновление 12.11.2026 после ревью
 
-Сборка полным Temurin JDK17.0.21+9, compiler release17, Maven3.10.0. Один готовый JAR физически скопирован в четыре выдачи. SHA-256 `2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed`. Проверка совместимости — Homebrew Java21.0.13.0.3. [Манифест](../../../jury/stand-manifest.md), [область изменения и общие доказательства](../../../jury/verify/evidence/2026-11-11-mf01/README.md).
+Актуальный JAR — `220d02c815017de6b22c2d3f16c6b97a1495279c1ae9c5a8029d4f3a8be0f5a2`, собран тем же Temurin JDK 17.0.21+9 на Windows 11. В стенде исправлены:
+- три попытки перед DLQ для уведомлений;
+- отложенная публикация события после commit;
+- HTTP только на loopback;
+- отчёт об обороте, зависевший от часового пояса JVM.
+
+Эталон дополнен:
+- `LimitsTest.accumulatedDailyUsageCountsTowardLimit` (3): накопленный лимит при предыдущем COMPLETED и PROCESSING;
+- `CommissionTest` [3]: 3000,50 → 30,01, точная половина копейки;
+- матрица статусов для BLOCKED→CLOSED принимает обе применимые причины, потому что ТЗ не задаёт приоритет.
+
+| Проверка на JAR 220d02c8… | Результат | Доказательство |
+| --- | --- | --- |
+| Полный Java-эталон, Java 17 | 65 PASS, 0 failures/errors/skipped; точный каталог подтверждён | [XML](../../../jury/verify/evidence/2026-11-12-review-fixes/java17-full/), [анализатор](../../../jury/verify/evidence/2026-11-12-review-fixes/java17-full-check.txt) |
+| Повтор без reset, случайный порядок seed 20261112 | 65 PASS; точный каталог подтверждён | [XML](../../../jury/verify/evidence/2026-11-12-review-fixes/java17-random/), [анализатор](../../../jury/verify/evidence/2026-11-12-review-fixes/java17-random-check.txt) |
+
+На этом JAR `TurnoverTest` сначала упал на машине в поясе UTC−6: стенд относил перевод, завершённый в 00:01 МСК, к предыдущим суткам. Ожидание теста верно, исправлен стенд. Java 21 на этой машине нет, поэтому она на новом JAR не перепроверялась. Подробности и границы — в [сводке исправлений](../../../jury/verify/evidence/2026-11-12-review-fixes/README.md).
+
+## Сборка 11.11.2026 после MF01
+
+Сборка полным Temurin JDK17.0.21+9, compiler release17, Maven3.10.0. Один готовый JAR физически скопирован в четыре выдачи. SHA-256 `2f0158dc67efd6ffec84bc0302c9201407f7f1a8f10eb4f093c8f7e55d199aed`. Проверка совместимости — Homebrew Java 21.0.13.0.3. [Манифест](../../../jury/stand-manifest.md), [область изменения и общие доказательства](../../../jury/verify/evidence/2026-11-11-mf01/README.md).
 
 | Проверка на новом JAR/исходниках | Результат | Доказательство |
 | --- | --- | --- |
-| Регресс исходников Java17/21 | По19 PASS,0 failures/errors/skipped. Новый тест неизвестного клиента до правки падал404≠200; существующий клиент без уведомлений проходил | [До правки](../../../jury/verify/evidence/2026-11-11-mf01/red.log), [XML17](../../../jury/verify/evidence/2026-11-11-mf01/source-java17.xml), [XML21](../../../jury/verify/evidence/2026-11-11-mf01/source-java21.xml) |
-| Полный Java-эталон, Java17 |61 PASS,0 failures/errors/skipped; Maven0, точный XML-каталог подтверждён | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java17-full/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java17-full-check.txt) |
-| Полный Java-эталон, Java21 |61 PASS,0 failures/errors/skipped; Maven0, анализатор0 | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java21-full/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java21-full-check.txt) |
-| Повтор Java21 без reset, случайный порядок seed20261111 |61 PASS,0 failures/errors/skipped; точный состав подтверждён | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java21-random/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java21-random-check.txt) |
-| Четыре выдачи × Java17/21 | Все8 запусков: MF01→404, существующий без уведомлений→200[], health/AMQP/PG SELECT-only/H2/Qpid/Dojo/история30000 | [Матрица](../../../jury/verify/evidence/2026-11-11-mf01/summary.json) |
+| Регресс исходников Java 17/21 | По 19 PASS, 0 failures/errors/skipped. Новый тест неизвестного клиента до правки падал 404≠200; существующий клиент без уведомлений проходил | [До правки](../../../jury/verify/evidence/2026-11-11-mf01/red.log), [XML17](../../../jury/verify/evidence/2026-11-11-mf01/source-java17.xml), [XML21](../../../jury/verify/evidence/2026-11-11-mf01/source-java21.xml) |
+| Полный Java-эталон, Java 17 |61 PASS, 0 failures/errors/skipped; Maven0, точный XML-каталог подтверждён | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java17-full/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java17-full-check.txt) |
+| Полный Java-эталон, Java 21 |61 PASS, 0 failures/errors/skipped; Maven0, анализатор 0 | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java21-full/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java21-full-check.txt) |
+| Повтор Java 21 без reset, случайный порядок seed20261111 |61 PASS, 0 failures/errors/skipped; точный состав подтверждён | [XML](../../../jury/verify/evidence/2026-11-11-mf01/java21-random/), [анализатор](../../../jury/verify/evidence/2026-11-11-mf01/java21-random-check.txt) |
+| Четыре выдачи × Java 17/21 | Все 8 запусков: MF01→404, существующий без уведомлений→200[], health/AMQP/PG SELECT-only/H2/Qpid/Dojo/история 30000 | [Матрица](../../../jury/verify/evidence/2026-11-11-mf01/summary.json) |
 | Общие Python-инструменты, CPython3.11.14 |12+10 unit-проверок PASS | [Каталог XML](../../../jury/verify/evidence/2026-11-11-mf01/tools-unit.log), [выдачи/нагрузочный инструмент](../../../jury/verify/evidence/2026-11-11-mf01/verify-unit.log) |
 
-Состав Java-эталона остался61, F01–F18 и правильные ожидания сохранены. Новые две проверки находятся в регрессе самого стенда, не в выдаче участнику. Существующие проверки уведомлений с данными, комиссии с превышения и полного возврата прошли в полном наборе.
+Состав Java-эталона остался 61, F01–F18 и правильные ожидания сохранены. Новые две проверки находятся в регрессе самого стенда, не в выдаче участнику. Существующие проверки уведомлений с данными, комиссии с превышения и полного возврата прошли в полном наборе.
 
 ## Границы и история
 

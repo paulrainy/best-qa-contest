@@ -38,6 +38,37 @@ class LimitsTest extends BaseTest {
             }
         }
     }
+    @ParameterizedTest
+    @CsvSource({"COMPLETED,50000.00,202", "COMPLETED,50000.01,422", "PROCESSING,50000.01,422"})
+    void accumulatedDailyUsageCountsTowardLimit(String prior, String amount, int code) throws Exception {
+        try (var scope = new GlobalStandScope(api)) {
+            clock("2030-07-10T12:00:00+03:00");
+            var p = data.other();
+            if (prior.equals("PROCESSING"))
+                pause();
+            var first = start(p, "100000");
+            if (prior.equals("COMPLETED"))
+                complete(first);
+            var r = api.createTransfer(
+                    p.fromNumber(), p.toNumber(), new BigDecimal(amount), UUID.randomUUID().toString());
+            assertEquals(code, r.statusCode(), r.asString());
+            var limits = "/api/v1/clients/" + p.clientId() + "/limits";
+            if (code == 202) {
+                complete(api.json(r));
+                money("150000", api.get(limits).get("dailyUsed").decimalValue());
+                // 50 000,00 сверх исчерпанного бесплатного порога: комиссия 1 % = 500,00.
+                money("849500", api.balance(p.fromNumber()));
+            } else {
+                assertEquals("DAILY_LIMIT_EXCEEDED", api.json(r).get("code").asText());
+                money("100000", api.get(limits).get("dailyUsed").decimalValue());
+                money("900000", api.balance(p.fromNumber()));
+            }
+            if (prior.equals("PROCESSING")) {
+                resume();
+                complete(first);
+            }
+        }
+    }
     @Test
     void moscowMidnightResetsDailyLimit() throws Exception {
         try (var scope = new GlobalStandScope(api)) {

@@ -19,4 +19,5 @@ for direction in ('1a-java', '1b-manual', '1c-load', '1d-python'):
 lines = ['# Происхождение стенда', '', 'Сборка: `' + args.java_version + '`; compiler release 17; четыре физические копии одной сборки.', '', 'Хеши фиксируют исходники, параметры, инструкции и runtime. После изменений пересобрать стенд; манифест не править вручную.', '', '| SHA-256 | Путь от корня репозитория |', '| --- | --- |']
 for p in sorted(set(inputs)):
     lines.append('| ' + hashlib.sha256(p.read_bytes()).hexdigest() + ' | ' + p.relative_to(root).as_posix() + ' |')
-(final / 'jury/stand-manifest.md').write_text('\n'.join(lines) + '\n', encoding='utf-8')
+# newline='\n': на Windows текстовый режим иначе пишет CRLF, а файл хранится с LF.
+(final / 'jury/stand-manifest.md').write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')

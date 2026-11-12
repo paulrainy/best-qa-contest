@@ -32,6 +32,29 @@ def test_daily_limit_boundaries(global_stand, db, amount, accepted, source_balan
     assert limits(api, source)["dailyUsed"] == (Decimal(amount) if accepted else Decimal("0.00"))
 
 
+@pytest.mark.parametrize("prior_status", ["COMPLETED", "PROCESSING"], ids=["completed", "processing"])
+def test_accumulated_daily_usage_rejects_excess(global_stand, db, prior_status):
+    api = global_stand
+    source, destination = pair(api, own=False)
+    clock(api, "2051-07-10T12:00:00+03:00")
+    if prior_status == "PROCESSING":
+        api.post("/api/test/consumers/accounting/pause")
+    first = require(api.transfer(source["accountNumber"], destination["accountNumber"],
+                                 Decimal("100000.00"), unique_key()), 202)
+    if prior_status == "COMPLETED":
+        assert wait_final(api, first["transferId"])["status"] == "COMPLETED"
+    # 100 000,00 уже занято в этих сутках: ещё 50 000,01 превышает 150 000,00.
+    response = api.transfer(source["accountNumber"], destination["accountNumber"], Decimal("50000.01"), unique_key())
+    assert require(response, 422)["code"] == "DAILY_LIMIT_EXCEEDED"
+    assert limits(api, source)["dailyUsed"] == Decimal("100000.00")
+    assert db.select("SELECT COUNT(*) AS n FROM transfers WHERE from_account = %s",
+                     (source["accountNumber"],))[0]["n"] == 1
+    if prior_status == "PROCESSING":
+        api.post("/api/test/consumers/accounting/resume")
+        assert wait_final(api, first["transferId"])["status"] == "COMPLETED"
+    balances(api, source, destination, "900000.00", "100000.00")
+
+
 def test_moscow_midnight_resets_daily_limit(global_stand):
     api = global_stand
     source, destination = pair(api, own=False)

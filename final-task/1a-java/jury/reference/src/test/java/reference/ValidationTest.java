@@ -87,9 +87,15 @@ class ValidationTest extends BaseTest {
             money("999900", api.balance(p.fromNumber()));
             money("1000100", api.balance(p.toNumber()));
         } else {
-            assertEquals(sender.equals("CLOSED") || recipient.equals("CLOSED") ? "ACCOUNT_CLOSED"
-                                                                               : "ACCOUNT_BLOCKED",
-                    api.json(r).get("code").asText());
+            String code = api.json(r).get("code").asText();
+            if (sender.equals("BLOCKED") && recipient.equals("CLOSED")) {
+                // ТЗ не задаёт приоритет причин: применимы и блокировка отправителя, и закрытый получатель.
+                assertTrue(Set.of("ACCOUNT_BLOCKED", "ACCOUNT_CLOSED").contains(code), code);
+            } else {
+                assertEquals(sender.equals("CLOSED") || recipient.equals("CLOSED") ? "ACCOUNT_CLOSED"
+                                                                                   : "ACCOUNT_BLOCKED",
+                        code);
+            }
             unchanged(p);
         }
     }

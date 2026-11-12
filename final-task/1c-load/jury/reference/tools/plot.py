@@ -51,13 +51,13 @@ def plot(summary_path, metrics_path, output):
     for interval in summary['intervals']:
         axes[0].hlines(interval['target_rps'], interval['start_s'], interval['end_s'], color='black', linestyle='--')
         axes[0].axvspan(interval['start_s'], interval['end_s'], color='green', alpha=.04)
-    axes[0].set_ylabel('POST/с; окна1с')
+    axes[0].set_ylabel('POST/с; окна 1 с')
     axes[0].legend()
-    axes[1].plot(sorted(per_second), [percentile(per_second[s]) for s in sorted(per_second)], label='p95 принятого POST в окне1с')
-    axes[1].axhline(500, color='red', linestyle='--', label='Порог500мс')
+    axes[1].plot(sorted(per_second), [percentile(per_second[s]) for s in sorted(per_second)], label='p95 принятого POST в окне 1 с')
+    axes[1].axhline(500, color='red', linestyle='--', label='Порог 500 мс')
     axes[1].set(xlabel='Секунды от начала JMeter', ylabel='Время HTTP, мс')
     axes[1].legend()
-    fig.suptitle(f"{summary['profile']}: полная когорта p95={summary['measured']['accepted_post_p95_ms']}мс; {summary['nft_verdict']}")
+    fig.suptitle(f"{summary['profile']}: полная когорта p95={summary['measured']['accepted_post_p95_ms']} мс; {summary['nft_verdict']}")
     save(fig, 'arrivals.png')
 
     fig, axes = plt.subplots(2, 1, figsize=(11, 7), sharex=True)
@@ -94,7 +94,7 @@ def plot(summary_path, metrics_path, output):
         axis.scatter([(timestamp(r['createdAt']) - origin) / 1000 for r in subset],
                      [timestamp(r['completedAt']) - timestamp(r['createdAt']) for r in subset],
                      s=4, alpha=.5, label=status, color=color)
-    axis.axhline(2000, color='red', linestyle='--', label='SLO2с')
+    axis.axhline(2000, color='red', linestyle='--', label='SLO 2 с')
     axis.set(xlabel='Создание: секунды от начала JMeter', ylabel='completedAt−createdAt, мс',
              title=f"В срок: {summary['measured']['within_2s_percent']}%; незавершённых: {summary['measured']['unfinished']}; неизвестных: {summary['measured']['unknown_status']}")
     axis.legend()

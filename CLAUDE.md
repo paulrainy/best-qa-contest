@@ -80,7 +80,7 @@ The full 1c pipeline order (data → dashboards → charts → protocols → she
 # Full JDK 17 (JAVA_HOME), jmods, Maven, Python 3.11+
 bash final-task/jury/build-stand.sh
 python3 final-task/jury/verify/check_distribution.py --check
-bash final-task/1a-java/participant/stand/run.sh  # Java 17 or21, ports18400/5672/19400/19402
+bash final-task/1a-java/participant/stand/run.sh  # Java 17 or 21, ports 18400/5672/19400/19402
 python3 final-task/jury/verify/verify_defects.py controls
 python3 final-task/jury/verify/verify_defects.py
 python3 -m unittest discover -s final-task/jury/tools
@@ -88,7 +88,7 @@ python3 -m unittest discover -s final-task/jury/verify
 cd final-task/1a-java/jury/reference && mvn test
 ```
 
-Verify scripts reset data. Ready JAR, runtime libraries and console ZIP are in each direction's `participant/stand/`, tracked via Git LFS. Build once, physically copy to four bundles. Run the same binaries on Java17/21. Sources stay in `jury/stand-src/`. Canonical contract: `jury/source/spec.md`; coverage: `jury/coverage-catalog.md`; provenance: `jury/stand-manifest.md`. Participant instructions are Markdown, no starters.
+Verify scripts reset data. Ready JAR, runtime libraries and console ZIP are in each direction's `participant/stand/`, tracked via Git LFS. Build once, physically copy to four bundles. Run the same binaries on Java 17/21. Sources stay in `jury/stand-src/`. Canonical contract: `jury/source/spec.md`; coverage: `jury/coverage-catalog.md`; provenance: `jury/stand-manifest.md`. Participant instructions are Markdown, no starters.
 
 The final task builds testing from scratch. The user removed all deliberately seeded final-stand defects: F10/F16 are ordinary passing requirement checks, and accounting has no artificial delay or prefetch=1 restriction. Other seeded review-exercise quotas do not apply. Java/Python full reference runs must pass every registered testcase without failures, errors or skips; `jury/tools/check_reference_results.py` verifies the exact inventory and rejects every failure. Other reference directions require their own approved plans. Scoring comes after all four references.
 

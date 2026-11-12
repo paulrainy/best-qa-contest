@@ -10,7 +10,9 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Deque;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,6 +34,11 @@ final class Messaging {
     private Channel publishChannel;
     private Channel monitorChannel;
     private volatile long accountingDepth;
+    /** События уже зафиксированных операций, которые не удалось опубликовать сразу. */
+    private final Deque<Deferred> deferred = new ConcurrentLinkedDeque<>();
+
+    private record Deferred(String routingKey, JsonNode event) {
+    }
 
     Messaging(Main.Config cfg) {
         this.cfg = cfg;
@@ -56,6 +63,7 @@ final class Messaging {
             return t;
         });
         s.scheduleWithFixedDelay(this::refreshDepth, 0, 250, TimeUnit.MILLISECONDS);
+        s.scheduleWithFixedDelay(this::publishDeferred, 500, 500, TimeUnit.MILLISECONDS);
         System.out.println("  подключение к брокеру установлено");
     }
 
@@ -74,10 +82,51 @@ final class Messaging {
     }
 
     synchronized void redeclareAndPurge() throws Exception {
-        declareTopology(publishChannel);
-        publishChannel.queuePurge(Q_ACCOUNTING);
-        publishChannel.queuePurge(Q_NOTIFICATIONS);
-        publishChannel.queuePurge(Q_DLQ);
+        // Отложенные события относятся к данным, которые сброс удаляет.
+        deferred.clear();
+        Channel ch = publishChannel();
+        declareTopology(ch);
+        ch.queuePurge(Q_ACCOUNTING);
+        ch.queuePurge(Q_NOTIFICATIONS);
+        ch.queuePurge(Q_DLQ);
+    }
+
+    /** Канал публикации; закрытый ошибкой канал открывается заново, иначе публикация не восстановится. */
+    private Channel publishChannel() throws Exception {
+        if (!publishChannel.isOpen()) {
+            publishChannel = connection.createChannel();
+        }
+        return publishChannel;
+    }
+
+    /**
+     * Публикация события после commit. Операция уже зафиксирована, поэтому сбой публикации не должен ни
+     * терять событие, ни превращать принятый перевод в ошибку: событие откладывается и повторяется.
+     */
+    void publishCommitted(String routingKey, JsonNode event) {
+        try {
+            publish(routingKey, event);
+        } catch (Exception e) {
+            System.out.println("[mq] публикация " + routingKey + " отложена: " + e);
+            deferred.offerLast(new Deferred(routingKey, event));
+        }
+    }
+
+    int deferredCount() {
+        return deferred.size();
+    }
+
+    private void publishDeferred() {
+        Deferred d;
+        // Событие снимается до публикации: после доставки потребителю оно уже не числится отложенным.
+        while ((d = deferred.pollFirst()) != null) {
+            try {
+                publish(d.routingKey(), d.event());
+            } catch (Exception e) {
+                deferred.offerFirst(d);
+                return;
+            }
+        }
     }
 
     synchronized void publish(String routingKey, JsonNode event) throws Exception {
@@ -88,7 +137,7 @@ final class Messaging {
                 .messageId(event.path("eventId").asString(UUID.randomUUID().toString()))
                 .type(event.path("eventType").asString(""))
                 .build();
-        publishChannel.basicPublish(EXCHANGE, routingKey, props, JSON.writeValueAsBytes(event));
+        publishChannel().basicPublish(EXCHANGE, routingKey, props, JSON.writeValueAsBytes(event));
     }
 
     synchronized void toDlq(byte[] body, String sourceQueue, String error) throws Exception {
@@ -97,7 +146,7 @@ final class Messaging {
                 .deliveryMode(2)
                 .headers(Map.of("x-source-queue", sourceQueue, "x-error", error))
                 .build();
-        publishChannel.basicPublish("", Q_DLQ, props, body);
+        publishChannel().basicPublish("", Q_DLQ, props, body);
     }
 
     private void refreshDepth() {

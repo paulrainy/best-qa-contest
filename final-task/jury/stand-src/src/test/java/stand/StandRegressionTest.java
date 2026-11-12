@@ -2,7 +2,14 @@ package stand;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Envelope;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
+import java.net.*;
 import java.net.URI;
 import java.net.http.*;
 import java.sql.*;
@@ -18,6 +25,7 @@ class StandRegressionTest {
     static Db db;
     static Messaging mq;
     static AccountingConsumer accounting;
+    static NotificationConsumer notifications;
     static StandClock clock;
     static TransferService service;
     static HttpClient http = HttpClient.newHttpClient();
@@ -39,7 +47,7 @@ class StandRegressionTest {
         mq.start();
         accounting = new AccountingConsumer(db, mq, clock, metrics);
         accounting.start();
-        NotificationConsumer notifications = new NotificationConsumer(db, mq, clock);
+        notifications = new NotificationConsumer(db, mq, clock);
         notifications.start();
         service = new TransferService(db, mq, clock, metrics);
         new Api(cfg, db, mq, clock, metrics, service, accounting, notifications).start();
@@ -91,6 +99,36 @@ class StandRegressionTest {
     }
     static void money(String expected, BigDecimal actual) {
         assertEquals(0, new BigDecimal(expected).compareTo(actual));
+    }
+    static JsonNode notificationsOf(JsonNode account, int expected) throws Exception {
+        long until = System.nanoTime() + Duration.ofSeconds(3).toNanos();
+        JsonNode ns;
+        do {
+            ns = json(request("GET", "/api/v1/clients/" + account.get("clientId").asString() + "/notifications", ""));
+            if (ns.size() >= expected)
+                return ns;
+            Thread.sleep(20);
+        } while (System.nanoTime() < until);
+        return ns;
+    }
+    /**
+     * Барьер вместо паузы: маркерный перевод публикуется позже проверяемого сообщения и проходит обе очереди
+     * по порядку, поэтому после его уведомления раньше опубликованное уже обработано.
+     */
+    static void drained() throws Exception {
+        JsonNode x = account(null, "ACTIVE"), y = account(null, "ACTIVE");
+        done(create(x, y, "10"));
+        assertEquals(1, notificationsOf(x, 1).size());
+    }
+    /** Канал-заглушка: записывает ack/nack вместо обращения к брокеру. */
+    static Channel recordingChannel(List<String> calls) {
+        return (Channel) Proxy.newProxyInstance(Channel.class.getClassLoader(), new Class<?>[] {Channel.class},
+                (proxy, method, args) -> switch (method.getName()) {
+                    case "basicAck" -> { calls.add("ack"); yield null; }
+                    case "basicNack" -> { calls.add("nack:requeue=" + args[2]); yield null; }
+                    case "isOpen" -> true;
+                    default -> throw new UnsupportedOperationException(method.getName());
+                });
     }
     @Test
     void notificationsForUnknownClientReturn404() throws Exception {
@@ -234,7 +272,7 @@ class StandRegressionTest {
         ev.put("commission", t.get("commission").decimalValue());
         ev.put("totalDebited", new BigDecimal("3491.35"));
         mq.publish("transfer.created", ev);
-        Thread.sleep(250);
+        drained();
         JsonNode dest = json(request("GET", "/api/v1/accounts/" + b.get("accountNumber").asString(), ""));
         money("1103456.78", dest.get("balance").decimalValue());
     }
@@ -278,6 +316,20 @@ class StandRegressionTest {
         money("100", report.get("totalAmount").decimalValue());
     }
     @Test
+    void turnoverUsesMoscowCompletionDateInNonMoscowJvm() throws Exception {
+        assertNotEquals(ZoneId.of("Europe/Moscow").getRules().getOffset(Instant.now()),
+                TimeZone.getDefault().toZoneId().getRules().getOffset(Instant.now()), "регресс должен идти не в МСК");
+        clock.set(Instant.parse("2027-09-09T09:00:00Z"));
+        JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
+        accounting.pause();
+        JsonNode t = create(a, b, "100");
+        clock.set(OffsetDateTime.parse("2027-09-10T00:01:00+03:00").toInstant());
+        accounting.start();
+        assertEquals("2027-09-10T00:01", done(t).get("completedAt").asString().substring(0, 16));
+        assertEquals(0, json(request("GET", "/api/v1/reports/turnover?date=2027-09-09", "")).get("transfersCount").asInt());
+        assertEquals(1, json(request("GET", "/api/v1/reports/turnover?date=2027-09-10", "")).get("transfersCount").asInt());
+    }
+    @Test
     void repeatedCompletionDoesNotDuplicateNotification() throws Exception {
         JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
         JsonNode t = done(create(a, b, "100"));
@@ -286,10 +338,83 @@ class StandRegressionTest {
         ev.put("transferId", t.get("transferId").asString());
         ev.put("commission", 0);
         mq.publish("transfer.completed", ev);
-        Thread.sleep(300);
+        drained();
         JsonNode ns = json(
                 request("GET", "/api/v1/clients/" + a.get("clientId").asString() + "/notifications", ""));
         assertEquals(1, ns.size());
+    }
+    @Test
+    void notificationFailureIsRetriedThreeTimesThenDlqWithoutBlocking() throws Exception {
+        JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
+        ObjectNode unknownSender = body(a, b, "100");
+        unknownSender.put("eventType", "TransferCompleted");
+        unknownSender.put("transferId", UUID.randomUUID().toString());
+        unknownSender.put("fromAccount", "40817810999999999999");
+        unknownSender.put("commission", 0);
+        ObjectNode withoutId = body(a, b, "100");
+        withoutId.put("eventType", "TransferCompleted");
+        withoutId.put("commission", 0);
+        for (ObjectNode event : List.of(unknownSender, withoutId)) {
+            long dlq = mq.depth(Messaging.Q_DLQ);
+            List<String> calls = new ArrayList<>();
+            Channel ch = recordingChannel(calls);
+            byte[] bytes = Messaging.JSON.writeValueAsBytes(event);
+            for (int i = 1; i <= 3; i++)
+                notifications.handle(ch, new Envelope(i, false, "", ""), new AMQP.BasicProperties(), bytes);
+            assertEquals(List.of("nack:requeue=true", "nack:requeue=true", "ack"), calls, event.toString());
+            long until = System.nanoTime() + Duration.ofSeconds(3).toNanos();
+            while (mq.depth(Messaging.Q_DLQ) == dlq && System.nanoTime() < until) Thread.sleep(20);
+            assertEquals(dlq + 1, mq.depth(Messaging.Q_DLQ));
+        }
+        // Реальная очередь не заблокирована: следующее уведомление доставляется.
+        drained();
+    }
+    @Test
+    void eventOfCommittedTransferIsDeferredWhenPublishFails() throws Exception {
+        Field field = Messaging.class.getDeclaredField("publishChannel");
+        field.setAccessible(true);
+        Channel real = (Channel) field.get(mq);
+        Channel broken = (Channel) Proxy.newProxyInstance(Channel.class.getClassLoader(),
+                new Class<?>[] {Channel.class}, (proxy, method, args) -> switch (method.getName()) {
+                    case "isOpen" -> true;
+                    case "basicPublish" -> throw new IOException("брокер недоступен");
+                    default -> method.invoke(real, args);
+                });
+        JsonNode a = account(null, "ACTIVE"), b = account(null, "ACTIVE");
+        JsonNode t;
+        synchronized (mq) {
+            field.set(mq, broken);
+        }
+        try {
+            t = create(a, b, "100");
+            assertEquals("PROCESSING", t.get("status").asString());
+            assertEquals(1, mq.deferredCount());
+        } finally {
+            synchronized (mq) {
+                field.set(mq, real);
+            }
+        }
+        assertEquals("COMPLETED", done(t).get("status").asString());
+        assertEquals(0, mq.deferredCount());
+        money("999900", json(request("GET", "/api/v1/accounts/" + a.get("accountNumber").asString(), ""))
+                .get("balance").decimalValue());
+    }
+    @Test
+    void httpListensOnlyOnLoopback() throws Exception {
+        InetAddress external = null;
+        for (NetworkInterface nic : Collections.list(NetworkInterface.getNetworkInterfaces()))
+            if (nic.isUp() && !nic.isLoopback())
+                for (InetAddress address : Collections.list(nic.getInetAddresses()))
+                    if (address instanceof Inet4Address && !address.isLinkLocalAddress())
+                        external = address;
+        Assumptions.assumeTrue(external != null, "нет сетевого IPv4-адреса");
+        InetAddress target = external;
+        assertThrows(IOException.class, () -> {
+            try (Socket s = new Socket()) {
+                s.connect(new InetSocketAddress(target, 18410), 3000);
+            }
+        });
+        assertEquals(200, request("GET", "/api/v1/health", "").statusCode());
     }
     @Test
     void usageAggregatesOnlyCurrentClientPeriodAndNonFailedOther() throws Exception {

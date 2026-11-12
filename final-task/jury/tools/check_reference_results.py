@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+REJECTED_TAGS = ('failure', 'error', 'skipped', 'flakyFailure', 'flakyError', 'rerunFailure', 'rerunError')
+
 
 def validate_reports(directory, expected):
     errors, seen = [], set()
@@ -26,7 +28,8 @@ def validate_reports(directory, expected):
             if identity in seen:
                 errors.append(f'{identity}: повторный результат')
             seen.add(identity)
-            bad = [c for c in case if c.tag in ('failure', 'error', 'skipped')]
+            # Surefire с rerunFailingTestsCount пишет flaky*/rerun*: падение, прошедшее при повторе, тоже отказ.
+            bad = [c for c in case if c.tag in REJECTED_TAGS]
             if not bad:
                 continue
             for failure in bad:

@@ -1,6 +1,6 @@
 # Трассировка F01–F18
 
-[Контракт](../../../jury/source/spec.md), [общий каталог](../../../jury/coverage-catalog.md). Пути классов ниже — `src/test/java/reference/`. Варианты параметризованных методов входят в [точный каталог XML](../../../jury/tools/reference-test-catalog.json); всего 61 testcase, включая 3 проверки поддержки. Это состав эталона, а не квота для участника.
+[Контракт](../../../jury/source/spec.md), [общий каталог](../../../jury/coverage-catalog.md). Пути классов ниже — `src/test/java/reference/`. Варианты параметризованных методов входят в [точный каталог XML](../../../jury/tools/reference-test-catalog.json); всего 65 testcase, включая 3 проверки поддержки. Это состав эталона, а не квота для участника.
 
 | ID | Методы | Проверяемый результат |
 | --- | --- | --- |
@@ -9,12 +9,12 @@
 | F03 | `TransferTest.otherTransferWithinFreeThreshold` | OTHER, нулевая комиссия, сохранение копейки |
 | F04 | `ValidationTest.amountBoundaries` (5 вариантов) | 9,99 и 300 000,01/10,001 отклонены без движения; 10,00 и 300 000,00 OWN приняты |
 | F05 | `ValidationTest.invalidPayloadLeavesMoneyUntouched` (7), `unknownAccountIs404` (2), `invalidKeyIs400` (2); `TransferTest.insufficientFundsLeaveNoTransfer` | Структурные ошибки, неизвестные счета, ключ, недостаток денег; код/тело и отсутствие побочных переводов |
-| F06 | `ValidationTest.accountStatusMatrix` (18) | Все сочетания ACTIVE/BLOCKED/CLOSED для OWN и OTHER, деньги при отказе не меняются |
+| F06 | `ValidationTest.accountStatusMatrix` (18) | Все сочетания ACTIVE/BLOCKED/CLOSED для OWN и OTHER, деньги при отказе не меняются. Для BLOCKED→CLOSED принимается ACCOUNT_BLOCKED или ACCOUNT_CLOSED: ТЗ не задаёт приоритет |
 | F07 | `ValidationTest.selfTransferIsValidationError` | 400 VALIDATION_ERROR, без перевода и списания |
-| F08 | `LimitsTest.dailyLimitBoundaries` (3), `failedTransferReleasesUsage` | 149 999,99 / 150 000,00 приняты, 150 000,01 отклонён; FAILED освобождает использование. Бесплатный порог исчерпан предыдущим днём, F10 не влияет |
+| F08 | `LimitsTest.dailyLimitBoundaries` (3), `accumulatedDailyUsageCountsTowardLimit` (3), `failedTransferReleasesUsage` | 149 999,99 / 150 000,00 приняты, 150 000,01 отклонён; при уже занятых 100 000,00 в тех же сутках 50 000,00 принят, 50 000,01 отклонён, в том числе когда первый перевод ещё PROCESSING; FAILED освобождает использование. Бесплатный порог в границах исчерпан предыдущим днём, F10 не влияет |
 | F09 | `LimitsTest.moscowMidnightResetsDailyLimit` | 23:59 → 00:01 МСК обнуляет дневное использование |
 | F10 | `CommissionTest.thresholdCrossingChargesOnlyExcess` | Требование комиссии 100,00 после 90 000 + 20 000; обычная проверка корректного поведения |
-| F11 | `CommissionTest.minimumAndHalfUpAfterThreshold` (2), `LimitsTest.calendarMonthResetsFreeThreshold` | Минимум 30,00; 34,5678 → 34,57; новый месяц обнуляет бесплатный порог |
+| F11 | `CommissionTest.minimumAndHalfUpAfterThreshold` (3), `LimitsTest.calendarMonthResetsFreeThreshold` | Минимум 30,00; 34,5678 → 34,57; точная половина 30,005 → 30,01; новый месяц обнуляет бесплатный порог |
 | F12 | `IdempotencyTest.sameBodyReturnsOriginalWithoutSecondDebit` | 100 и 100,00 равнозначны; один transferId, одна строка и две проводки, одно списание |
 | F13 | `IdempotencyTest.differentBodyReturns409`, `keyIsGlobalAcrossClients`, `expiredKeyCreatesNewOperation` | Конфликт до истечения; область всех клиентов; новая операция через 24 ч, история сохранена |
 | F14 | `EventsTest.createdEventAndPostingsMatchOwnTransfer` | Подписка до запроса, eventId/transferId/поля/денежные суммы, проводки по своему ID |

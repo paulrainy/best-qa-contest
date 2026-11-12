@@ -87,7 +87,7 @@ if (vars.get('fromClient') == vars.get('toClient') || vars.get('fromAccount') ==
             <stringProp name="parameters"/>
             <stringProp name="script"><![CDATA[
 def code = prev.getResponseCode()
-def category = code == '503' ? 'overload_503' : code == '200' ? 'application_rejection' : code.contains('Timeout') ? 'timeout' : 'http_or_transport_error'
+def category = code == '503' ? 'overload_503' : code == '422' ? 'application_rejection' : code.contains('Timeout') ? 'timeout' : 'http_or_transport_error'
 try {
     def body = new groovy.json.JsonSlurper().parseText(prev.getResponseDataAsString())
     ['transferId','createdAt','status'].each { key ->

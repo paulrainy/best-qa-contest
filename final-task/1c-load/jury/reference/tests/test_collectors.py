@@ -6,12 +6,20 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from tools.collect_metrics import parse_metrics, generator_stats
+from tools.collect_metrics import parse_metrics, generator_stats, java_child
 from tools.collect_transfers import collect
 from test_analysis import row, final
 
 
 class CollectorTests(unittest.TestCase):
+    def test_java_child_is_found_by_process_name_on_linux_and_macos(self):
+        linux = ['  100     1 bash', '  200   100 java', '  300   200 java']
+        macos = ['  100     1 /bin/sh', '  200   100 /Library/Java/jdk-17/Contents/Home/bin/java']
+        self.assertEqual(java_child(linux, 100), 200)
+        self.assertEqual(java_child(macos, 100), 200)
+        self.assertEqual(java_child(['  200   100 javac'], 100), 100)
+        self.assertEqual(java_child([], 100), 100)
+
     def test_real_local_process_resources_are_readable(self):
         result = generator_stats(os.getpid())
         self.assertNotIn('generatorError', result)

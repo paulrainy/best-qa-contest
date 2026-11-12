@@ -1,0 +1,126 @@
+{
+  "startedAtMs": 1794493852222,
+  "python": "3.11.18 (main, Oct 26 2026, 14:08:50) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\.venv\\Scripts\\python.exe",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "machine": "AMD64",
+  "cpuCount": 4,
+  "java": {
+    "command": [
+      "C:\\paul\\best-qa-contest\\review-tasks\\1c-load-review\\participant\\1-scripts\\tools\\java\\windows-x64\\bin\\java",
+      "-version"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": "openjdk version \"17.0.21\" 2026-10-20\nOpenJDK Runtime Environment Temurin-17.0.21+9 (build 17.0.21+9)\nOpenJDK 64-Bit Server VM Temurin-17.0.21+9 (build 17.0.21+9, mixed mode, sharing)\n"
+  },
+  "jmeter": {
+    "command": [
+      "C:\\paul\\best-qa-contest\\review-tasks\\1c-load-review\\participant\\1-scripts\\tools\\apache-jmeter-5.6.3\\bin\\jmeter.bat",
+      "-v"
+    ],
+    "exit": 0,
+    "stdout": "WARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\nWARN StatusConsoleListener The use of package scanning to locate plugins is deprecated and will be removed in a future release\n    _    ____   _    ____ _   _ _____       _ __  __ _____ _____ _____ ____\n   / \\  |  _ \\ / \\  / ___| | | | ____|     | |  \\/  | ____|_   _| ____|  _ \\\n  / _ \\ | |_) / _ \\| |   | |_| |  _|    _  | | |\\/| |  _|   | | |  _| | |_) |\n / ___ \\|  __/ ___ \\ |___|  _  | |___  | |_| | |  | | |___  | | | |___|  _ <\n/_/   \\_\\_| /_/   \\_\\____|_| |_|_____|  \\___/|_|  |_|_____| |_| |_____|_| \\_\\ 5.6.3\n\nCopyright (c) 1999-2024 The Apache Software Foundation\n\n",
+    "stderr": ""
+  },
+  "colocated": true,
+  "baseUrl": "http://localhost:18400",
+  "standPid": 4816,
+  "standJarSha256": "220d02c815017de6b22c2d3f16c6b97a1495279c1ae9c5a8029d4f3a8be0f5a2",
+  "hashes": {
+    "tools\\__init__.py": "7b2badfeb61a6be3be1b7ae6114b5301543143a384fe1373c6e41b2a983bb5d7",
+    "tools\\analyse.py": "8ee9fd34598a9b61808ffb3558a23e6bff3302370c19c0d17d3166df87190366",
+    "tools\\collect_metrics.py": "feef6a2b376a6b49450a04076dbd871a0c02e5bef9724a3effd607a3c5a3d744",
+    "tools\\collect_transfers.py": "860c7e71365c0bc1376df9a489c38f7931b488b653f7cc502b315462f846f4c9",
+    "tools\\common.py": "222f75d15e3d9d247a4bbb133750a0544ae9a54b6fbf301d344edfdb73e56bbb",
+    "tools\\plot.py": "d74193e1c0cde84c0695e00155bcc3b054296ca0ecabff3e7e9bdde7b2261b89",
+    "tools\\prepare_data.py": "901e7416db4fc3f675a91c7f82d05949520661d2949bedacd61a00c2c29af16b",
+    "tools\\run.py": "9de9385b1f0dc38aca97339942a6ab63f50d50e4b95881b36539b60d97e1f4f0"
+  },
+  "jmxSha256": "f6ce263f597483b13e9e6af33ef616a6dacfb83a2cf71f59fd12fe5a77f8ceac",
+  "profileSha256": "e9fb8d42692ac8cc60f94a162262d6ff5f58e3a69044ec8f65190845a1315718",
+  "requirementsSha256": "a2db73e75e51e3e17c1a84d7cb2d10d10acb19304fbc7bb07a106df99c2ca6ce",
+  "packages": {
+    "contourpy": "1.3.3",
+    "cycler": "0.12.1",
+    "fonttools": "4.68.0",
+    "kiwisolver": "1.5.1",
+    "matplotlib": "3.11.2",
+    "numpy": "2.4.6",
+    "packaging": "26.3",
+    "pillow": "13.0.0",
+    "pyparsing": "3.3.3",
+    "python-dateutil": "4.0.0",
+    "tzdata": "2026.6"
+  },
+  "environment": {
+    "JAVA_HOME": "C:\\paul\\best-qa-contest\\review-tasks\\1c-load-review\\participant\\1-scripts\\tools\\java\\windows-x64",
+    "HEAP": "-Xms256m -Xmx1g",
+    "JVM_ARGS": null,
+    "JAVA_TOOL_OPTIONS": null
+  },
+  "hardware": {
+    "command": [
+      "powershell",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "[Console]::OutputEncoding=[Text.Encoding]::UTF8; $c=Get-CimInstance Win32_Processor; $s=Get-CimInstance Win32_ComputerSystem; $o=Get-CimInstance Win32_OperatingSystem; \"cpu=$($c.Name); logical=$($s.NumberOfLogicalProcessors); ramBytes=$($s.TotalPhysicalMemory); model=$($s.Manufacturer) $($s.Model); os=$($o.Caption) $($o.Version) $($o.OSArchitecture)\""
+    ],
+    "exit": 0,
+    "stdout": "cpu=Intel(R) Pentium(R) CPU G4560 @ 3.50GHz; logical=4; ramBytes=12842504192; model=Gigabyte Technology Co., Ltd. H110M-M.2; os=Microsoft Windows 11 Pro 10.0.26200 64-bit\n",
+    "stderr": ""
+  },
+  "javaOnPath": {
+    "command": [
+      "where",
+      "java"
+    ],
+    "exit": 0,
+    "stdout": "C:\\paul\\best-qa-contest\\review-tasks\\1c-load-review\\participant\\1-scripts\\tools\\java\\windows-x64\\bin\\java.exe\nC:\\Program Files\\Eclipse Adoptium\\jdk-25.0.5.8-hotspot\\bin\\java.exe\n",
+    "stderr": ""
+  },
+  "standCommand": {
+    "command": [
+      "powershell",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "[Console]::OutputEncoding=[Text.Encoding]::UTF8; (Get-CimInstance Win32_Process -Filter \"ProcessId=4816\").CommandLine"
+    ],
+    "exit": 0,
+    "stdout": "C:\\Temp\\claude\\dc5eee4154292e8f\\45999d8a-bf8a-4efa-86f4-170af2de8b98\\scratchpad\\jdk17-download\\extracted\\jdk-17.0.21+9\\bin\\java.exe -jar transfer-stand.jar\n",
+    "stderr": ""
+  },
+  "command": [
+    "C:\\paul\\best-qa-contest\\review-tasks\\1c-load-review\\participant\\1-scripts\\tools\\apache-jmeter-5.6.3\\bin\\jmeter.bat",
+    "-n",
+    "-t",
+    "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\transfers.jmx",
+    "-q",
+    "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\profiles\\confirmation.properties",
+    "-Jaccounts.file=C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\build\\review-20261112\\confirmation\\accounts.csv",
+    "-Jhttp.protocol=http",
+    "-Jhttp.host=localhost",
+    "-Jhttp.port=18400",
+    "-l",
+    "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\build\\review-20261112\\confirmation\\samples.jtl",
+    "-j",
+    "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\build\\review-20261112\\confirmation\\jmeter.log",
+    "-e",
+    "-o",
+    "C:\\paul\\best-qa-contest\\final-task\\1c-load\\jury\\reference\\build\\review-20261112\\confirmation\\html"
+  ],
+  "jmeterLauncherPid": 18152,
+  "jmeterExit": 0,
+  "postRunClock": {
+    "now": "2026-11-12T17:34:47.851350800+03:00",
+    "shifted": false
+  },
+  "postRunConsumers": {
+    "accounting": "RUNNING",
+    "notifications": "RUNNING"
+  },
+  "plotExit": 0,
+  "finishedAtMs": 1794494093165
+}

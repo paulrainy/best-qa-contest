@@ -16,7 +16,8 @@ class CommissionTest extends BaseTest {
                 .isEqualByComparingTo("100.00");
     }
     @ParameterizedTest
-    @CsvSource({"10.00,30.00", "3456.78,34.57"})
+    // 3000,50 × 1 % = 30,005: точная половина копейки округляется вверх.
+    @CsvSource({"10.00,30.00", "3456.78,34.57", "3000.50,30.01"})
     void minimumAndHalfUpAfterThreshold(String amount, String fee) throws Exception {
         var p = data.other();
         complete(start(p, "100000"));

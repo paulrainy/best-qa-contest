@@ -23,17 +23,12 @@ final class AccountingConsumer extends PausableConsumer {
     private final Db db;
     private final StandClock clock;
     private final Metrics metrics;
-    private final Map<String, Integer> attempts = new ConcurrentHashMap<>();
 
     AccountingConsumer(Db db, Messaging mq, StandClock clock, Metrics metrics) {
         super("accounting", Messaging.Q_ACCOUNTING, mq);
         this.db = db;
         this.clock = clock;
         this.metrics = metrics;
-    }
-
-    void clearAttempts() {
-        attempts.clear();
     }
 
     @Override
@@ -97,7 +92,7 @@ final class AccountingConsumer extends PausableConsumer {
                 out.put("reason", "RECIPIENT_ACCOUNT_CLOSED");
                 out.put("refundedAmount", refund);
                 c.commit();
-                mq.publish("transfer.failed", out);
+                mq.publishCommitted("transfer.failed", out);
                 metrics.transfer("failed");
             } else {
                 BigDecimal credited = amount;
@@ -106,33 +101,17 @@ final class AccountingConsumer extends PausableConsumer {
                 finish(c, transferId, "COMPLETED", null, at);
                 out.put("eventType", "TransferCompleted");
                 c.commit();
-                mq.publish("transfer.completed", out);
+                mq.publishCommitted("transfer.completed", out);
                 metrics.transfer("completed");
             }
             OffsetDateTime created = OffsetDateTime.parse(transfer.get("createdAt").asString());
             metrics.completion(Math.max(0, Duration.between(created.toInstant(), now).toMillis() / 1000.0));
             metrics.processedMessage();
-            attempts.remove(key(body));
+            forgetAttempts(body);
             ch.basicAck(tag, false);
         } catch (Exception e) {
             retryOrDlq(ch, tag, body, "Ошибка обработки: " + e.getMessage());
         }
-    }
-
-    private void retryOrDlq(Channel ch, long tag, byte[] body, String error) throws Exception {
-        String k = key(body);
-        int n = attempts.merge(k, 1, Integer::sum);
-        if (n >= 3) {
-            attempts.remove(k);
-            mq.toDlq(body, Messaging.Q_ACCOUNTING, error);
-            ch.basicAck(tag, false);
-        } else {
-            ch.basicNack(tag, false, true);
-        }
-    }
-
-    private static String key(byte[] body) {
-        return Integer.toHexString(java.util.Arrays.hashCode(body)) + ":" + body.length;
     }
 
     private static void require(JsonNode n, String field) {
@@ -170,6 +149,7 @@ abstract class PausableConsumer {
     final String queue;
     final Messaging mq;
     private final Object handling = new Object();
+    private final Map<String, Integer> attempts = new ConcurrentHashMap<>();
     private Channel channel;
     private volatile String tag;
 
@@ -185,6 +165,31 @@ abstract class PausableConsumer {
 
     protected abstract void handle(Channel ch, Envelope env, AMQP.BasicProperties props, byte[] body)
             throws Exception;
+
+    /** ТЗ, раздел 8: сообщение, не обработанное три раза подряд, уходит в DLQ и не блокирует остальные. */
+    protected final void retryOrDlq(Channel ch, long tag, byte[] body, String error) throws Exception {
+        String k = key(body);
+        int n = attempts.merge(k, 1, Integer::sum);
+        if (n >= 3) {
+            attempts.remove(k);
+            mq.toDlq(body, queue, error);
+            ch.basicAck(tag, false);
+        } else {
+            ch.basicNack(tag, false, true);
+        }
+    }
+
+    protected final void forgetAttempts(byte[] body) {
+        attempts.remove(key(body));
+    }
+
+    void clearAttempts() {
+        attempts.clear();
+    }
+
+    private static String key(byte[] body) {
+        return Integer.toHexString(java.util.Arrays.hashCode(body)) + ":" + body.length;
+    }
 
     synchronized void start() throws Exception {
         if (tag != null) {

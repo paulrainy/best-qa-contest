@@ -158,7 +158,7 @@ final class TransferService {
             event.put("occurredAt", createdAt.toString());
             ObjectNode result = findById(c, id);
             c.commit();
-            mq.publish("transfer.created", event);
+            mq.publishCommitted("transfer.created", event);
             metrics.transfer("created");
 
             return new Result(202, result);

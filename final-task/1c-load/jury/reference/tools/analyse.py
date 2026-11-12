@@ -23,7 +23,7 @@ def classify(row):
     code = row.get('responseCode', '')
     if code == '503':
         return 'overload_503'
-    if code == '200':
+    if code == '422':
         return 'application_rejection'
     if 'Timeout' in code or 'timeout' in code:
         return 'timeout'
